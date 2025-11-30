@@ -10,3 +10,8 @@ export interface Approval {
 }
 
 export type GetApprovalsResponse = Approval[];
+
+export interface ApprovalActionRequest {
+  id: number;
+  action: 'APPROVED' | 'REJECTED';
+}
