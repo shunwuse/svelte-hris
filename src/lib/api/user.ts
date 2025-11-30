@@ -1,7 +1,8 @@
 import { api } from './client';
 import type {
   GetUsersResponse,
-  CreateUserRequest
+  CreateUserRequest,
+  UpdateUserRequest
 } from '$lib/types';
 
 export function getUsers(token: string): Promise<GetUsersResponse> {
@@ -15,6 +16,15 @@ export function createUser(
   token: string
 ): Promise<string> {
   return api.post<string>('/users', data, {
+    Authorization: `Bearer ${token}`
+  });
+}
+
+export function updateUser(
+  data: UpdateUserRequest,
+  token: string
+): Promise<string> {
+  return api.put<string>('/users', data, {
     Authorization: `Bearer ${token}`
   });
 }

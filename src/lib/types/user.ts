@@ -16,3 +16,8 @@ export interface CreateUserRequest {
   name: string;
   role: 'manager' | 'staff';
 }
+
+export interface UpdateUserRequest {
+  id: number;
+  name?: string;
+}
