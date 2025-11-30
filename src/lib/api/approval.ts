@@ -8,3 +8,9 @@ export function getApprovals(token: string): Promise<GetApprovalsResponse> {
     Authorization: `Bearer ${token}`
   });
 }
+
+export function createApproval(token: string): Promise<string> {
+  return api.post<string>('/approvals', {}, {
+    Authorization: `Bearer ${token}`
+  });
+}
