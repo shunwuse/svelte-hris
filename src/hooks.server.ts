@@ -18,5 +18,8 @@ export const handle: Handle = async ({ event, resolve }) => {
     redirect(303, '/');
   }
 
+  // Store token in locals for use in server load/actions
+  event.locals.token = token ?? '';
+
   return resolve(event);
 };

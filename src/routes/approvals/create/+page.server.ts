@@ -1,18 +1,11 @@
 import type { Actions } from './$types';
 import { redirect } from '@sveltejs/kit';
-import { COOKIE_KEYS } from '$lib/constants';
 import { createApproval, ApiClientError } from '$lib/api';
 
 export const actions: Actions = {
-  default: async ({ cookies }) => {
-    const token = cookies.get(COOKIE_KEYS.AUTH_TOKEN);
-
-    if (!token) {
-      redirect(303, '/login');
-    }
-
+  default: async ({ locals }) => {
     try {
-      await createApproval(token);
+      await createApproval(locals.token);
     } catch (err) {
       if (err instanceof ApiClientError) {
         return { error: err.message };

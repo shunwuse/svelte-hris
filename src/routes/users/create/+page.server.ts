@@ -1,16 +1,9 @@
 import type { Actions } from './$types';
 import { fail, redirect } from '@sveltejs/kit';
-import { COOKIE_KEYS } from '$lib/constants';
 import { createUser, ApiClientError } from '$lib/api';
 
 export const actions: Actions = {
-  default: async ({ request, cookies }) => {
-    const token = cookies.get(COOKIE_KEYS.AUTH_TOKEN);
-
-    if (!token) {
-      redirect(303, '/login');
-    }
-
+  default: async ({ request, locals }) => {
     const formData = await request.formData();
     const username = formData.get('username') as string;
     const name = formData.get('name') as string;
@@ -37,7 +30,7 @@ export const actions: Actions = {
     try {
       await createUser(
         { username, name, password, role: role as 'manager' | 'staff' },
-        token
+        locals.token
       );
     } catch (err) {
       if (err instanceof ApiClientError) {

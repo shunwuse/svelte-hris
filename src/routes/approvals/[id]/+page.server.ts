@@ -1,19 +1,12 @@
 import type { PageServerLoad, Actions } from './$types';
 import { fail, redirect } from '@sveltejs/kit';
-import { COOKIE_KEYS } from '$lib/constants';
 import { getApprovals, actionApproval, ApiClientError } from '$lib/api';
 
-export const load: PageServerLoad = async ({ params, cookies }) => {
-  const token = cookies.get(COOKIE_KEYS.AUTH_TOKEN);
-
-  if (!token) {
-    redirect(303, '/login');
-  }
-
+export const load: PageServerLoad = async ({ params, locals }) => {
   const approvalId = Number(params.id);
 
   try {
-    const approvals = await getApprovals(token);
+    const approvals = await getApprovals(locals.token);
     const approval = approvals.find((a) => a.id === approvalId);
 
     if (!approval) {
@@ -34,17 +27,11 @@ export const load: PageServerLoad = async ({ params, cookies }) => {
 };
 
 export const actions: Actions = {
-  approve: async ({ params, cookies }) => {
-    const token = cookies.get(COOKIE_KEYS.AUTH_TOKEN);
-
-    if (!token) {
-      redirect(303, '/login');
-    }
-
+  approve: async ({ params, locals }) => {
     const approvalId = Number(params.id);
 
     try {
-      await actionApproval({ id: approvalId, action: 'APPROVED' }, token);
+      await actionApproval({ id: approvalId, action: 'APPROVED' }, locals.token);
     } catch (err) {
       if (err instanceof ApiClientError) {
         return fail(400, { error: err.message });
@@ -56,17 +43,11 @@ export const actions: Actions = {
     redirect(303, '/approvals');
   },
 
-  reject: async ({ params, cookies }) => {
-    const token = cookies.get(COOKIE_KEYS.AUTH_TOKEN);
-
-    if (!token) {
-      redirect(303, '/login');
-    }
-
+  reject: async ({ params, locals }) => {
     const approvalId = Number(params.id);
 
     try {
-      await actionApproval({ id: approvalId, action: 'REJECTED' }, token);
+      await actionApproval({ id: approvalId, action: 'REJECTED' }, locals.token);
     } catch (err) {
       if (err instanceof ApiClientError) {
         return fail(400, { error: err.message });

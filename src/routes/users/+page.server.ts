@@ -1,17 +1,9 @@
 import type { PageServerLoad } from './$types';
-import { COOKIE_KEYS } from '$lib/constants';
 import { getUsers } from '$lib/api';
-import { redirect } from '@sveltejs/kit';
 
-export const load: PageServerLoad = async ({ cookies }) => {
-  const token = cookies.get(COOKIE_KEYS.AUTH_TOKEN);
-
-  if (!token) {
-    redirect(303, '/login');
-  }
-
+export const load: PageServerLoad = async ({ locals }) => {
   try {
-    const response = await getUsers(token);
+    const response = await getUsers(locals.token);
     return {
       users: response
     };
