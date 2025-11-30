@@ -1,37 +1,13 @@
 <script lang="ts">
-  import { goto } from '$app/navigation';
   import { Button } from '$lib/components/ui/button';
   import { Input } from '$lib/components/ui/input';
   import { Label } from '$lib/components/ui/label';
   import * as Card from '$lib/components/ui/card';
-  import { login, ApiClientError } from '$lib/api';
+  import { enhance } from '$app/forms';
 
-  let username = $state('');
-  let password = $state('');
-  let error = $state('');
+  let { form } = $props();
+
   let isLoading = $state(false);
-
-  async function handleSubmit(e: Event) {
-    e.preventDefault();
-    error = '';
-    isLoading = true;
-
-    try {
-      const response = await login({ username, password });
-      console.log('Login successful:', response);
-
-      // TODO: Save token and redirect
-      goto('/');
-    } catch (err) {
-      if (err instanceof ApiClientError) {
-        error = err.message;
-      } else {
-        error = 'An unexpected error occurred';
-      }
-    } finally {
-      isLoading = false;
-    }
-  }
 </script>
 
 <div class="flex min-h-screen items-center justify-center bg-background">
@@ -41,11 +17,20 @@
       <Card.Description>Enter your credentials to access the system</Card.Description>
     </Card.Header>
 
-    <form onsubmit={handleSubmit}>
+    <form
+      method="POST"
+      use:enhance={() => {
+        isLoading = true;
+        return async ({ update }) => {
+          isLoading = false;
+          await update();
+        };
+      }}
+    >
       <Card.Content class="space-y-4">
-        {#if error}
+        {#if  form?.error}
           <div class="rounded-md bg-destructive/15 p-3 text-sm text-destructive">
-            {error}
+            {form.error}
           </div>
         {/if}
 
@@ -53,9 +38,10 @@
           <Label for="username">Username</Label>
           <Input
             id="username"
+            name="username"
             type="text"
             placeholder="Enter your username"
-            bind:value={username}
+            value={form?.username ?? ''}
             required
           />
         </div>
@@ -64,9 +50,9 @@
           <Label for="password">Password</Label>
           <Input
             id="password"
+            name="password"
             type="password"
             placeholder="Enter your password"
-            bind:value={password}
             required
           />
         </div>
