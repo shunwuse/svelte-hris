@@ -1,29 +1,28 @@
 import type { PageServerLoad, Actions } from './$types';
-import { fail, redirect } from '@sveltejs/kit';
-import { getApprovals, actionApproval, ApiClientError } from '$lib/api';
+import { redirect } from '@sveltejs/kit';
+import { getApprovals, actionApproval } from '$lib/api';
+import { safeLoad, handleActionError } from '$lib/server/utils';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
   const approvalId = Number(params.id);
 
-  try {
-    const approvals = await getApprovals(locals.token);
-    const approval = approvals.find((a) => a.id === approvalId);
+  const { data: approvals, error } = await safeLoad(
+    () => getApprovals(locals.token),
+    [],
+    'Failed to fetch approval'
+  );
 
-    if (!approval) {
-      return {
-        approval: null,
-        error: 'Approval not found'
-      };
-    }
-
-    return { approval };
-  } catch (err) {
-    console.error('Failed to fetch approval:', err);
-    return {
-      approval: null,
-      error: 'Failed to load approval'
-    };
+  if (error) {
+    return { approval: null, error };
   }
+
+  const approval = approvals.find((a) => a.id === approvalId);
+
+  if (!approval) {
+    return { approval: null, error: 'Approval not found' };
+  }
+
+  return { approval };
 };
 
 export const actions: Actions = {
@@ -33,11 +32,7 @@ export const actions: Actions = {
     try {
       await actionApproval({ id: approvalId, action: 'APPROVED' }, locals.token);
     } catch (err) {
-      if (err instanceof ApiClientError) {
-        return fail(400, { error: err.message });
-      }
-      console.error('Approve error:', err);
-      return fail(500, { error: 'Unable to connect to server' });
+      return handleActionError(err, 'Approve error');
     }
 
     redirect(303, '/approvals');
@@ -49,11 +44,7 @@ export const actions: Actions = {
     try {
       await actionApproval({ id: approvalId, action: 'REJECTED' }, locals.token);
     } catch (err) {
-      if (err instanceof ApiClientError) {
-        return fail(400, { error: err.message });
-      }
-      console.error('Reject error:', err);
-      return fail(500, { error: 'Unable to connect to server' });
+      return handleActionError(err, 'Reject error');
     }
 
     redirect(303, '/approvals');

@@ -1,29 +1,28 @@
 import type { PageServerLoad, Actions } from './$types';
 import { fail, redirect } from '@sveltejs/kit';
-import { getUsers, updateUser, ApiClientError } from '$lib/api';
+import { getUsers, updateUser } from '$lib/api';
+import { safeLoad, handleActionError } from '$lib/server/utils';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
   const userId = Number(params.id);
 
-  try {
-    const users = await getUsers(locals.token);
-    const user = users.find((u) => u.id === userId);
+  const { data: users, error } = await safeLoad(
+    () => getUsers(locals.token),
+    [],
+    'Failed to fetch user'
+  );
 
-    if (!user) {
-      return {
-        user: null,
-        error: 'User not found'
-      };
-    }
-
-    return { user };
-  } catch (err) {
-    console.error('Failed to fetch user:', err);
-    return {
-      user: null,
-      error: 'Failed to load user'
-    };
+  if (error) {
+    return { user: null, error };
   }
+
+  const user = users.find((u) => u.id === userId);
+
+  if (!user) {
+    return { user: null, error: 'User not found' };
+  }
+
+  return { user };
 };
 
 export const actions: Actions = {
@@ -32,27 +31,16 @@ export const actions: Actions = {
     const formData = await request.formData();
     const name = formData.get('name') as string;
 
+    const formFields = { name };
+
     if (!name || name.trim() === '') {
-      return fail(400, {
-        error: 'Name is required',
-        name
-      });
+      return fail(400, { error: 'Name is required', ...formFields });
     }
 
     try {
       await updateUser({ id: userId, name }, locals.token);
     } catch (err) {
-      if (err instanceof ApiClientError) {
-        return fail(400, {
-          error: err.message,
-          name
-        });
-      }
-      console.error('Update user error:', err);
-      return fail(500, {
-        error: 'Unable to connect to server',
-        name
-      });
+      return handleActionError(err, 'Update user error', formFields);
     }
 
     redirect(303, '/users');

@@ -1,8 +1,8 @@
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions } from './$types';
 import { login } from '$lib/api/auth';
-import { ApiClientError } from '$lib/api/client';
 import { COOKIE_KEYS } from '$lib/constants';
+import { handleActionError } from '$lib/server/utils';
 
 export const actions: Actions = {
   default: async ({ request, cookies }) => {
@@ -40,17 +40,7 @@ export const actions: Actions = {
         }
       );
     } catch (err) {
-      if (err instanceof ApiClientError) {
-        return fail(400, {
-          error: err.message,
-          username
-        });
-      }
-      console.error('Login error:', err);
-      return fail(500, {
-        error: 'Unable to connect to server',
-        username
-      });
+      return handleActionError(err, 'Login error', { username });
     }
 
     redirect(303, '/');

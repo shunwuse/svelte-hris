@@ -1,17 +1,14 @@
 import type { Actions } from './$types';
 import { redirect } from '@sveltejs/kit';
-import { createApproval, ApiClientError } from '$lib/api';
+import { createApproval } from '$lib/api';
+import { handleActionError } from '$lib/server/utils';
 
 export const actions: Actions = {
   default: async ({ locals }) => {
     try {
       await createApproval(locals.token);
     } catch (err) {
-      if (err instanceof ApiClientError) {
-        return { error: err.message };
-      }
-      console.error('Create approval error:', err);
-      return { error: 'Unable to connect to server' };
+      return handleActionError(err, 'Create approval error');
     }
 
     redirect(303, '/approvals');
