@@ -25,17 +25,14 @@
   }
 </script>
 
-<div class="min-h-screen bg-gray-50 p-6">
+<div class="p-6">
   <!-- Header -->
   <div class="mb-6 flex items-center justify-between">
     <div>
       <h1 class="text-2xl font-bold text-gray-900">Approvals</h1>
       <p class="text-gray-500">Manage approval requests</p>
     </div>
-    <div class="flex gap-2">
-      <Button variant="outline" href="/">← Back</Button>
-      <Button href="/approvals/create">+ New Request</Button>
-    </div>
+    <Button href="/approvals/create">+ New Request</Button>
   </div>
 
   <!-- Error Message -->

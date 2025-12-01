@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
 	import { Button } from '$lib/components/ui/button';
 	import {
 		Card,
@@ -11,7 +10,6 @@
 	import { Badge } from '$lib/components/ui/badge';
 
 	let { data } = $props();
-	let isLoading = $state(false);
 
 	const statusColors = {
 		PENDING: 'bg-yellow-100 text-yellow-800',
@@ -20,30 +18,14 @@
 	} as const;
 </script>
 
-<div class="min-h-screen bg-gray-50 p-8">
+<div class="p-8">
 	<div class="mx-auto max-w-6xl">
 		<!-- Header -->
-		<div class="mb-8 flex items-center justify-between">
-			<div>
-				<h1 class="text-3xl font-bold text-gray-900">
-					Welcome back{data.userInfo?.username ? `, ${data.userInfo.username}` : ''}!
-				</h1>
-				<p class="mt-1 text-gray-500">Here's what's happening in your HRIS system.</p>
-			</div>
-			<form
-				method="POST"
-				action="/logout"
-				use:enhance={() => {
-					isLoading = true;
-					return async ({ update }) => {
-						await update();
-					};
-				}}
-			>
-				<Button type="submit" variant="outline" disabled={isLoading}>
-					{isLoading ? 'Logging out...' : 'Logout'}
-				</Button>
-			</form>
+		<div class="mb-8">
+			<h1 class="text-3xl font-bold text-gray-900">
+				Welcome back{data.userInfo?.username ? `, ${data.userInfo.username}` : ''}!
+			</h1>
+			<p class="mt-1 text-gray-500">Here's what's happening in your HRIS system.</p>
 		</div>
 
 		<!-- User Profile Card -->
