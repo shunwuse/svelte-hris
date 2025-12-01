@@ -4,10 +4,17 @@
   import { Input } from '$lib/components/ui/input';
   import { Label } from '$lib/components/ui/label';
   import * as Card from '$lib/components/ui/card';
+  import { flash } from '$lib/stores';
 
   let { data, form } = $props();
 
   let isSubmitting = $state(false);
+
+  // Forward page-level errors to flash so layout shows toast
+  $effect(() => {
+    if (data?.error) flash.error(data.error);
+    if (form?.error) flash.error(form.error);
+  });
 </script>
 
 <div class="p-6">
@@ -18,34 +25,21 @@
         <Card.Description>Update user information</Card.Description>
       </Card.Header>
 
-      {#if data.error}
-        <Card.Content>
-          <div class="rounded-md bg-destructive/15 p-3 text-sm text-destructive">
-            {data.error}
-          </div>
-        </Card.Content>
-        <Card.Footer>
-          <Button variant="outline" href="/users">← Back to Users</Button>
-        </Card.Footer>
-      {:else if data.user}
+      {#if data.user}
         <form
           method="POST"
           use:enhance={() => {
             isSubmitting = true;
-            return async ({ update }) => {
+            return async ({ result, update }) => {
+              if (result.type === 'redirect') {
+                flash.success('User updated successfully');
+              }
               await update();
               isSubmitting = false;
             };
           }}
         >
           <Card.Content class="space-y-4">
-            <!-- Error Message -->
-            {#if form?.error}
-              <div class="rounded-md bg-destructive/15 p-3 text-sm text-destructive">
-                {form.error}
-              </div>
-            {/if}
-
             <!-- Username (read-only) -->
             <div class="space-y-2">
               <Label for="username">Username</Label>

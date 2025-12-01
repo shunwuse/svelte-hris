@@ -3,6 +3,7 @@
   import { Badge } from '$lib/components/ui/badge';
   import * as Table from '$lib/components/ui/table';
   import type { ApprovalStatus } from '$lib/types';
+  import { flash } from '$lib/stores';
 
   let { data } = $props();
 
@@ -23,6 +24,11 @@
   function formatStatus(status: ApprovalStatus): string {
     return status.charAt(0) + status.slice(1).toLowerCase();
   }
+
+  // Forward page-level errors to flash so layout shows toast
+  $effect(() => {
+    if (data?.error) flash.error(data.error);
+  });
 </script>
 
 <div class="p-6">
@@ -34,13 +40,6 @@
     </div>
     <Button href="/approvals/create">+ New Request</Button>
   </div>
-
-  <!-- Error Message -->
-  {#if data.error}
-    <div class="mb-4 rounded-md bg-destructive/15 p-4 text-destructive">
-      {data.error}
-    </div>
-  {/if}
 
   <!-- Approvals Table -->
   <div class="rounded-lg border bg-white">

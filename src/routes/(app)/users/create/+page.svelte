@@ -5,6 +5,7 @@
   import { Label } from '$lib/components/ui/label';
   import * as Card from '$lib/components/ui/card';
   import * as Select from '$lib/components/ui/select';
+  import { flash } from '$lib/stores';
 
   let { form } = $props();
 
@@ -15,6 +16,11 @@
     { value: 'manager', label: 'Manager' },
     { value: 'staff', label: 'Staff' }
   ];
+
+  // Forward page-level errors to flash so layout shows toast
+  $effect(() => {
+    if (form?.error) flash.error(form.error);
+  });
 </script>
 
 <div class="p-6">
@@ -29,20 +35,16 @@
         method="POST"
         use:enhance={() => {
           isSubmitting = true;
-          return async ({ update }) => {
+          return async ({ result, update }) => {
+            if (result.type === 'redirect') {
+              flash.success('User created successfully');
+            }
             await update();
             isSubmitting = false;
           };
         }}
       >
         <Card.Content class="space-y-4">
-          <!-- Error Message -->
-          {#if form?.error}
-            <div class="rounded-md bg-destructive/15 p-3 text-sm text-destructive">
-              {form.error}
-            </div>
-          {/if}
-
           <!-- Username -->
           <div class="space-y-2">
             <Label for="username">Username</Label>

@@ -2,6 +2,7 @@
   import { Button } from '$lib/components/ui/button';
   import { Badge } from '$lib/components/ui/badge';
   import * as Table from '$lib/components/ui/table';
+  import { flash } from '$lib/stores';
 
   let { data } = $props();
 
@@ -15,6 +16,11 @@
       minute: '2-digit'
     });
   }
+
+  // Forward page-level errors to flash so layout shows toast
+  $effect(() => {
+    if (data?.error) flash.error(data.error);
+  });
 </script>
 
 <div class="p-6">
@@ -26,13 +32,6 @@
     </div>
     <Button href="/users/create">+ Add User</Button>
   </div>
-
-  <!-- Error Message -->
-  {#if data.error}
-    <div class="mb-4 rounded-md bg-red-50 p-4 text-red-700">
-      {data.error}
-    </div>
-  {/if}
 
   <!-- Users Table -->
   <div class="rounded-lg border bg-white">

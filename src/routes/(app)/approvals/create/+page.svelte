@@ -2,10 +2,16 @@
   import { enhance } from '$app/forms';
   import { Button } from '$lib/components/ui/button';
   import * as Card from '$lib/components/ui/card';
+  import { flash } from '$lib/stores';
 
   let { form } = $props();
 
   let isSubmitting = $state(false);
+
+  // Forward page-level errors to flash so layout shows toast
+  $effect(() => {
+    if (form?.error) flash.error(form.error);
+  });
 </script>
 
 <div class="p-6">
@@ -20,20 +26,16 @@
         method="POST"
         use:enhance={() => {
           isSubmitting = true;
-          return async ({ update }) => {
+          return async ({ result, update }) => {
+            if (result.type === 'redirect') {
+              flash.success('Approval request submitted successfully');
+            }
             await update();
             isSubmitting = false;
           };
         }}
       >
         <Card.Content class="space-y-4">
-          <!-- Error Message -->
-          {#if form?.error}
-            <div class="rounded-md bg-destructive/15 p-3 text-sm text-destructive">
-              {form.error}
-            </div>
-          {/if}
-
           <p class="text-sm text-muted-foreground">
             Click the button below to submit a new approval request.
             It will be sent to a manager for review.
