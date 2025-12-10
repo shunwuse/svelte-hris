@@ -5,7 +5,8 @@ import { COOKIE_KEYS } from '$lib/constants';
 export const actions: Actions = {
   default: async ({ cookies }) => {
     // Clear auth cookies
-    cookies.delete(COOKIE_KEYS.AUTH_TOKEN, { path: '/' });
+    cookies.delete(COOKIE_KEYS.ACCESS_TOKEN, { path: '/' });
+    cookies.delete(COOKIE_KEYS.REFRESH_TOKEN, { path: '/' });
     cookies.delete(COOKIE_KEYS.USER_INFO, { path: '/' });
 
     redirect(303, '/login');

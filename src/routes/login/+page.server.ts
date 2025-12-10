@@ -20,7 +20,15 @@ export const actions: Actions = {
     try {
       const data = await login({ username, password });
 
-      cookies.set(COOKIE_KEYS.AUTH_TOKEN, data.token, {
+      cookies.set(COOKIE_KEYS.ACCESS_TOKEN, data.access_token, {
+        path: '/',
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: 24 * 60 * 60
+      });
+
+      cookies.set(COOKIE_KEYS.REFRESH_TOKEN, data.refresh_token, {
         path: '/',
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',

@@ -22,5 +22,6 @@ export interface LoginRequest {
 export interface LoginResponse {
   username: string;
   roles: string[];
-  token: string;
+  access_token: string;
+  refresh_token: string;
 }

@@ -5,7 +5,7 @@ import { COOKIE_KEYS } from '$lib/constants';
 const publicRoutes = ['/login'];
 
 export const handle: Handle = async ({ event, resolve }) => {
-  const token = event.cookies.get(COOKIE_KEYS.AUTH_TOKEN);
+  const token = event.cookies.get(COOKIE_KEYS.ACCESS_TOKEN);
   const isPublicRoute = publicRoutes.some((route) => event.url.pathname.startsWith(route));
 
   // Not authenticated then redirect to login
