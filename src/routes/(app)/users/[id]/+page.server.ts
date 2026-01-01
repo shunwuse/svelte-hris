@@ -6,9 +6,9 @@ import { safeLoad, handleActionError } from '$lib/server/utils';
 export const load: PageServerLoad = async ({ params, locals }) => {
   const userId = Number(params.id);
 
-  const { data: users, error } = await safeLoad(
+  const { data: usersResponse, error } = await safeLoad(
     () => getUsers(locals.token),
-    [],
+    { data: [], meta: { total: 0, per_page: 10, current_page: 1, last_page: 1 } },
     'Failed to fetch user'
   );
 
@@ -16,7 +16,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
     return { user: null, error };
   }
 
-  const user = users.find((u) => u.id === userId);
+  const user = usersResponse.data.find((u) => u.id === userId);
 
   if (!user) {
     return { user: null, error: 'User not found' };

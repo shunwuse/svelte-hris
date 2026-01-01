@@ -18,7 +18,11 @@ export const load: PageServerLoad = async ({ cookies, locals }) => {
 
 	// Fetch users and approvals for stats
 	const [usersResult, approvalsResult] = await Promise.all([
-		safeLoad(() => getUsers(locals.token), [], 'Failed to fetch users'),
+		safeLoad(
+			() => getUsers(locals.token),
+			{ data: [], meta: { total: 0, per_page: 10, current_page: 1, last_page: 1 } },
+			'Failed to fetch users'
+		),
 		safeLoad(() => getApprovals(locals.token), [], 'Failed to fetch approvals')
 	]);
 
@@ -30,7 +34,7 @@ export const load: PageServerLoad = async ({ cookies, locals }) => {
 	return {
 		userInfo,
 		stats: {
-			totalUsers: usersResult.data.length,
+			totalUsers: usersResult.data.meta.total,
 			totalApprovals: approvalsResult.data.length,
 			pendingApprovals,
 			approvedApprovals,

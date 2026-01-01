@@ -1,3 +1,5 @@
+import type { OffsetPaginationResponse } from './api';
+
 // ==================== User ====================
 
 export interface User {
@@ -8,7 +10,7 @@ export interface User {
   last_updated_time: string;
 }
 
-export type GetUsersResponse = User[];
+export type GetUsersResponse = OffsetPaginationResponse<User>;
 
 export interface CreateUserRequest {
   username: string;
