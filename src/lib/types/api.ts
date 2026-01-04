@@ -17,3 +17,13 @@ export interface OffsetPaginationResponse<T> {
   data: T[];
   meta: OffsetPaginationMeta;
 }
+
+export interface CursorPaginationMeta {
+  next_cursor: string | null;
+  has_more: boolean;
+}
+
+export interface CursorPaginationResponse<T> {
+  data: T[];
+  meta: CursorPaginationMeta;
+}

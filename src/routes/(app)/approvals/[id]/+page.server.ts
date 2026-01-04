@@ -6,9 +6,9 @@ import { safeLoad, handleActionError } from '$lib/server/utils';
 export const load: PageServerLoad = async ({ params, locals }) => {
   const approvalId = Number(params.id);
 
-  const { data: approvals, error } = await safeLoad(
+  const { data: approvalsResponse, error } = await safeLoad(
     () => getApprovals(locals.token),
-    [],
+    { data: [], meta: { next_cursor: null, has_more: false } },
     'Failed to fetch approval'
   );
 
@@ -16,7 +16,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
     return { approval: null, error };
   }
 
-  const approval = approvals.find((a) => a.id === approvalId);
+  const approval = approvalsResponse.data.find((a) => a.id === approvalId);
 
   if (!approval) {
     return { approval: null, error: 'Approval not found' };

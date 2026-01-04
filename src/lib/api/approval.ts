@@ -4,8 +4,18 @@ import type {
     ApprovalActionRequest
 } from '$lib/types';
 
-export function getApprovals(token: string): Promise<GetApprovalsResponse> {
-  return api.get<GetApprovalsResponse>('/approvals', {
+export function getApprovals(
+  token: string,
+  params: { cursor?: string; per_page?: number } = {}
+): Promise<GetApprovalsResponse> {
+  const searchParams = new URLSearchParams();
+  if (params.cursor) searchParams.set('cursor', params.cursor);
+  if (params.per_page) searchParams.set('per_page', params.per_page.toString());
+
+  const queryString = searchParams.toString();
+  const endpoint = `/approvals${queryString ? `?${queryString}` : ''}`;
+
+  return api.get<GetApprovalsResponse>(endpoint, {
     Authorization: `Bearer ${token}`
   });
 }
