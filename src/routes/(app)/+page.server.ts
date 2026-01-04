@@ -1,6 +1,5 @@
 import type { PageServerLoad } from './$types';
 import { COOKIE_KEYS } from '$lib/constants';
-import { APPROVAL_STATUS } from '$lib/domain';
 import { getUsers, getApprovals } from '$lib/api';
 import { safeLoad } from '$lib/server/utils';
 
@@ -20,8 +19,8 @@ export const load: PageServerLoad = async ({ cookies, locals }) => {
 	// Fetch users and approvals for stats
 	const [usersResult, approvalsResult] = await Promise.all([
 		safeLoad(
-			() => getUsers(locals.token),
-			{ data: [], meta: { total: 0, per_page: 10, current_page: 1, last_page: 1 } },
+			() => getUsers(locals.token, { per_page: 5 }),
+			{ data: [], meta: { total: 0, per_page: 5, current_page: 1, last_page: 1 } },
 			'Failed to fetch users'
 		),
 		safeLoad(
@@ -31,20 +30,9 @@ export const load: PageServerLoad = async ({ cookies, locals }) => {
 		)
 	]);
 
-	// Calculate stats
-	const pendingApprovals = approvalsResult.data.data.filter((a) => a.status === APPROVAL_STATUS.PENDING).length;
-	const approvedApprovals = approvalsResult.data.data.filter((a) => a.status === APPROVAL_STATUS.APPROVED).length;
-	const rejectedApprovals = approvalsResult.data.data.filter((a) => a.status === APPROVAL_STATUS.REJECTED).length;
-
 	return {
 		userInfo,
-		stats: {
-			totalUsers: usersResult.data.meta.total,
-			totalApprovals: approvalsResult.data.data.length,
-			pendingApprovals,
-			approvedApprovals,
-			rejectedApprovals
-		},
+		recentUsers: usersResult.data.data,
 		recentApprovals: approvalsResult.data.data.slice(0, 5)
 	};
 };

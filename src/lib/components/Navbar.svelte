@@ -8,7 +8,7 @@
 	let isLoggingOut = $state(false);
 
 	const navItems = [
-		{ href: '/' as Pathname, label: 'Dashboard' },
+		{ href: '/' as Pathname, label: 'Overview' },
 		{ href: '/users' as Pathname, label: 'Users' },
 		{ href: '/approvals' as Pathname, label: 'Approvals' }
 	];

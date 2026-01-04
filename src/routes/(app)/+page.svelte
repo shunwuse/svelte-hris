@@ -12,6 +12,9 @@
 	import { Badge } from '$lib/components/ui/badge';
 	import { APPROVAL_STATUS } from '$lib/domain';
 	import Eye from '@lucide/svelte/icons/eye';
+	import Plus from '@lucide/svelte/icons/plus';
+	import UserPlus from '@lucide/svelte/icons/user-plus';
+	import Pencil from '@lucide/svelte/icons/pencil';
 
 	let { data } = $props();
 
@@ -23,108 +26,36 @@
 </script>
 
 <div class="p-8">
-	<div class="mx-auto max-w-6xl">
+	<div class="mx-auto max-w-6xl space-y-8">
 		<!-- Header -->
-		<div class="mb-8">
-			<h1 class="text-3xl font-bold text-gray-900">
-				Welcome back{data.userInfo?.username ? `, ${data.userInfo.username}` : ''}!
-			</h1>
-			<p class="mt-1 text-gray-500">Here's an overview of your HRIS system.</p>
+		<div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+			<div>
+				<h1 class="text-3xl font-bold tracking-tight text-gray-900">
+					Welcome back{data.userInfo?.username ? `, ${data.userInfo.username}` : ''}!
+				</h1>
+				<p class="text-muted-foreground">Here's an overview of the system activity.</p>
+			</div>
+			<div class="flex items-center gap-3">
+				<Button href={resolve('/approvals/create')} variant="default" class="gap-2">
+					<Plus class="size-4" />
+					Create Request
+				</Button>
+				<Button href={resolve('/users/create')} variant="outline" class="gap-2">
+					<UserPlus class="size-4" />
+					Create User
+				</Button>
+			</div>
 		</div>
 
-		<!-- User Profile Card -->
-		{#if data.userInfo}
-			<Card class="mb-8">
-				<CardHeader>
-					<CardTitle>Your Profile</CardTitle>
-				</CardHeader>
-				<CardContent>
-					<div class="flex items-center gap-4">
-						<div
-							class="flex h-16 w-16 items-center justify-center rounded-full bg-primary text-2xl font-bold text-primary-foreground"
-						>
-							{data.userInfo.username?.charAt(0).toUpperCase() ?? '?'}
-						</div>
-						<div>
-							<p class="text-xl font-medium">{data.userInfo.username}</p>
-							{#if data.userInfo.roles}
-								<div class="mt-1 flex gap-2">
-									{#each data.userInfo.roles as role (role)}
-										<Badge variant="secondary">{role}</Badge>
-									{/each}
-								</div>
-							{/if}
-						</div>
-					</div>
-				</CardContent>
-			</Card>
-		{/if}
-
-		<!-- Stats Cards -->
-		<div class="mb-8 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-			<a href={resolve("/users")} class="block">
-				<Card
-					class="cursor-pointer transition-all hover:border-primary hover:shadow-md"
-				>
-					<CardHeader class="pb-2">
-						<CardDescription>Total Users</CardDescription>
-						<CardTitle class="text-3xl">{data.stats.totalUsers}</CardTitle>
-					</CardHeader>
-					<CardContent>
-						<p class="text-xs text-muted-foreground">Registered in system →</p>
-					</CardContent>
-				</Card>
-			</a>
-
-			<a href={resolve(`/approvals?status=${APPROVAL_STATUS.PENDING}` as Pathname)} class="block">
-				<Card
-					class="cursor-pointer transition-all hover:border-yellow-500 hover:shadow-md"
-				>
-					<CardHeader class="pb-2">
-						<CardDescription>Pending Approvals</CardDescription>
-						<CardTitle class="text-3xl text-yellow-600">{data.stats.pendingApprovals}</CardTitle>
-					</CardHeader>
-					<CardContent>
-						<p class="text-xs text-muted-foreground">Awaiting review →</p>
-					</CardContent>
-				</Card>
-			</a>
-
-			<a href={resolve(`/approvals?status=${APPROVAL_STATUS.APPROVED}` as Pathname)} class="block">
-				<Card
-					class="cursor-pointer transition-all hover:border-green-500 hover:shadow-md"
-				>
-					<CardHeader class="pb-2">
-						<CardDescription>Approved</CardDescription>
-						<CardTitle class="text-3xl text-green-600">{data.stats.approvedApprovals}</CardTitle>
-					</CardHeader>
-					<CardContent>
-						<p class="text-xs text-muted-foreground">This period →</p>
-					</CardContent>
-				</Card>
-			</a>
-
-			<a href={resolve(`/approvals?status=${APPROVAL_STATUS.REJECTED}` as Pathname)} class="block">
-				<Card
-					class="cursor-pointer transition-all hover:border-red-500 hover:shadow-md"
-				>
-					<CardHeader class="pb-2">
-						<CardDescription>Rejected</CardDescription>
-						<CardTitle class="text-3xl text-red-600">{data.stats.rejectedApprovals}</CardTitle>
-					</CardHeader>
-					<CardContent>
-						<p class="text-xs text-muted-foreground">This period →</p>
-					</CardContent>
-				</Card>
-			</a>
-		</div>
-
-		<div class="grid gap-6 lg:grid-cols-3">
+		<div class="grid gap-6 lg:grid-cols-2">
 			<!-- Recent Approvals -->
-			<Card class="lg:col-span-2">
-				<CardHeader>
-					<CardTitle>Recent Approvals</CardTitle>
-					<CardDescription>Latest approval requests in the system</CardDescription>
+			<Card>
+				<CardHeader class="flex flex-row items-center justify-between">
+					<div>
+						<CardTitle>Recent Approvals</CardTitle>
+						<CardDescription>Latest approval requests</CardDescription>
+					</div>
+					<Button href={resolve('/approvals')} variant="ghost" size="sm">View All</Button>
 				</CardHeader>
 				<CardContent>
 					{#if data.recentApprovals.length === 0}
@@ -132,9 +63,7 @@
 					{:else}
 						<div class="space-y-3">
 							{#each data.recentApprovals as approval (approval.id)}
-								<div
-									class="flex items-center justify-between rounded-lg border p-3 hover:bg-gray-50"
-								>
+								<div class="flex items-center justify-between rounded-lg border p-3 hover:bg-gray-50">
 									<div>
 										<p class="font-medium">Approval #{approval.id}</p>
 										<p class="text-sm text-gray-500">By {approval.creator_name}</p>
@@ -158,84 +87,46 @@
 				</CardContent>
 			</Card>
 
-			<!-- Quick Actions -->
+			<!-- Recent Users -->
 			<Card>
-				<CardHeader>
-					<CardTitle>Quick Actions</CardTitle>
-					<CardDescription>Common tasks and navigation</CardDescription>
+				<CardHeader class="flex flex-row items-center justify-between">
+					<div>
+						<CardTitle>Recent Users</CardTitle>
+						<CardDescription>Latest registered users</CardDescription>
+					</div>
+					<Button href={resolve('/users')} variant="ghost" size="sm">View All</Button>
 				</CardHeader>
-				<CardContent class="space-y-3">
-					<Button href="/users" class="w-full justify-start" variant="outline">
-						<svg
-							class="mr-2 h-4 w-4"
-							fill="none"
-							stroke="currentColor"
-							viewBox="0 0 24 24"
-							xmlns="http://www.w3.org/2000/svg"
-						>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
-							></path>
-						</svg>
-						Manage Users
-					</Button>
-
-					<Button href="/users/create" class="w-full justify-start" variant="outline">
-						<svg
-							class="mr-2 h-4 w-4"
-							fill="none"
-							stroke="currentColor"
-							viewBox="0 0 24 24"
-							xmlns="http://www.w3.org/2000/svg"
-						>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"
-							></path>
-						</svg>
-						Create User
-					</Button>
-
-					<Button href={resolve("/approvals")} class="w-full justify-start" variant="outline">
-						<svg
-							class="mr-2 h-4 w-4"
-							fill="none"
-							stroke="currentColor"
-							viewBox="0 0 24 24"
-							xmlns="http://www.w3.org/2000/svg"
-						>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-							></path>
-						</svg>
-						View Approvals
-					</Button>
-
-					<Button href={resolve("/approvals/create")} class="w-full justify-start" variant="outline">
-						<svg
-							class="mr-2 h-4 w-4"
-							fill="none"
-							stroke="currentColor"
-							viewBox="0 0 24 24"
-							xmlns="http://www.w3.org/2000/svg"
-						>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
-							></path>
-						</svg>
-						Create Approval
-					</Button>
+				<CardContent>
+					{#if data.recentUsers.length === 0}
+						<p class="py-4 text-center text-gray-500">No users yet</p>
+					{:else}
+						<div class="space-y-3">
+							{#each data.recentUsers as user (user.id)}
+								<div class="flex items-center justify-between rounded-lg border p-3 hover:bg-gray-50">
+									<div class="flex items-center gap-3">
+										<div
+											class="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary"
+										>
+											{user.username.charAt(0).toUpperCase()}
+										</div>
+										<div>
+											<p class="font-medium">{user.username}</p>
+											<p class="text-xs text-gray-500">{user.name}</p>
+										</div>
+									</div>
+									<Button
+										href={resolve(`/users/${user.id}` as Pathname)}
+										size="icon"
+										variant="ghost"
+										class="h-8 w-8"
+									>
+										<Pencil class="size-4" />
+										<span class="sr-only">Edit</span>
+									</Button>
+								</div>
+							{/each}
+						</div>
+					{/if}
 				</CardContent>
 			</Card>
 		</div>
