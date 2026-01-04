@@ -93,23 +93,24 @@
   }
 </script>
 
-<div class="space-y-6 p-6">
-  <!-- Header -->
-  <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-    <div>
-      <h1 class="text-3xl font-bold tracking-tight text-gray-900">Approvals</h1>
-      <p class="text-muted-foreground">Manage and review approval requests.</p>
+<div class="p-8">
+  <div class="mx-auto max-w-6xl space-y-6">
+    <!-- Header -->
+    <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+      <div>
+        <h1 class="text-3xl font-bold tracking-tight text-gray-900">Approvals</h1>
+        <p class="text-muted-foreground">Manage and review approval requests.</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <Button href="/approvals/create" class="gap-2">
+          <Plus class="size-4" />
+          Create Request
+        </Button>
+      </div>
     </div>
-    <div class="flex items-center gap-2">
-      <Button href="/approvals/create" class="gap-2">
-        <Plus class="size-4" />
-        Create Request
-      </Button>
-    </div>
-  </div>
 
-  <!-- Filters & Actions -->
-  <Card.Root>
+    <!-- Filters & Actions -->
+    <Card.Root>
     <Card.Content class="p-4">
       <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div class="relative max-w-sm flex-1">
@@ -200,4 +201,5 @@
       {/if}
     </div>
   </Card.Root>
+  </div>
 </div>
