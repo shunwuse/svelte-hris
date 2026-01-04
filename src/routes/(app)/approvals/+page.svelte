@@ -82,7 +82,7 @@
       approvals = [...approvals, ...response.data];
       nextCursor = response.meta.next_cursor;
       hasMore = response.meta.has_more;
-    } catch (err) {
+    } catch {
       flash.error('Failed to load more approvals');
     } finally {
       isLoadingMore = false;

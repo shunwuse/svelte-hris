@@ -1,6 +1,5 @@
 <script lang="ts">
   import { Button } from '$lib/components/ui/button';
-  import { Badge } from '$lib/components/ui/badge';
   import { Input } from '$lib/components/ui/input';
   import * as Table from '$lib/components/ui/table';
   import * as Select from '$lib/components/ui/select';
