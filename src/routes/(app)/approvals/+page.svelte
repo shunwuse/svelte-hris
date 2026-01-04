@@ -12,6 +12,7 @@
   import type { Approval } from '$lib/types';
   import Search from '@lucide/svelte/icons/search';
   import Plus from '@lucide/svelte/icons/plus';
+  import Eye from '@lucide/svelte/icons/eye';
   import Loader2 from '@lucide/svelte/icons/loader-2';
 
   let { data } = $props();
@@ -156,13 +157,15 @@
                 </Badge>
               </Table.Cell>
               <Table.Cell class="text-right">
-                {#if approval.status === 'PENDING'}
-                  <Button variant="ghost" size="sm" href="/approvals/{approval.id}">
-                    Review
-                  </Button>
-                {:else}
-                  <span class="text-sm text-muted-foreground">-</span>
-                {/if}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  href="/approvals/{approval.id}"
+                  class="h-8 w-8"
+                >
+                  <Eye class="size-4" />
+                  <span class="sr-only">View</span>
+                </Button>
               </Table.Cell>
             </Table.Row>
           {:else}

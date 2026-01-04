@@ -13,7 +13,7 @@
   import ChevronRight from '@lucide/svelte/icons/chevron-right';
   import Search from '@lucide/svelte/icons/search';
   import UserPlus from '@lucide/svelte/icons/user-plus';
-  import Edit2 from '@lucide/svelte/icons/edit-2';
+  import Pencil from '@lucide/svelte/icons/pencil';
 
   let { data } = $props();
 
@@ -124,8 +124,13 @@
                 {formatDate(user.last_updated_time)}
               </Table.Cell>
               <Table.Cell class="text-right">
-                <Button variant="ghost" size="icon" href={resolve(`/users/${user.id}` as Pathname)} class="opacity-0 group-hover:opacity-100">
-                  <Edit2 class="size-4" />
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  href={resolve(`/users/${user.id}` as Pathname)}
+                  class="h-8 w-8"
+                >
+                  <Pencil class="size-4" />
                   <span class="sr-only">Edit</span>
                 </Button>
               </Table.Cell>

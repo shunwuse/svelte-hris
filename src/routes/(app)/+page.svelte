@@ -11,6 +11,7 @@
 	} from '$lib/components/ui/card';
 	import { Badge } from '$lib/components/ui/badge';
 	import { APPROVAL_STATUS } from '$lib/domain';
+	import Eye from '@lucide/svelte/icons/eye';
 
 	let { data } = $props();
 
@@ -140,11 +141,15 @@
 									</div>
 									<div class="flex items-center gap-3">
 										<Badge class={statusColors[approval.status]}>{approval.status}</Badge>
-										{#if approval.status === 'PENDING'}
-											<Button href="/approvals/{approval.id}" size="sm" variant="outline">
-												Review
-											</Button>
-										{/if}
+										<Button
+											href={resolve(`/approvals/${approval.id}` as Pathname)}
+											size="icon"
+											variant="ghost"
+											class="h-8 w-8"
+										>
+											<Eye class="size-4" />
+											<span class="sr-only">View</span>
+										</Button>
 									</div>
 								</div>
 							{/each}
