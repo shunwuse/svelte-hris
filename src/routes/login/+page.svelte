@@ -58,7 +58,7 @@
         </div>
       </Card.Content>
 
-      <Card.Footer class="pt-4">
+      <Card.Footer class="pt-6">
         <Button type="submit" class="w-full" disabled={isLoading}>
           {#if isLoading}
             Logging in...

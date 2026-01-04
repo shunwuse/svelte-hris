@@ -62,7 +62,7 @@
             {data.error}
           </div>
         </Card.Content>
-        <Card.Footer>
+        <Card.Footer class="pt-6">
           <Button variant="outline" href={resolve("/approvals")}>← Back to Approvals</Button>
         </Card.Footer>
       {:else if data.approval}
@@ -90,7 +90,7 @@
           </div>
         </Card.Content>
 
-        <Card.Footer class="flex justify-between">
+        <Card.Footer class="flex justify-between pt-6">
           <Button variant="outline" href={resolve("/approvals")}>Cancel</Button>
 
           {#if data.approval.status === APPROVAL_STATUS.PENDING}

@@ -104,7 +104,7 @@
           </div>
         </Card.Content>
 
-        <Card.Footer class="flex justify-between">
+        <Card.Footer class="flex justify-between pt-6">
           <Button variant="outline" href={resolve("/users")}>Cancel</Button>
           <Button type="submit" disabled={isSubmitting}>
             {#if isSubmitting}
