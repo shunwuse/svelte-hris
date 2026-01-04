@@ -38,7 +38,7 @@ export const actions: Actions = {
     }
 
     try {
-      await updateUser({ id: userId, name }, locals.token);
+      await updateUser(userId, { name }, locals.token);
     } catch (err) {
       return handleActionError(err, 'Update user error', formFields);
     }

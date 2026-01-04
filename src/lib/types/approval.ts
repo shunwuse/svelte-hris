@@ -13,6 +13,5 @@ export interface Approval {
 export type GetApprovalsResponse = CursorPaginationResponse<Approval>;
 
 export interface ApprovalActionRequest {
-  id: number;
   action: ActionableApprovalStatus;
 }

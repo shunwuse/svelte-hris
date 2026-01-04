@@ -30,10 +30,11 @@ export function createUser(
 }
 
 export function updateUser(
+  id: number,
   data: UpdateUserRequest,
   token: string
 ): Promise<string> {
-  return api.put<string>('/users', data, {
+  return api.put<string>(`/users/${id}`, data, {
     Authorization: `Bearer ${token}`
   });
 }

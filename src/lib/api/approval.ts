@@ -27,10 +27,11 @@ export function createApproval(token: string): Promise<string> {
 }
 
 export function actionApproval(
+  id: number,
   data: ApprovalActionRequest,
   token: string
 ): Promise<string> {
-  return api.put<string>('/approvals/action', data, {
+  return api.put<string>(`/approvals/${id}/action`, data, {
     Authorization: `Bearer ${token}`
   });
 }

@@ -31,7 +31,7 @@ export const actions: Actions = {
     const approvalId = Number(params.id);
 
     try {
-      await actionApproval({ id: approvalId, action: APPROVAL_STATUS.APPROVED }, locals.token);
+      await actionApproval(approvalId, { action: APPROVAL_STATUS.APPROVED }, locals.token);
     } catch (err) {
       return handleActionError(err, 'Approve error');
     }
@@ -43,7 +43,7 @@ export const actions: Actions = {
     const approvalId = Number(params.id);
 
     try {
-      await actionApproval({ id: approvalId, action: APPROVAL_STATUS.REJECTED }, locals.token);
+      await actionApproval(approvalId, { action: APPROVAL_STATUS.REJECTED }, locals.token);
     } catch (err) {
       return handleActionError(err, 'Reject error');
     }

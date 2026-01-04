@@ -21,6 +21,5 @@ export interface CreateUserRequest {
 }
 
 export interface UpdateUserRequest {
-  id: number;
   name?: string;
 }
