@@ -1,6 +1,7 @@
 import { api } from './client';
 import type {
   GetUsersResponse,
+  User,
   CreateUserRequest,
   UpdateUserRequest
 } from '$lib/types';
@@ -16,6 +17,12 @@ export function getUsers(
   const path = query.toString() ? `/users?${query.toString()}` : '/users';
 
   return api.get<GetUsersResponse>(path, {
+    Authorization: `Bearer ${token}`
+  });
+}
+
+export function getUser(id: number, token: string): Promise<User> {
+  return api.get<User>(`/users/${id}`, {
     Authorization: `Bearer ${token}`
   });
 }
