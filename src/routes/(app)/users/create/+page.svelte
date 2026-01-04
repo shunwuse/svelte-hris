@@ -91,7 +91,7 @@
                 {roleOptions.find(r => r.value === selectedRole)?.label ?? 'Select a role'}
               </Select.Trigger>
               <Select.Content>
-                {#each roleOptions as role}
+                {#each roleOptions as role (role.value)}
                   <Select.Item value={role.value} label={role.label}>
                     {role.label}
                   </Select.Item>

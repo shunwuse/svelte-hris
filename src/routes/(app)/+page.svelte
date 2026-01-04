@@ -45,7 +45,7 @@
 							<p class="text-xl font-medium">{data.userInfo.username}</p>
 							{#if data.userInfo.roles}
 								<div class="mt-1 flex gap-2">
-									{#each data.userInfo.roles as role}
+									{#each data.userInfo.roles as role (role)}
 										<Badge variant="secondary">{role}</Badge>
 									{/each}
 								</div>
@@ -127,7 +127,7 @@
 						<p class="py-4 text-center text-gray-500">No approvals yet</p>
 					{:else}
 						<div class="space-y-3">
-							{#each data.recentApprovals as approval}
+							{#each data.recentApprovals as approval (approval.id)}
 								<div
 									class="flex items-center justify-between rounded-lg border p-3 hover:bg-gray-50"
 								>

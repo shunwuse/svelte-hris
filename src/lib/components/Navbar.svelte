@@ -29,7 +29,7 @@
 
 			<!-- Nav Links -->
 			<div class="flex items-center gap-1">
-				{#each navItems as item}
+				{#each navItems as item (item.href)}
 					<a
 						href={item.href}
 						class="rounded-md px-3 py-2 text-sm font-medium transition-colors {isActive(

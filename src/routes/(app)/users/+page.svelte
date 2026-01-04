@@ -82,7 +82,7 @@
               )?.label}
             </Select.Trigger>
             <Select.Content>
-              {#each perPageOptions as option}
+              {#each perPageOptions as option (option.value)}
                 <Select.Item value={option.value}>{option.label}</Select.Item>
               {/each}
             </Select.Content>
@@ -104,7 +104,7 @@
           </Table.Row>
         </Table.Header>
         <Table.Body>
-          {#each data.usersResponse.data as user}
+          {#each data.usersResponse.data as user (user.id)}
             <Table.Row class="group transition-colors hover:bg-muted/30">
               <Table.Cell class="text-center font-mono text-xs text-muted-foreground">
                 {user.id}
@@ -163,7 +163,7 @@
           </Button>
 
           <div class="hidden items-center gap-1 sm:flex">
-            {#each Array.from({ length: data.usersResponse.meta.last_page }, (_, i) => i + 1) as p}
+            {#each Array.from({ length: data.usersResponse.meta.last_page }, (_, i) => i + 1) as p (p)}
               {#if p === 1 || p === data.usersResponse.meta.last_page || (p >= data.usersResponse.meta.current_page - 1 && p <= data.usersResponse.meta.current_page + 1)}
                 <Button
                   variant={data.usersResponse.meta.current_page === p ? 'default' : 'outline'}
