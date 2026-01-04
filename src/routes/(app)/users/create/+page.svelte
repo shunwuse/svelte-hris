@@ -6,6 +6,7 @@
   import * as Card from '$lib/components/ui/card';
   import * as Select from '$lib/components/ui/select';
   import { flash } from '$lib/stores';
+  import { resolve } from '$app/paths';
 
   let { form } = $props();
 
@@ -103,7 +104,7 @@
         </Card.Content>
 
         <Card.Footer class="flex justify-between">
-          <Button variant="outline" href="/users">Cancel</Button>
+          <Button variant="outline" href={resolve("/users")}>Cancel</Button>
           <Button type="submit" disabled={isSubmitting}>
             {#if isSubmitting}
               Creating...

@@ -5,6 +5,7 @@
   import * as Card from '$lib/components/ui/card';
   import { flash } from '$lib/stores';
   import type { ApprovalStatus } from '$lib/types';
+  import { resolve } from '$app/paths';
 
   let { data, form } = $props();
 
@@ -61,7 +62,7 @@
           </div>
         </Card.Content>
         <Card.Footer>
-          <Button variant="outline" href="/approvals">← Back to Approvals</Button>
+          <Button variant="outline" href={resolve("/approvals")}>← Back to Approvals</Button>
         </Card.Footer>
       {:else if data.approval}
         <Card.Content class="space-y-4">
@@ -89,7 +90,7 @@
         </Card.Content>
 
         <Card.Footer class="flex justify-between">
-          <Button variant="outline" href="/approvals">Cancel</Button>
+          <Button variant="outline" href={resolve("/approvals")}>Cancel</Button>
 
           {#if data.approval.status === 'PENDING'}
             <div class="flex gap-2">

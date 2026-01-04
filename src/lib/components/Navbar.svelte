@@ -1,14 +1,16 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { enhance } from '$app/forms';
+	import { resolve } from '$app/paths';
+	import type { Pathname } from '$app/types';
 	import { Button } from '$lib/components/ui/button';
 
 	let isLoggingOut = $state(false);
 
 	const navItems = [
-		{ href: '/', label: 'Dashboard' },
-		{ href: '/users', label: 'Users' },
-		{ href: '/approvals', label: 'Approvals' }
+		{ href: '/' as Pathname, label: 'Dashboard' },
+		{ href: '/users' as Pathname, label: 'Users' },
+		{ href: '/approvals' as Pathname, label: 'Approvals' }
 	];
 
 	function isActive(href: string, pathname: string): boolean {
@@ -23,7 +25,7 @@
 	<div class="mx-auto max-w-6xl px-4">
 		<div class="flex h-16 items-center justify-between">
 			<!-- Logo -->
-			<a href="/" class="text-xl font-bold text-primary">
+			<a href={resolve("/")} class="text-xl font-bold text-primary">
 				HRIS
 			</a>
 
@@ -31,7 +33,7 @@
 			<div class="flex items-center gap-1">
 				{#each navItems as item (item.href)}
 					<a
-						href={item.href}
+						href={resolve(item.href)}
 						class="rounded-md px-3 py-2 text-sm font-medium transition-colors {isActive(
 							item.href,
 							page.url.pathname

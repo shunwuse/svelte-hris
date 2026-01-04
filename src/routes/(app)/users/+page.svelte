@@ -5,6 +5,8 @@
   import * as Select from '$lib/components/ui/select';
   import * as Card from '$lib/components/ui/card';
   import { flash } from '$lib/stores';
+  import { resolve } from '$app/paths';
+  import type { Pathname } from '$app/types';
   import { goto } from '$app/navigation';
   import { page } from '$app/state';
   import ChevronLeft from '@lucide/svelte/icons/chevron-left';
@@ -36,7 +38,7 @@
     const url = new URL(page.url);
     url.searchParams.set('per_page', value);
     url.searchParams.set('page', '1');
-    goto(url.toString());
+    goto(url.pathname + url.search);
   }
 
   const perPageOptions = [
@@ -54,7 +56,7 @@
       <p class="text-muted-foreground">Manage system users and their permissions.</p>
     </div>
     <div class="flex items-center gap-2">
-      <Button href="/users/create" class="gap-2">
+      <Button href={resolve("/users/create")} class="gap-2">
         <UserPlus class="size-4" />
         Add User
       </Button>
@@ -122,7 +124,7 @@
                 {formatDate(user.last_updated_time)}
               </Table.Cell>
               <Table.Cell class="text-right">
-                <Button variant="ghost" size="icon" href="/users/{user.id}" class="opacity-0 group-hover:opacity-100">
+                <Button variant="ghost" size="icon" href={resolve(`/users/${user.id}` as Pathname)} class="opacity-0 group-hover:opacity-100">
                   <Edit2 class="size-4" />
                   <span class="sr-only">Edit</span>
                 </Button>

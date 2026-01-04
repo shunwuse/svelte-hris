@@ -5,6 +5,7 @@
   import { Label } from '$lib/components/ui/label';
   import * as Card from '$lib/components/ui/card';
   import { flash } from '$lib/stores';
+  import { resolve } from '$app/paths';
 
   let { data, form } = $props();
 
@@ -68,7 +69,7 @@
           </Card.Content>
 
           <Card.Footer class="flex justify-between">
-            <Button variant="outline" href="/users">Cancel</Button>
+            <Button variant="outline" href={resolve("/users")}>Cancel</Button>
             <Button type="submit" disabled={isSubmitting}>
               {#if isSubmitting}
                 Saving...

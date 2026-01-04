@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
+	import type { Pathname } from '$app/types';
 	import { Button } from '$lib/components/ui/button';
 	import {
 		Card,
@@ -58,7 +60,7 @@
 
 		<!-- Stats Cards -->
 		<div class="mb-8 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-			<a href="/users" class="block">
+			<a href={resolve("/users")} class="block">
 				<Card
 					class="cursor-pointer transition-all hover:border-primary hover:shadow-md"
 				>
@@ -72,7 +74,7 @@
 				</Card>
 			</a>
 
-			<a href="/approvals?status=PENDING" class="block">
+			<a href={resolve("/approvals?status=PENDING" as Pathname)} class="block">
 				<Card
 					class="cursor-pointer transition-all hover:border-yellow-500 hover:shadow-md"
 				>
@@ -86,7 +88,7 @@
 				</Card>
 			</a>
 
-			<a href="/approvals?status=APPROVED" class="block">
+			<a href={resolve("/approvals?status=APPROVED" as Pathname)} class="block">
 				<Card
 					class="cursor-pointer transition-all hover:border-green-500 hover:shadow-md"
 				>
@@ -100,7 +102,7 @@
 				</Card>
 			</a>
 
-			<a href="/approvals?status=REJECTED" class="block">
+			<a href={resolve("/approvals?status=REJECTED" as Pathname)} class="block">
 				<Card
 					class="cursor-pointer transition-all hover:border-red-500 hover:shadow-md"
 				>
@@ -193,7 +195,7 @@
 						Create User
 					</Button>
 
-					<Button href="/approvals" class="w-full justify-start" variant="outline">
+					<Button href={resolve("/approvals")} class="w-full justify-start" variant="outline">
 						<svg
 							class="mr-2 h-4 w-4"
 							fill="none"
@@ -211,7 +213,7 @@
 						View Approvals
 					</Button>
 
-					<Button href="/approvals/create" class="w-full justify-start" variant="outline">
+					<Button href={resolve("/approvals/create")} class="w-full justify-start" variant="outline">
 						<svg
 							class="mr-2 h-4 w-4"
 							fill="none"
