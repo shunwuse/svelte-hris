@@ -1,6 +1,7 @@
 import { api } from './client';
 import type {
     GetApprovalsResponse,
+    Approval,
     ApprovalActionRequest
 } from '$lib/types';
 
@@ -16,6 +17,12 @@ export function getApprovals(
   const endpoint = `/approvals${queryString ? `?${queryString}` : ''}`;
 
   return api.get<GetApprovalsResponse>(endpoint, {
+    Authorization: `Bearer ${token}`
+  });
+}
+
+export function getApproval(id: number, token: string): Promise<Approval> {
+  return api.get<Approval>(`/approvals/${id}`, {
     Authorization: `Bearer ${token}`
   });
 }
