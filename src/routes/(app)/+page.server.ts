@@ -1,5 +1,6 @@
 import type { PageServerLoad } from './$types';
 import { COOKIE_KEYS } from '$lib/constants';
+import { APPROVAL_STATUS } from '$lib/domain';
 import { getUsers, getApprovals } from '$lib/api';
 import { safeLoad } from '$lib/server/utils';
 
@@ -31,9 +32,9 @@ export const load: PageServerLoad = async ({ cookies, locals }) => {
 	]);
 
 	// Calculate stats
-	const pendingApprovals = approvalsResult.data.data.filter((a) => a.status === 'PENDING').length;
-	const approvedApprovals = approvalsResult.data.data.filter((a) => a.status === 'APPROVED').length;
-	const rejectedApprovals = approvalsResult.data.data.filter((a) => a.status === 'REJECTED').length;
+	const pendingApprovals = approvalsResult.data.data.filter((a) => a.status === APPROVAL_STATUS.PENDING).length;
+	const approvedApprovals = approvalsResult.data.data.filter((a) => a.status === APPROVAL_STATUS.APPROVED).length;
+	const rejectedApprovals = approvalsResult.data.data.filter((a) => a.status === APPROVAL_STATUS.REJECTED).length;
 
 	return {
 		userInfo,

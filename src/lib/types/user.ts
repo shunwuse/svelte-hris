@@ -1,4 +1,5 @@
 import type { OffsetPaginationResponse } from './api';
+import type { CreateableRole } from '$lib/domain';
 
 // ==================== User ====================
 
@@ -16,7 +17,7 @@ export interface CreateUserRequest {
   username: string;
   password: string;
   name: string;
-  role: 'manager' | 'staff';
+  role: CreateableRole;
 }
 
 export interface UpdateUserRequest {

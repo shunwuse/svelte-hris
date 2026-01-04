@@ -4,7 +4,8 @@
   import { Badge } from '$lib/components/ui/badge';
   import * as Card from '$lib/components/ui/card';
   import { flash } from '$lib/stores';
-  import type { ApprovalStatus } from '$lib/types';
+  import type { ApprovalStatus } from '$lib/domain';
+  import { APPROVAL_STATUS } from '$lib/domain';
   import { resolve } from '$app/paths';
 
   let { data, form } = $props();
@@ -13,11 +14,11 @@
 
   function getStatusVariant(status: ApprovalStatus): 'default' | 'secondary' | 'destructive' {
     switch (status) {
-      case 'APPROVED':
+      case APPROVAL_STATUS.APPROVED:
         return 'default';
-      case 'REJECTED':
+      case APPROVAL_STATUS.REJECTED:
         return 'destructive';
-      case 'PENDING':
+      case APPROVAL_STATUS.PENDING:
       default:
         return 'secondary';
     }
@@ -92,7 +93,7 @@
         <Card.Footer class="flex justify-between">
           <Button variant="outline" href={resolve("/approvals")}>Cancel</Button>
 
-          {#if data.approval.status === 'PENDING'}
+          {#if data.approval.status === APPROVAL_STATUS.PENDING}
             <div class="flex gap-2">
               <form
                 method="POST"

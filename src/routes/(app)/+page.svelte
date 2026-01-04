@@ -10,13 +10,14 @@
 		CardTitle
 	} from '$lib/components/ui/card';
 	import { Badge } from '$lib/components/ui/badge';
+	import { APPROVAL_STATUS } from '$lib/domain';
 
 	let { data } = $props();
 
 	const statusColors = {
-		PENDING: 'bg-yellow-100 text-yellow-800',
-		APPROVED: 'bg-green-100 text-green-800',
-		REJECTED: 'bg-red-100 text-red-800'
+		[APPROVAL_STATUS.PENDING]: 'bg-yellow-100 text-yellow-800',
+		[APPROVAL_STATUS.APPROVED]: 'bg-green-100 text-green-800',
+		[APPROVAL_STATUS.REJECTED]: 'bg-red-100 text-red-800'
 	} as const;
 </script>
 
@@ -74,7 +75,7 @@
 				</Card>
 			</a>
 
-			<a href={resolve("/approvals?status=PENDING" as Pathname)} class="block">
+			<a href={resolve(`/approvals?status=${APPROVAL_STATUS.PENDING}` as Pathname)} class="block">
 				<Card
 					class="cursor-pointer transition-all hover:border-yellow-500 hover:shadow-md"
 				>
@@ -88,7 +89,7 @@
 				</Card>
 			</a>
 
-			<a href={resolve("/approvals?status=APPROVED" as Pathname)} class="block">
+			<a href={resolve(`/approvals?status=${APPROVAL_STATUS.APPROVED}` as Pathname)} class="block">
 				<Card
 					class="cursor-pointer transition-all hover:border-green-500 hover:shadow-md"
 				>
@@ -102,7 +103,7 @@
 				</Card>
 			</a>
 
-			<a href={resolve("/approvals?status=REJECTED" as Pathname)} class="block">
+			<a href={resolve(`/approvals?status=${APPROVAL_STATUS.REJECTED}` as Pathname)} class="block">
 				<Card
 					class="cursor-pointer transition-all hover:border-red-500 hover:shadow-md"
 				>

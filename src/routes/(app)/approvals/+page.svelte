@@ -7,7 +7,9 @@
   import { Label } from '$lib/components/ui/label';
   import { flash } from '$lib/stores';
   import { getApprovals } from '$lib/api';
-  import type { Approval, ApprovalStatus } from '$lib/types';
+  import { APPROVAL_STATUS } from '$lib/domain';
+  import type { ApprovalStatus } from '$lib/domain';
+  import type { Approval } from '$lib/types';
   import Search from '@lucide/svelte/icons/search';
   import Plus from '@lucide/svelte/icons/plus';
   import Loader2 from '@lucide/svelte/icons/loader-2';
@@ -50,11 +52,11 @@
   // Get badge variant based on status
   function getStatusVariant(status: ApprovalStatus): 'default' | 'secondary' | 'destructive' | 'outline' {
     switch (status) {
-      case 'APPROVED':
+      case APPROVAL_STATUS.APPROVED:
         return 'default';
-      case 'REJECTED':
+      case APPROVAL_STATUS.REJECTED:
         return 'destructive';
-      case 'PENDING':
+      case APPROVAL_STATUS.PENDING:
       default:
         return 'secondary';
     }

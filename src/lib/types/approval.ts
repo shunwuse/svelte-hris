@@ -1,8 +1,7 @@
 import type { CursorPaginationResponse } from './api';
+import type { ApprovalStatus, ActionableApprovalStatus } from '$lib/domain';
 
 // ==================== Approval ====================
-
-export type ApprovalStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
 
 export interface Approval {
   id: number;
@@ -15,5 +14,5 @@ export type GetApprovalsResponse = CursorPaginationResponse<Approval>;
 
 export interface ApprovalActionRequest {
   id: number;
-  action: 'APPROVED' | 'REJECTED';
+  action: ActionableApprovalStatus;
 }

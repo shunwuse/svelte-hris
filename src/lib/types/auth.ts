@@ -1,18 +1,4 @@
-// ==================== Role ====================
-
-export type Role = 'administrator' | 'manager' | 'staff';
-
-// ==================== Permission ====================
-
-export type Permission =
-  | 'create_user'
-  | 'read_user'
-  | 'update_user'
-  | 'create_approval'
-  | 'read_approval'
-  | 'action_approval';
-
-// ==================== Login ====================
+import type { Role } from '$lib/domain';
 
 export interface LoginRequest {
   username: string;
@@ -21,7 +7,7 @@ export interface LoginRequest {
 
 export interface LoginResponse {
   username: string;
-  roles: string[];
+  roles: Role[];
   access_token: string;
   refresh_token: string;
 }

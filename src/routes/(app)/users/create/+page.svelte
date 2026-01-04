@@ -7,6 +7,7 @@
   import * as Select from '$lib/components/ui/select';
   import { flash } from '$lib/stores';
   import { resolve } from '$app/paths';
+  import { ROLES } from '$lib/domain';
 
   let { form } = $props();
 
@@ -14,8 +15,8 @@
   let selectedRole = $state<string | undefined>(undefined);
 
   const roleOptions = [
-    { value: 'manager', label: 'Manager' },
-    { value: 'staff', label: 'Staff' }
+    { value: ROLES.MANAGER, label: 'Manager' },
+    { value: ROLES.STAFF, label: 'Staff' }
   ];
 
   // Forward page-level errors to flash so layout shows toast
