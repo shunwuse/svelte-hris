@@ -33,7 +33,7 @@
       isSubmitting = true;
       return async ({ result, update }: { result: { type: string }; update: () => Promise<void> }) => {
         if (result.type === 'redirect') {
-          flash.success(action === 'approve' ? 'Approval approved successfully' : 'Approval rejected');
+          flash.success(action === 'approve' ? 'Request approved' : 'Request rejected');
         }
         await update();
         isSubmitting = false;
@@ -52,8 +52,8 @@
   <div class="mx-auto max-w-md">
     <Card.Root>
       <Card.Header>
-        <Card.Title>Review Approval</Card.Title>
-        <Card.Description>Review and take action on this request</Card.Description>
+        <Card.Title>Review Request</Card.Title>
+        <Card.Description>Review and manage this approval request</Card.Description>
       </Card.Header>
 
       {#if data.error}

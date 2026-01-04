@@ -102,7 +102,7 @@
     <div class="flex items-center gap-2">
       <Button href="/approvals/create" class="gap-2">
         <Plus class="size-4" />
-        New Request
+        Create Request
       </Button>
     </div>
   </div>

@@ -58,7 +58,7 @@
     <div class="flex items-center gap-2">
       <Button href={resolve("/users/create")} class="gap-2">
         <UserPlus class="size-4" />
-        Add User
+        Create User
       </Button>
     </div>
   </div>
@@ -100,8 +100,8 @@
           <Table.Row class="bg-muted/50">
             <Table.Head class="w-16 text-center">ID</Table.Head>
             <Table.Head>User Information</Table.Head>
-            <Table.Head>Created</Table.Head>
-            <Table.Head>Updated</Table.Head>
+            <Table.Head>Created At</Table.Head>
+            <Table.Head>Updated At</Table.Head>
             <Table.Head class="w-24 text-right">Actions</Table.Head>
           </Table.Row>
         </Table.Header>
@@ -135,7 +135,7 @@
               <Table.Cell colspan={5} class="h-32 text-center">
                 <div class="flex flex-col items-center justify-center gap-1 text-muted-foreground">
                   <p class="text-lg font-medium">No users found</p>
-                  <p class="text-sm">Try adjusting your search or filters.</p>
+                  <p class="text-sm">Try a different search term or clear filters.</p>
                 </div>
               </Table.Cell>
             </Table.Row>

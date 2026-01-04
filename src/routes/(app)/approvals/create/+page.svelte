@@ -19,8 +19,8 @@
   <div class="mx-auto max-w-md">
     <Card.Root>
       <Card.Header>
-        <Card.Title>New Approval Request</Card.Title>
-        <Card.Description>Submit a new approval request for review</Card.Description>
+        <Card.Title>Create Approval Request</Card.Title>
+        <Card.Description>Submit a new request for review</Card.Description>
       </Card.Header>
 
       <form
@@ -29,7 +29,7 @@
           isSubmitting = true;
           return async ({ result, update }) => {
             if (result.type === 'redirect') {
-              flash.success('Approval request submitted successfully');
+              flash.success('Request submitted');
             }
             await update();
             isSubmitting = false;

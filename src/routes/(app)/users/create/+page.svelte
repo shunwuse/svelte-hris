@@ -39,7 +39,7 @@
           isSubmitting = true;
           return async ({ result, update }) => {
             if (result.type === 'redirect') {
-              flash.success('User created successfully');
+              flash.success('User created');
             }
             await update();
             isSubmitting = false;

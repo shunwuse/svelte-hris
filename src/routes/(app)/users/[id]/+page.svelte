@@ -33,7 +33,7 @@
             isSubmitting = true;
             return async ({ result, update }) => {
               if (result.type === 'redirect') {
-                flash.success('User updated successfully');
+                flash.success('User updated');
               }
               await update();
               isSubmitting = false;
@@ -74,7 +74,7 @@
               {#if isSubmitting}
                 Saving...
               {:else}
-                Save Changes
+                Save
               {/if}
             </Button>
           </Card.Footer>

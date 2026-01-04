@@ -28,7 +28,7 @@
 			<h1 class="text-3xl font-bold text-gray-900">
 				Welcome back{data.userInfo?.username ? `, ${data.userInfo.username}` : ''}!
 			</h1>
-			<p class="mt-1 text-gray-500">Here's what's happening in your HRIS system.</p>
+			<p class="mt-1 text-gray-500">Here's an overview of your HRIS system.</p>
 		</div>
 
 		<!-- User Profile Card -->
@@ -229,7 +229,7 @@
 								d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
 							></path>
 						</svg>
-						New Approval
+						Create Approval
 					</Button>
 				</CardContent>
 			</Card>

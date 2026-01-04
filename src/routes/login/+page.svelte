@@ -14,7 +14,7 @@
   <Card.Root class="w-full max-w-md">
     <Card.Header class="space-y-1">
       <Card.Title class="text-2xl font-bold">Login</Card.Title>
-      <Card.Description>Enter your credentials to access the system</Card.Description>
+      <Card.Description>Sign in to your account to continue</Card.Description>
     </Card.Header>
 
     <form
