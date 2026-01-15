@@ -1,11 +1,10 @@
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions } from './$types';
-import { login } from '$lib/api/auth';
 import { COOKIE_KEYS } from '$lib/constants';
 import { handleActionError } from '$lib/server/utils';
 
 export const actions: Actions = {
-  default: async ({ request, cookies }) => {
+  default: async ({ request, cookies, locals }) => {
     const formData = await request.formData();
     const username = formData.get('username') as string;
     const password = formData.get('password') as string;
@@ -18,7 +17,7 @@ export const actions: Actions = {
     }
 
     try {
-      const data = await login({ username, password });
+      const data = await locals.api.auth.login({ username, password });
 
       cookies.set(COOKIE_KEYS.ACCESS_TOKEN, data.access_token, {
         path: '/',

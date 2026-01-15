@@ -4,7 +4,8 @@ declare global {
   namespace App {
     // interface Error {}
     interface Locals {
-      token: string;
+      token: string | null;
+      api: import('$lib/api').ApiInstance;
     }
     // interface PageData {}
     // interface PageState {}

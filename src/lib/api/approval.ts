@@ -1,44 +1,33 @@
-import { api } from './client';
+import { BaseApi } from './client';
 import type {
-    GetApprovalsResponse,
-    Approval,
-    ApprovalActionRequest
+  GetApprovalsResponse,
+  Approval,
+  ApprovalActionRequest
 } from '$lib/types';
 
-export function getApprovals(
-  token: string,
-  params: { cursor?: string; per_page?: number } = {}
-): Promise<GetApprovalsResponse> {
-  const searchParams = new URLSearchParams();
-  if (params.cursor) searchParams.set('cursor', params.cursor);
-  if (params.per_page) searchParams.set('per_page', params.per_page.toString());
+export class ApprovalApi extends BaseApi {
+  async list(
+    params: { cursor?: string; per_page?: number; } = {}
+  ): Promise<GetApprovalsResponse> {
+    const searchParams = new URLSearchParams();
+    if (params.cursor) searchParams.set('cursor', params.cursor);
+    if (params.per_page) searchParams.set('per_page', params.per_page.toString());
 
-  const queryString = searchParams.toString();
-  const endpoint = `/approvals${queryString ? `?${queryString}` : ''}`;
+    const queryString = searchParams.toString();
+    const path = `/approvals${queryString ? `?${queryString}` : ''}`;
 
-  return api.get<GetApprovalsResponse>(endpoint, {
-    Authorization: `Bearer ${token}`
-  });
-}
+    return this.client.get<GetApprovalsResponse>(path);
+  }
 
-export function getApproval(id: number, token: string): Promise<Approval> {
-  return api.get<Approval>(`/approvals/${id}`, {
-    Authorization: `Bearer ${token}`
-  });
-}
+  async get(id: number): Promise<Approval> {
+    return this.client.get<Approval>(`/approvals/${id}`);
+  }
 
-export function createApproval(token: string): Promise<string> {
-  return api.post<string>('/approvals', {}, {
-    Authorization: `Bearer ${token}`
-  });
-}
+  async create(): Promise<string> {
+    return this.client.post<string>('/approvals', {});
+  }
 
-export function actionApproval(
-  id: number,
-  data: ApprovalActionRequest,
-  token: string
-): Promise<string> {
-  return api.put<string>(`/approvals/${id}/action`, data, {
-    Authorization: `Bearer ${token}`
-  });
+  async action(id: number, data: ApprovalActionRequest): Promise<string> {
+    return this.client.put<string>(`/approvals/${id}/action`, data);
+  }
 }

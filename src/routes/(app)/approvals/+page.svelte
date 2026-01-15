@@ -6,7 +6,7 @@
   import * as Card from '$lib/components/ui/card';
   import { Label } from '$lib/components/ui/label';
   import { flash } from '$lib/stores';
-  import { getApprovals } from '$lib/api';
+  import { createApi } from '$lib/api';
   import { APPROVAL_STATUS } from '$lib/domain';
   import type { ApprovalStatus } from '$lib/domain';
   import type { Approval } from '$lib/types';
@@ -16,6 +16,8 @@
   import Loader2 from '@lucide/svelte/icons/loader-2';
 
   let { data } = $props();
+
+  const api = createApi({ token: data.token });
 
   // State for cursor-based pagination
   let approvals = $state<Approval[]>(data.approvalsResponse.data);
@@ -78,7 +80,7 @@
 
     isLoadingMore = true;
     try {
-      const response = await getApprovals(data.token, {
+      const response = await api.approvals.list({
         cursor: nextCursor
       });
 

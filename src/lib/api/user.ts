@@ -1,4 +1,4 @@
-import { api } from './client';
+import { BaseApi } from './client';
 import type {
   GetUsersResponse,
   User,
@@ -6,42 +6,28 @@ import type {
   UpdateUserRequest
 } from '$lib/types';
 
-export function getUsers(
-  token: string,
-  params?: { page?: number; per_page?: number }
-): Promise<GetUsersResponse> {
-  const query = new URLSearchParams();
-  if (params?.page) query.append('page', params.page.toString());
-  if (params?.per_page) query.append('per_page', params.per_page.toString());
+export class UserApi extends BaseApi {
+  async list(
+    params?: { page?: number; per_page?: number; }
+  ): Promise<GetUsersResponse> {
+    const query = new URLSearchParams();
+    if (params?.page) query.append('page', params.page.toString());
+    if (params?.per_page) query.append('per_page', params.per_page.toString());
 
-  const path = query.toString() ? `/users?${query.toString()}` : '/users';
+    const path = query.toString() ? `/users?${query.toString()}` : '/users';
 
-  return api.get<GetUsersResponse>(path, {
-    Authorization: `Bearer ${token}`
-  });
-}
+    return this.client.get<GetUsersResponse>(path);
+  }
 
-export function getUser(id: number, token: string): Promise<User> {
-  return api.get<User>(`/users/${id}`, {
-    Authorization: `Bearer ${token}`
-  });
-}
+  async get(id: number): Promise<User> {
+    return this.client.get<User>(`/users/${id}`);
+  }
 
-export function createUser(
-  data: CreateUserRequest,
-  token: string
-): Promise<string> {
-  return api.post<string>('/users', data, {
-    Authorization: `Bearer ${token}`
-  });
-}
+  async create(data: CreateUserRequest): Promise<string> {
+    return this.client.post<string>('/users', data);
+  }
 
-export function updateUser(
-  id: number,
-  data: UpdateUserRequest,
-  token: string
-): Promise<string> {
-  return api.put<string>(`/users/${id}`, data, {
-    Authorization: `Bearer ${token}`
-  });
+  async update(id: number, data: UpdateUserRequest): Promise<string> {
+    return this.client.put<string>(`/users/${id}`, data);
+  }
 }

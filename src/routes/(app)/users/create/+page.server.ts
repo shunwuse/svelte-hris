@@ -1,6 +1,5 @@
 import type { Actions } from './$types';
 import { fail, redirect } from '@sveltejs/kit';
-import { createUser } from '$lib/api';
 import { handleActionError } from '$lib/server/utils';
 import type { CreateableRole } from '$lib/domain';
 
@@ -24,9 +23,8 @@ export const actions: Actions = {
     }
 
     try {
-      await createUser(
-        { username, name, password, role },
-        locals.token
+      await locals.api.users.create(
+        { username, name, password, role }
       );
     } catch (err) {
       return handleActionError(err, 'Create user error', formFields);

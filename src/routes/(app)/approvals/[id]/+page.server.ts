@@ -1,14 +1,13 @@
 import type { PageServerLoad, Actions } from './$types';
 import { redirect } from '@sveltejs/kit';
 import { APPROVAL_STATUS } from '$lib/domain';
-import { getApproval, actionApproval } from '$lib/api';
 import { safeLoad, handleActionError } from '$lib/server/utils';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
   const approvalId = Number(params.id);
 
   const { data: approval, error } = await safeLoad(
-    () => getApproval(approvalId, locals.token),
+    () => locals.api.approvals.get(approvalId),
     null,
     'Failed to fetch approval'
   );
@@ -29,7 +28,7 @@ export const actions: Actions = {
     const approvalId = Number(params.id);
 
     try {
-      await actionApproval(approvalId, { action: APPROVAL_STATUS.APPROVED }, locals.token);
+      await locals.api.approvals.action(approvalId, { action: APPROVAL_STATUS.APPROVED });
     } catch (err) {
       return handleActionError(err, 'Approve error');
     }
@@ -41,7 +40,7 @@ export const actions: Actions = {
     const approvalId = Number(params.id);
 
     try {
-      await actionApproval(approvalId, { action: APPROVAL_STATUS.REJECTED }, locals.token);
+      await locals.api.approvals.action(approvalId, { action: APPROVAL_STATUS.REJECTED });
     } catch (err) {
       return handleActionError(err, 'Reject error');
     }

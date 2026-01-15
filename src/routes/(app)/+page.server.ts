@@ -1,6 +1,5 @@
 import type { PageServerLoad } from './$types';
 import { COOKIE_KEYS } from '$lib/constants';
-import { getUsers, getApprovals } from '$lib/api';
 import { safeLoad } from '$lib/server/utils';
 
 export const load: PageServerLoad = async ({ cookies, locals }) => {
@@ -19,12 +18,12 @@ export const load: PageServerLoad = async ({ cookies, locals }) => {
 	// Fetch users and approvals for stats
 	const [usersResult, approvalsResult] = await Promise.all([
 		safeLoad(
-			() => getUsers(locals.token, { per_page: 5 }),
+			() => locals.api.users.list({ per_page: 5 }),
 			{ data: [], meta: { total: 0, per_page: 5, current_page: 1, last_page: 1 } },
 			'Failed to fetch users'
 		),
 		safeLoad(
-			() => getApprovals(locals.token),
+			() => locals.api.approvals.list(),
 			{ data: [], meta: { next_cursor: null, has_more: false } },
 			'Failed to fetch approvals'
 		)

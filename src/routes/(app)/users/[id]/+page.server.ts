@@ -1,13 +1,12 @@
 import type { PageServerLoad, Actions } from './$types';
 import { fail, redirect } from '@sveltejs/kit';
-import { getUser, updateUser } from '$lib/api';
 import { safeLoad, handleActionError } from '$lib/server/utils';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
   const userId = Number(params.id);
 
   const { data: user, error } = await safeLoad(
-    () => getUser(userId, locals.token),
+    () => locals.api.users.get(userId),
     null,
     'Failed to fetch user'
   );
@@ -36,7 +35,7 @@ export const actions: Actions = {
     }
 
     try {
-      await updateUser(userId, { name }, locals.token);
+      await locals.api.users.update(userId, { name });
     } catch (err) {
       return handleActionError(err, 'Update user error', formFields);
     }
