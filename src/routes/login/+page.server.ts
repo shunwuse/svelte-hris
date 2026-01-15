@@ -1,4 +1,5 @@
 import { fail, redirect } from '@sveltejs/kit';
+import { dev } from '$app/environment';
 import type { Actions } from './$types';
 import { COOKIE_KEYS } from '$lib/constants';
 import { handleActionError } from '$lib/server/utils';
@@ -22,7 +23,7 @@ export const actions: Actions = {
       cookies.set(COOKIE_KEYS.ACCESS_TOKEN, data.access_token, {
         path: '/',
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: !dev,
         sameSite: 'strict',
         maxAge: 24 * 60 * 60
       });
@@ -30,7 +31,7 @@ export const actions: Actions = {
       cookies.set(COOKIE_KEYS.REFRESH_TOKEN, data.refresh_token, {
         path: '/',
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: !dev,
         sameSite: 'strict',
         maxAge: 24 * 60 * 60
       });
@@ -41,7 +42,7 @@ export const actions: Actions = {
         {
           path: '/',
           httpOnly: false,
-          secure: process.env.NODE_ENV === 'production',
+          secure: !dev,
           sameSite: 'strict',
           maxAge: 24 * 60 * 60
         }
