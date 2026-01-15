@@ -7,16 +7,9 @@ import type {
 
 export class ApprovalApi extends BaseApi {
   async list(
-    params: { cursor?: string; per_page?: number; } = {}
+    query: { cursor?: string; per_page?: number; } = {}
   ): Promise<GetApprovalsResponse> {
-    const searchParams = new URLSearchParams();
-    if (params.cursor) searchParams.set('cursor', params.cursor);
-    if (params.per_page) searchParams.set('per_page', params.per_page.toString());
-
-    const queryString = searchParams.toString();
-    const path = `/approvals${queryString ? `?${queryString}` : ''}`;
-
-    return this.client.get<GetApprovalsResponse>(path);
+    return this.client.get<GetApprovalsResponse>('/approvals', { query });
   }
 
   async get(id: number): Promise<Approval> {

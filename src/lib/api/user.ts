@@ -8,15 +8,9 @@ import type {
 
 export class UserApi extends BaseApi {
   async list(
-    params?: { page?: number; per_page?: number; }
+    query?: { page?: number; per_page?: number; }
   ): Promise<GetUsersResponse> {
-    const query = new URLSearchParams();
-    if (params?.page) query.append('page', params.page.toString());
-    if (params?.per_page) query.append('per_page', params.per_page.toString());
-
-    const path = query.toString() ? `/users?${query.toString()}` : '/users';
-
-    return this.client.get<GetUsersResponse>(path);
+    return this.client.get<GetUsersResponse>('/users', { query });
   }
 
   async get(id: number): Promise<User> {

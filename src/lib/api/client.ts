@@ -19,6 +19,30 @@ export class ApiClient {
     this.token = options.token ?? null;
   }
 
+  // Build URL with query parameters
+  private buildUrl(
+    endpoint: string,
+    query?: RequestOptions['query']
+  ): string {
+    let url = endpoint;
+    if (query) {
+      const searchParams = new URLSearchParams();
+
+      Object.entries(query).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          searchParams.append(key, value.toString());
+        }
+      });
+
+      const queryString = searchParams.toString();
+      if (queryString) {
+        url += (url.includes('?') ? '&' : '?') + queryString;
+      }
+    }
+
+    return url;
+  }
+
   // Generic fetch wrapper with error handling
   private async request<T>(
     endpoint: string,
@@ -62,33 +86,33 @@ export class ApiClient {
   }
 
   // HTTP method helpers
-  public get<T>(endpoint: string, headers?: HeadersInit) {
-    return this.request<T>(endpoint, {
+  public get<T>(endpoint: string, options?: RequestOptions) {
+    return this.request<T>(this.buildUrl(endpoint, options?.query), {
       method: 'GET',
-      headers
+      headers: options?.headers
     });
   }
 
-  public post<T>(endpoint: string, body?: unknown, headers?: HeadersInit) {
-    return this.request<T>(endpoint, {
+  public post<T>(endpoint: string, body?: unknown, options?: RequestOptions) {
+    return this.request<T>(this.buildUrl(endpoint, options?.query), {
       method: 'POST',
       body: body instanceof FormData ? body : JSON.stringify(body),
-      headers
+      headers: options?.headers
     });
   }
 
-  public put<T>(endpoint: string, body?: unknown, headers?: HeadersInit) {
-    return this.request<T>(endpoint, {
+  public put<T>(endpoint: string, body?: unknown, options?: RequestOptions) {
+    return this.request<T>(this.buildUrl(endpoint, options?.query), {
       method: 'PUT',
       body: body instanceof FormData ? body : JSON.stringify(body),
-      headers
+      headers: options?.headers
     });
   }
 
-  public delete<T>(endpoint: string, headers?: HeadersInit) {
-    return this.request<T>(endpoint, {
+  public delete<T>(endpoint: string, options?: RequestOptions) {
+    return this.request<T>(this.buildUrl(endpoint, options?.query), {
       method: 'DELETE',
-      headers
+      headers: options?.headers
     });
   }
 }
@@ -96,6 +120,12 @@ export class ApiClient {
 // Base class for API services
 export abstract class BaseApi {
   constructor(protected client: ApiClient) {}
+}
+
+// Options for individual requests
+export interface RequestOptions {
+  query?: Record<string, string | number | boolean | undefined | null>;
+  headers?: HeadersInit;
 }
 
 // Custom error class for API errors
