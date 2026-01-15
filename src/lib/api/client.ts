@@ -6,17 +6,30 @@ const API_BASE_URL = 'http://localhost:8080';
 // Options for ApiClient
 export interface ApiClientOptions {
   fetch?: typeof fetch;
-  token?: string | null;
+  accessToken?: string | null;
+  refreshToken?: string | null;
+  onTokenUpdate?: (tokens: { access_token: string; refresh_token: string }) => Promise<void> | void;
+  onLogout?: () => Promise<void> | void;
 }
 
 // Main API client class
 export class ApiClient {
   private fetchFn: typeof fetch;
-  private token: string | null;
+  private accessToken: string | null;
+  private refreshToken: string | null;
+  private onTokenUpdate?: ApiClientOptions['onTokenUpdate'];
+  private onLogout?: ApiClientOptions['onLogout'];
+
+  // For handling concurrent refresh calls
+  private isRefreshing = false;
+  private refreshPromise: Promise<{ access_token: string; refresh_token: string }> | null = null;
 
   constructor(options: ApiClientOptions = {}) {
     this.fetchFn = options.fetch ?? fetch;
-    this.token = options.token ?? null;
+    this.accessToken = options.accessToken ?? null;
+    this.refreshToken = options.refreshToken ?? null;
+    this.onTokenUpdate = options.onTokenUpdate;
+    this.onLogout = options.onLogout;
   }
 
   // Build URL with query parameters
@@ -43,7 +56,7 @@ export class ApiClient {
     return url;
   }
 
-  // Generic fetch wrapper with error handling
+  // Generic fetch wrapper with error handling and automatic refresh
   private async request<T>(
     endpoint: string,
     options: RequestInit = {}
@@ -55,8 +68,8 @@ export class ApiClient {
       headers.set('Content-Type', 'application/json');
     }
 
-    if (this.token) {
-      headers.set('Authorization', `Bearer ${this.token}`);
+    if (this.accessToken) {
+      headers.set('Authorization', `Bearer ${this.accessToken}`);
     }
 
     const config: RequestInit = {
@@ -64,7 +77,32 @@ export class ApiClient {
       headers
     };
 
-    const response = await this.fetchFn(url, config);
+    let response = await this.fetchFn(url, config);
+
+    // Detect 401 and TOKEN_EXPIRED error
+    if (response.status === 401) {
+      const clonedResponse = response.clone();
+      try {
+        const errorData: ApiError = await clonedResponse.json();
+
+        if (errorData.error.code === 'TOKEN_EXPIRED' && this.refreshToken) {
+          // Trigger token refresh
+          const newTokens = await this.handleTokenRefresh();
+
+          // Retry the original request with new token
+          headers.set('Authorization', `Bearer ${newTokens.access_token}`);
+          response = await this.fetchFn(url, { ...config, headers });
+        } else {
+          // Not an expiry error, or no refresh token available
+          throw new ApiClientError(errorData.error);
+        }
+      } catch (e) {
+        // If it's already an ApiClientError, rethrow it
+        if (e instanceof ApiClientError) throw e;
+        // Otherwise, if JSON parsing fails or other issues, throw generic error
+        throw new Error(`API Request failed with status ${response.status}`);
+      }
+    }
 
     // Handle non-OK responses
     if (!response.ok) {
@@ -83,6 +121,69 @@ export class ApiClient {
     }
 
     return response.json();
+  }
+
+  // Handle centralized token refresh with concurrency protection
+  private async handleTokenRefresh(): Promise<{
+    access_token: string;
+    refresh_token: string;
+  }> {
+    if (this.isRefreshing && this.refreshPromise) {
+      return this.refreshPromise;
+    }
+
+    this.isRefreshing = true;
+    this.refreshPromise = (async () => {
+      try {
+        const response = await this.fetchFn(`${API_BASE_URL}/auth/refresh`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ refresh_token: this.refreshToken })
+        });
+
+        if (!response.ok) {
+          const errorData: ApiError = await response.json();
+          // Critical failure: TOKEN_INVALID or TOKEN_EXPIRED on refresh endpoint
+          if (
+            response.status === 401 ||
+            errorData.error.code === 'TOKEN_INVALID' ||
+            errorData.error.code === 'TOKEN_EXPIRED'
+          ) {
+            await this.handleLogout();
+          }
+          throw new ApiClientError(errorData.error);
+        }
+
+        const tokens: {
+          access_token: string;
+          refresh_token: string;
+        } = await response.json();
+
+        // Update local state
+        this.accessToken = tokens.access_token;
+        this.refreshToken = tokens.refresh_token;
+
+        // Notify external handlers (to update cookies etc.)
+        if (this.onTokenUpdate) {
+          await this.onTokenUpdate(tokens);
+        }
+
+        return tokens;
+      } finally {
+        this.isRefreshing = false;
+        this.refreshPromise = null;
+      }
+    })();
+
+    return this.refreshPromise;
+  }
+
+  private async handleLogout() {
+    this.accessToken = null;
+    this.refreshToken = null;
+    if (this.onLogout) {
+      await this.onLogout();
+    }
   }
 
   // HTTP method helpers

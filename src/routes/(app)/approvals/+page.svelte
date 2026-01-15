@@ -17,7 +17,14 @@
 
   let { data } = $props();
 
-  const api = createApi({ token: data.token });
+  // Create API client - only on client side to avoid SSR fetch warnings
+  const api = $derived.by(() => {
+    if (typeof window === 'undefined') return null as any;
+    return createApi({
+      accessToken: data.accessToken,
+      refreshToken: data.refreshToken
+    });
+  });
 
   // State for cursor-based pagination
   let approvals = $state<Approval[]>(data.approvalsResponse.data);
