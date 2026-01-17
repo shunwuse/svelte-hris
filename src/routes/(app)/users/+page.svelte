@@ -118,7 +118,7 @@
                 value={page.url.searchParams.get('role') || 'all'}
                 onValueChange={handleRoleChange}
               >
-              <Select.Trigger class="w-[160px]">
+              <Select.Trigger class="w-40">
                 {(() => {
                   const role = page.url.searchParams.get('role') || 'all';
                   return role === 'all'

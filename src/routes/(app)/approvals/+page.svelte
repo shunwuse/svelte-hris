@@ -143,7 +143,7 @@
               value={page.url.searchParams.get('status') || 'all'}
               onValueChange={handleStatusChange}
             >
-              <Select.Trigger class="w-[160px]">
+              <Select.Trigger class="w-40">
                 {(() => {
                   const status = page.url.searchParams.get('status') as ApprovalStatus | 'all' | null;
                   if (!status || status === 'all') return 'All Statuses';
