@@ -2,14 +2,17 @@ import { BaseApi } from './client';
 import type {
   GetApprovalsResponse,
   Approval,
-  ApprovalActionRequest
+  ApprovalActionRequest,
+  ListApprovalsRequest
 } from '$lib/types';
 
 export class ApprovalApi extends BaseApi {
   async list(
-    query: { cursor?: string; per_page?: number; } = {}
+    query?: ListApprovalsRequest
   ): Promise<GetApprovalsResponse> {
-    return this.client.get<GetApprovalsResponse>('/approvals', { query });
+    return this.client.get<GetApprovalsResponse>('/approvals', {
+      query: query as Record<string, any>
+    });
   }
 
   async get(id: number): Promise<Approval> {

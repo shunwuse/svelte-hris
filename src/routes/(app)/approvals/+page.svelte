@@ -1,16 +1,17 @@
 <script lang="ts">
   import { Button } from '$lib/components/ui/button';
   import { Badge } from '$lib/components/ui/badge';
-  import { Input } from '$lib/components/ui/input';
   import * as Table from '$lib/components/ui/table';
+  import * as Select from '$lib/components/ui/select';
   import * as Card from '$lib/components/ui/card';
   import { Label } from '$lib/components/ui/label';
   import { flash } from '$lib/stores';
   import { createApi } from '$lib/api';
   import { APPROVAL_STATUS } from '$lib/domain';
+  import { page } from '$app/state';
+  import { goto } from '$app/navigation';
   import type { ApprovalStatus } from '$lib/domain';
   import type { Approval } from '$lib/types';
-  import Search from '@lucide/svelte/icons/search';
   import Plus from '@lucide/svelte/icons/plus';
   import Eye from '@lucide/svelte/icons/eye';
   import Loader2 from '@lucide/svelte/icons/loader-2';
@@ -82,13 +83,25 @@
     if (data?.error) flash.error(data.error);
   });
 
+  function handleStatusChange(value: string | undefined) {
+    const url = new URL(page.url);
+    if (!value || value === 'all') {
+      url.searchParams.delete('status');
+    } else {
+      url.searchParams.set('status', value);
+    }
+    url.searchParams.delete('cursor'); // Reset pagination
+    goto(url.pathname + url.search);
+  }
+
   async function loadMore() {
     if (isLoadingMore || !nextCursor) return;
 
     isLoadingMore = true;
     try {
       const response = await api.approvals.list({
-        cursor: nextCursor
+        cursor: nextCursor,
+        status: page.url.searchParams.get('status') as ApprovalStatus | undefined
       });
 
       approvals = [...approvals, ...response.data];
@@ -122,9 +135,29 @@
     <Card.Root>
     <Card.Content class="p-4">
       <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div class="relative max-w-sm flex-1">
-          <Search class="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-          <Input placeholder="Search approvals..." class="pl-9" />
+        <div class="flex flex-1 items-center gap-4">
+          <div class="flex items-center gap-2">
+            <span class="text-sm font-medium text-muted-foreground">Status</span>
+            <Select.Root
+              type="single"
+              value={page.url.searchParams.get('status') || 'all'}
+              onValueChange={handleStatusChange}
+            >
+              <Select.Trigger class="w-[160px]">
+                {(() => {
+                  const status = page.url.searchParams.get('status') as ApprovalStatus | 'all' | null;
+                  if (!status || status === 'all') return 'All Statuses';
+                  return formatStatus(status);
+                })()}
+              </Select.Trigger>
+              <Select.Content>
+                <Select.Item value="all">All Statuses</Select.Item>
+                <Select.Item value={APPROVAL_STATUS.PENDING}>Pending</Select.Item>
+                <Select.Item value={APPROVAL_STATUS.APPROVED}>Approved</Select.Item>
+                <Select.Item value={APPROVAL_STATUS.REJECTED}>Rejected</Select.Item>
+              </Select.Content>
+            </Select.Root>
+          </div>
         </div>
         <div class="flex items-center gap-2">
           <Label for="auto-load" class="text-sm text-muted-foreground">Auto-load</Label>

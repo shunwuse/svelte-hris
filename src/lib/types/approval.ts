@@ -10,6 +10,12 @@ export interface Approval {
   status: ApprovalStatus;
 }
 
+export interface ListApprovalsRequest {
+  cursor?: string;
+  limit?: number;
+  status?: ApprovalStatus;
+}
+
 export type GetApprovalsResponse = CursorPaginationResponse<Approval>;
 
 export interface ApprovalActionRequest {
