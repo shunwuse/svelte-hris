@@ -38,7 +38,7 @@
   let loadMoreTrigger = $state<HTMLElement | null>(null);
 
   $effect(() => {
-    if (!isAutoLoad || !hasMore || !loadMoreTrigger) return;
+    if (!isAutoLoad || !hasMore || !loadMoreTrigger || approvals.length === 0) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -46,7 +46,7 @@
           loadMore();
         }
       },
-      { threshold: 0.5 }
+      { threshold: 0.1 }
     );
 
     observer.observe(loadMoreTrigger);
