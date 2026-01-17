@@ -1,6 +1,8 @@
 import { fail } from '@sveltejs/kit';
 import { ApiClientError } from '$lib/api';
 import type { ApiError } from '$lib/types';
+import type { ErrorMessageOverrides } from '$lib/api/error-codes';
+import { getErrorMessage } from '$lib/api/error-codes';
 
 /**
  * Helper type for API error handling
@@ -20,18 +22,21 @@ export type ActionErrorResponse = ApiError['error'] & {
  * @param err - The caught error
  * @param context - Error context description (for console.error)
  * @param formFields - Form field values to preserve (optional)
+ * @param overrides - Custom error message overrides by code (optional)
  * @returns SvelteKit fail response
  */
 export function handleActionError<T extends FormFields = FormFields>(
 	err: unknown,
 	context: string,
-	formFields?: T
+	formFields?: T,
+	overrides?: ErrorMessageOverrides
 ) {
 	if (err instanceof ApiClientError) {
+		const message = getErrorMessage(err.code, err.message, overrides);
 		return fail(400, {
-			error: err.message,
+			error: message,
 			code: err.code,
-			message: err.message,
+			message: message,
 			details: err.details,
 			...formFields
 		} as ActionErrorResponse & T);
@@ -51,13 +56,18 @@ export function handleActionError<T extends FormFields = FormFields>(
  *
  * @param err - The caught error
  * @param context - Error context description
+ * @param overrides - Custom error message overrides by code (optional)
  * @returns Error message string
  */
-export function handleLoadError(err: unknown, context: string): string {
+export function handleLoadError(
+	err: unknown,
+	context: string,
+	overrides?: ErrorMessageOverrides
+): string {
 	console.error(`${context}:`, err);
 
 	if (err instanceof ApiClientError) {
-		return err.message;
+		return getErrorMessage(err.code, err.message, overrides);
 	}
 
 	return 'Failed to load data';
@@ -70,18 +80,20 @@ export function handleLoadError(err: unknown, context: string): string {
  * @param fn - The async function to execute
  * @param defaultValue - Default value to return on error
  * @param context - Error context description
+ * @param overrides - Custom error message overrides by code (optional)
  * @returns Promise containing data or error
  */
 export async function safeLoad<T>(
 	fn: () => Promise<T>,
 	defaultValue: T,
-	context: string
+	context: string,
+	overrides?: ErrorMessageOverrides
 ): Promise<{ data: T; error?: string }> {
 	try {
 		const data = await fn();
 		return { data };
 	} catch (err) {
-		const error = handleLoadError(err, context);
+		const error = handleLoadError(err, context, overrides);
 		return { data: defaultValue, error };
 	}
 }

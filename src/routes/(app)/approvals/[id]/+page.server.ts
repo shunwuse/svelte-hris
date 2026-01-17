@@ -2,6 +2,7 @@ import type { PageServerLoad, Actions } from './$types';
 import { redirect } from '@sveltejs/kit';
 import { APPROVAL_STATUS } from '$lib/domain';
 import { safeLoad, handleActionError } from '$lib/server/utils';
+import { ERROR_CODES } from '$lib/api';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
   const approvalId = Number(params.id);
@@ -9,7 +10,8 @@ export const load: PageServerLoad = async ({ params, locals }) => {
   const { data: approval, error } = await safeLoad(
     () => locals.api.approvals.get(approvalId),
     null,
-    'Failed to fetch approval'
+    'Failed to fetch approval',
+    { [ERROR_CODES.NOT_FOUND]: 'The approval request does not exist or has been deleted' }
   );
 
   if (error) {
@@ -30,7 +32,14 @@ export const actions: Actions = {
     try {
       await locals.api.approvals.action(approvalId, { action: APPROVAL_STATUS.APPROVED });
     } catch (err) {
-      return handleActionError(err, 'Approve error');
+      return handleActionError(
+        err,
+        'Approve error',
+        {},
+        {
+          [ERROR_CODES.NOT_FOUND]: 'The approval request no longer exists'
+        },
+      );
     }
 
     redirect(303, '/approvals');
@@ -42,7 +51,14 @@ export const actions: Actions = {
     try {
       await locals.api.approvals.action(approvalId, { action: APPROVAL_STATUS.REJECTED });
     } catch (err) {
-      return handleActionError(err, 'Reject error');
+      return handleActionError(
+        err,
+        'Reject error',
+        {},
+        {
+          [ERROR_CODES.NOT_FOUND]: 'The approval request no longer exists'
+        },
+      );
     }
 
     redirect(303, '/approvals');

@@ -3,8 +3,9 @@ import { ApiClient, ApiClientError } from './client';
 import { AuthApi } from './auth';
 import { UserApi } from './user';
 import { ApprovalApi } from './approval';
+import { getErrorMessage, ERROR_CODES } from './error-codes';
 
-export { ApiClientError };
+export { ApiClientError, getErrorMessage, ERROR_CODES };
 export type { ApiClientOptions };
 
 export function createApi(options: ApiClientOptions = {}) {

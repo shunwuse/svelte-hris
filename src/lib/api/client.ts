@@ -1,4 +1,5 @@
 import type { ApiError } from '$lib/types';
+import { getErrorMessage } from './error-codes';
 
 // Backend API base URL
 const API_BASE_URL = 'http://localhost:8080';
@@ -235,7 +236,7 @@ export class ApiClientError extends Error {
   public details?: Record<string, string>;
 
   constructor(error: ApiError['error']) {
-    super(error.message);
+    super(getErrorMessage(error.code, error.message));
     this.code = error.code;
     this.details = error.details;
   }

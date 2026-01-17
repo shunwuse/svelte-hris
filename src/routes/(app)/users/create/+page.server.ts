@@ -1,6 +1,7 @@
 import type { Actions } from './$types';
 import { fail, redirect } from '@sveltejs/kit';
 import { handleActionError } from '$lib/server/utils';
+import { ERROR_CODES } from '$lib/api';
 import type { CreateableRole } from '$lib/domain';
 
 export const actions: Actions = {
@@ -27,7 +28,9 @@ export const actions: Actions = {
         { username, name, password, role }
       );
     } catch (err) {
-      return handleActionError(err, 'Create user error', formFields);
+      return handleActionError(err, 'Create user error', formFields, {
+        [ERROR_CODES.ALREADY_EXISTS]: 'Username is already taken, please choose another one'
+      });
     }
 
     redirect(303, '/users');

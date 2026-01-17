@@ -6,7 +6,7 @@
   import * as Card from '$lib/components/ui/card';
   import { Label } from '$lib/components/ui/label';
   import { flash } from '$lib/stores';
-  import { createApi } from '$lib/api';
+  import { createApi, ApiClientError } from '$lib/api';
   import { APPROVAL_STATUS } from '$lib/domain';
   import { page } from '$app/state';
   import { goto } from '$app/navigation';
@@ -107,8 +107,12 @@
       approvals = [...approvals, ...response.data];
       nextCursor = response.meta.next_cursor;
       hasMore = response.meta.has_more;
-    } catch {
-      flash.error('Failed to load more approvals');
+    } catch (err) {
+      if (err instanceof ApiClientError) {
+        flash.error(err.message);
+      } else {
+        flash.error('Failed to load more approvals');
+      }
     } finally {
       isLoadingMore = false;
     }
