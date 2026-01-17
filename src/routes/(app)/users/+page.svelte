@@ -9,6 +9,7 @@
   import type { Pathname } from '$app/types';
   import { goto } from '$app/navigation';
   import { page } from '$app/state';
+  import { ROLES } from '$lib/domain';
   import ChevronLeft from '@lucide/svelte/icons/chevron-left';
   import ChevronRight from '@lucide/svelte/icons/chevron-right';
   import Search from '@lucide/svelte/icons/search';
@@ -16,6 +17,12 @@
   import Pencil from '@lucide/svelte/icons/pencil';
 
   let { data } = $props();
+
+  let nameQuery = $state(page.url.searchParams.get('name') || '');
+
+  $effect(() => {
+    nameQuery = page.url.searchParams.get('name') || '';
+  });
 
   function formatDate(timestamp: string): string {
     const date = new Date(Number(timestamp));
@@ -33,12 +40,38 @@
     if (data?.error) flash.error(data.error);
   });
 
-  function handlePerPageChange(value: string | undefined) {
-    if (!value) return;
+  function updateFilters(newParams: Record<string, string | undefined>) {
     const url = new URL(page.url);
-    url.searchParams.set('per_page', value);
+    Object.entries(newParams).forEach(([key, value]) => {
+      if (value === undefined || value === 'all' || value === '') {
+        url.searchParams.delete(key);
+      } else {
+        url.searchParams.set(key, value);
+      }
+    });
     url.searchParams.set('page', '1');
     goto(url.pathname + url.search);
+  }
+
+  function handleNameSearch(e: KeyboardEvent) {
+    if (e.key === 'Enter') {
+      updateFilters({ name: nameQuery });
+    }
+  }
+
+  function handleRoleChange(value: string | undefined) {
+    updateFilters({ role: value });
+  }
+
+  function handlePerPageChange(value: string | undefined) {
+    if (!value) return;
+    updateFilters({ per_page: value });
+  }
+
+  function getPageLink(p: number) {
+    const url = new URL(page.url);
+    url.searchParams.set('page', p.toString());
+    return url.pathname + url.search;
   }
 
   const perPageOptions = [
@@ -66,11 +99,41 @@
 
     <!-- Filters & Actions -->
     <Card.Root>
-    <Card.Content class="p-4">
-      <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div class="relative max-w-sm flex-1">
-          <Search class="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-          <Input placeholder="Search users..." class="pl-9" />
+      <Card.Content class="p-4">
+        <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div class="flex flex-1 flex-col gap-4 sm:flex-row sm:items-center">
+            <div class="relative flex-1 max-w-sm">
+              <Search class="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder="name or username..."
+                class="pl-9"
+                bind:value={nameQuery}
+                onkeydown={handleNameSearch}
+              />
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-sm font-medium text-muted-foreground">Role</span>
+              <Select.Root
+                type="single"
+                value={page.url.searchParams.get('role') || 'all'}
+                onValueChange={handleRoleChange}
+              >
+              <Select.Trigger class="w-[160px]">
+                {(() => {
+                  const role = page.url.searchParams.get('role') || 'all';
+                  return role === 'all'
+                    ? 'All Roles'
+                    : role.charAt(0).toUpperCase() + role.slice(1);
+                })()}
+              </Select.Trigger>
+              <Select.Content>
+                <Select.Item value="all">All Roles</Select.Item>
+                <Select.Item value={ROLES.ADMINISTRATOR}>Administrator</Select.Item>
+                <Select.Item value={ROLES.MANAGER}>Manager</Select.Item>
+                <Select.Item value={ROLES.STAFF}>Staff</Select.Item>
+              </Select.Content>
+            </Select.Root>
+          </div>
         </div>
         <div class="flex items-center gap-2">
           <span class="text-sm text-muted-foreground">Show</span>
@@ -164,7 +227,7 @@
             variant="outline"
             size="icon"
             disabled={data.usersResponse.meta.current_page === 1}
-            href="?page={data.usersResponse.meta.current_page - 1}&per_page={data.usersResponse.meta.per_page}"
+            href={getPageLink(data.usersResponse.meta.current_page - 1)}
           >
             <ChevronLeft class="size-4" />
             <span class="sr-only">Previous</span>
@@ -177,7 +240,7 @@
                   variant={data.usersResponse.meta.current_page === p ? 'default' : 'outline'}
                   size="sm"
                   class="h-8 w-8 p-0"
-                  href="?page={p}&per_page={data.usersResponse.meta.per_page}"
+                  href={getPageLink(p)}
                 >
                   {p}
                 </Button>
@@ -191,7 +254,7 @@
             variant="outline"
             size="icon"
             disabled={data.usersResponse.meta.current_page === data.usersResponse.meta.last_page}
-            href="?page={data.usersResponse.meta.current_page + 1}&per_page={data.usersResponse.meta.per_page}"
+            href={getPageLink(data.usersResponse.meta.current_page + 1)}
           >
             <ChevronRight class="size-4" />
             <span class="sr-only">Next</span>

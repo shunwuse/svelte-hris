@@ -2,15 +2,18 @@ import { BaseApi } from './client';
 import type {
   GetUsersResponse,
   User,
+  ListUsersRequest,
   CreateUserRequest,
   UpdateUserRequest
 } from '$lib/types';
 
 export class UserApi extends BaseApi {
   async list(
-    query?: { page?: number; per_page?: number; }
+    query?: ListUsersRequest
   ): Promise<GetUsersResponse> {
-    return this.client.get<GetUsersResponse>('/users', { query });
+    return this.client.get<GetUsersResponse>('/users', {
+      query: query as Record<string, any>
+    });
   }
 
   async get(id: number): Promise<User> {
