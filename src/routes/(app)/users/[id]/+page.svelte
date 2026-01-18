@@ -6,6 +6,7 @@
   import * as Card from '$lib/components/ui/card';
   import { flash } from '$lib/stores';
   import { resolve } from '$app/paths';
+  import * as t from '$paraglide/messages';
 
   let { data, form } = $props();
 
@@ -22,8 +23,8 @@
   <div class="mx-auto max-w-md">
     <Card.Root>
       <Card.Header>
-        <Card.Title>Edit User</Card.Title>
-        <Card.Description>Update user information</Card.Description>
+        <Card.Title>{t['users.edit_user']()}</Card.Title>
+        <Card.Description>{t['users.update_user_desc']()}</Card.Description>
       </Card.Header>
 
       {#if data.user}
@@ -33,7 +34,7 @@
             isSubmitting = true;
             return async ({ result, update }) => {
               if (result.type === 'redirect') {
-                flash.success('User updated');
+                flash.success(t['users.updated']());
               }
               await update();
               isSubmitting = false;
@@ -43,7 +44,7 @@
           <Card.Content class="space-y-4">
             <!-- Username (read-only) -->
             <div class="space-y-2">
-              <Label for="username">Username</Label>
+              <Label for="username">{t['login.username']()}</Label>
               <Input
                 id="username"
                 type="text"
@@ -51,17 +52,17 @@
                 disabled
                 class="bg-muted"
               />
-              <p class="text-xs text-muted-foreground">Username cannot be changed</p>
+              <p class="text-xs text-muted-foreground">{t['users.username_readonly']()}</p>
             </div>
 
             <!-- Name -->
             <div class="space-y-2">
-              <Label for="name">Name</Label>
+              <Label for="name">{t['users.table_name']()}</Label>
               <Input
                 id="name"
                 name="name"
                 type="text"
-                placeholder="Enter full name"
+                placeholder={t['users.enter_name']()}
                 required
                 value={form?.name ?? data.user.name}
               />
@@ -69,12 +70,12 @@
           </Card.Content>
 
           <Card.Footer class="flex justify-between pt-6">
-            <Button variant="outline" href={resolve("/users")}>Cancel</Button>
+            <Button variant="outline" href={resolve("/users")}>{t['common.cancel']()}</Button>
             <Button type="submit" disabled={isSubmitting}>
               {#if isSubmitting}
-                Saving...
+                {t['common.saving']()}
               {:else}
-                Save
+                {t['common.save']()}
               {/if}
             </Button>
           </Card.Footer>

@@ -7,6 +7,7 @@
   import type { ApprovalStatus } from '$lib/domain';
   import { APPROVAL_STATUS } from '$lib/domain';
   import { resolve } from '$app/paths';
+  import * as t from '$paraglide/messages';
 
   let { data, form } = $props();
 
@@ -25,7 +26,16 @@
   }
 
   function formatStatus(status: ApprovalStatus): string {
-    return status.charAt(0) + status.slice(1).toLowerCase();
+    switch (status) {
+      case APPROVAL_STATUS.PENDING:
+        return t['approvals.status_pending']();
+      case APPROVAL_STATUS.APPROVED:
+        return t['approvals.status_approved']();
+      case APPROVAL_STATUS.REJECTED:
+        return t['approvals.status_rejected']();
+      default:
+        return status;
+    }
   }
 
   function handleEnhance(action: 'approve' | 'reject') {
@@ -33,7 +43,7 @@
       isSubmitting = true;
       return async ({ result, update }: { result: { type: string }; update: () => Promise<void> }) => {
         if (result.type === 'redirect') {
-          flash.success(action === 'approve' ? 'Request approved' : 'Request rejected');
+          flash.success(action === 'approve' ? t['approvals.approved_msg']() : t['approvals.rejected_msg']());
         }
         await update();
         isSubmitting = false;
@@ -52,8 +62,8 @@
   <div class="mx-auto max-w-md">
     <Card.Root>
       <Card.Header>
-        <Card.Title>Review Request</Card.Title>
-        <Card.Description>Review and manage this approval request</Card.Description>
+        <Card.Title>{t['approvals.review_request']()}</Card.Title>
+        <Card.Description>{t['approvals.review_desc']()}</Card.Description>
       </Card.Header>
 
       {#if data.error}
@@ -63,26 +73,26 @@
           </div>
         </Card.Content>
         <Card.Footer class="pt-6">
-          <Button variant="outline" href={resolve("/approvals")}>← Back to Approvals</Button>
+          <Button variant="outline" href={resolve("/approvals")}>← {t['approvals.back_to_list']()}</Button>
         </Card.Footer>
       {:else if data.approval}
         <Card.Content class="space-y-4">
           <!-- Approval Details -->
           <div class="space-y-3">
             <div class="flex items-center justify-between">
-              <span class="text-sm text-muted-foreground">ID</span>
+              <span class="text-sm text-muted-foreground">{t['users.table_id']()}</span>
               <span class="font-medium">{data.approval.id}</span>
             </div>
             <div class="flex items-center justify-between">
-              <span class="text-sm text-muted-foreground">Creator</span>
+              <span class="text-sm text-muted-foreground">{t['approvals.creator']()}</span>
               <span class="font-medium">{data.approval.creator_name}</span>
             </div>
             <div class="flex items-center justify-between">
-              <span class="text-sm text-muted-foreground">Approver</span>
+              <span class="text-sm text-muted-foreground">{t['approvals.approver']()}</span>
               <span class="font-medium">{data.approval.approver_name ?? '-'}</span>
             </div>
             <div class="flex items-center justify-between">
-              <span class="text-sm text-muted-foreground">Status</span>
+              <span class="text-sm text-muted-foreground">{t['common.status']()}</span>
               <Badge variant={getStatusVariant(data.approval.status)}>
                 {formatStatus(data.approval.status)}
               </Badge>
@@ -91,7 +101,7 @@
         </Card.Content>
 
         <Card.Footer class="flex justify-between pt-6">
-          <Button variant="outline" href={resolve("/approvals")}>Cancel</Button>
+          <Button variant="outline" href={resolve("/approvals")}>{t['common.cancel']()}</Button>
 
           {#if data.approval.status === APPROVAL_STATUS.PENDING}
             <div class="flex gap-2">
@@ -101,7 +111,7 @@
                 use:enhance={handleEnhance('reject')}
               >
                 <Button type="submit" variant="destructive" disabled={isSubmitting}>
-                  Reject
+                  {t['approvals.reject']()}
                 </Button>
               </form>
 
@@ -111,7 +121,7 @@
                 use:enhance={handleEnhance('approve')}
               >
                 <Button type="submit" disabled={isSubmitting}>
-                  Approve
+                  {t['approvals.approve']()}
                 </Button>
               </form>
             </div>

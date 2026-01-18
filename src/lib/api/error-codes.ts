@@ -1,3 +1,5 @@
+import * as t from '$paraglide/messages';
+
 export const ERROR_CODES = {
 	// Common errors
 	NOT_FOUND: 'NOT_FOUND',
@@ -28,24 +30,24 @@ export type ApiErrorCode = keyof typeof ERROR_CODES;
 export type ErrorMessageOverrides = Partial<Record<ApiErrorCode, string>> &
 	Record<string, string | undefined>;
 
-const API_ERROR_MESSAGES: Record<ApiErrorCode, string> = {
-	[ERROR_CODES.NOT_FOUND]: 'The requested resource was not found.',
-	[ERROR_CODES.ALREADY_EXISTS]: 'The resource already exists.',
-	[ERROR_CODES.INVALID_INPUT]: 'The input provided is invalid.',
-    [ERROR_CODES.INTERNAL_ERROR]: 'An internal server error occurred. Please try again later.',
+const API_ERROR_MESSAGES: Record<ApiErrorCode, () => string> = {
+	[ERROR_CODES.NOT_FOUND]: t['api.error.not_found'],
+	[ERROR_CODES.ALREADY_EXISTS]: t['api.error.already_exists'],
+	[ERROR_CODES.INVALID_INPUT]: t['api.error.invalid_input'],
+	[ERROR_CODES.INTERNAL_ERROR]: t['api.error.internal_error'],
 
-	[ERROR_CODES.UNAUTHORIZED]: 'You are not authorized to perform this action.',
-	[ERROR_CODES.INVALID_CREDENTIALS]: 'Invalid username or password.',
-	[ERROR_CODES.TOKEN_EXPIRED]: 'Your session has expired. Please login again.',
-    [ERROR_CODES.TOKEN_INVALID]: 'Invalid session token. Please login again.',
+	[ERROR_CODES.UNAUTHORIZED]: t['api.error.unauthorized'],
+	[ERROR_CODES.INVALID_CREDENTIALS]: t['api.error.invalid_credentials'],
+	[ERROR_CODES.TOKEN_EXPIRED]: t['api.error.token_expired'],
+	[ERROR_CODES.TOKEN_INVALID]: t['api.error.token_invalid'],
 
-    [ERROR_CODES.VALIDATION_FAILED]: 'Validation failed. Please check your input.',
+	[ERROR_CODES.VALIDATION_FAILED]: t['api.error.validation_failed'],
 
-	[ERROR_CODES.FORBIDDEN]: 'Access to this resource is forbidden.',
-	[ERROR_CODES.OPERATION_NOT_ALLOWED]: 'This operation is not allowed.',
-    [ERROR_CODES.CONFLICT]: 'A conflict occurred with the current state of the resource.',
+	[ERROR_CODES.FORBIDDEN]: t['api.error.forbidden'],
+	[ERROR_CODES.OPERATION_NOT_ALLOWED]: t['api.error.operation_not_allowed'],
+	[ERROR_CODES.CONFLICT]: t['api.error.conflict'],
 
-	[ERROR_CODES.DATABASE_ERROR]: 'A database error occurred.'
+	[ERROR_CODES.DATABASE_ERROR]: t['api.error.internal_error']
 };
 
 // Gets a user-friendly error message based on the API error code
@@ -60,8 +62,8 @@ export function getErrorMessage(
 
 	const errorCode = code as ApiErrorCode;
 	if (errorCode in API_ERROR_MESSAGES) {
-		return API_ERROR_MESSAGES[errorCode];
+		return API_ERROR_MESSAGES[errorCode]();
 	}
 
-	return defaultMessage || 'An unexpected error occurred.';
+	return defaultMessage || t['common.error.unexpected']();
 }

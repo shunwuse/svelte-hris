@@ -2,6 +2,7 @@ import type { PageServerLoad, Actions } from './$types';
 import { fail, redirect } from '@sveltejs/kit';
 import { safeLoad, handleActionError } from '$lib/server/utils';
 import { ERROR_CODES } from '$lib/api';
+import * as t from '$paraglide/messages';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
   const userId = Number(params.id);
@@ -10,7 +11,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
     () => locals.api.users.get(userId),
     null,
     'Failed to fetch user',
-    { [ERROR_CODES.NOT_FOUND]: 'The user does not exist or has been deleted' }
+    { [ERROR_CODES.NOT_FOUND]: t['users.error.not_found']() }
   );
 
   if (error) {
@@ -18,7 +19,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
   }
 
   if (!user) {
-    return { user: null, error: 'User not found' };
+    return { user: null, error: t['users.error.not_found']() };
   }
 
   return { user };
@@ -33,14 +34,14 @@ export const actions: Actions = {
     const formFields = { name };
 
     if (!name || name.trim() === '') {
-      return fail(400, { error: 'Name is required', ...formFields });
+      return fail(400, { error: t['users.error.name_required'](), ...formFields });
     }
 
     try {
       await locals.api.users.update(userId, { name });
     } catch (err) {
       return handleActionError(err, 'Update user error', formFields, {
-        [ERROR_CODES.NOT_FOUND]: 'Cannot update user as they no longer exist'
+        [ERROR_CODES.NOT_FOUND]: t['users.error.update_failed_not_found']()
       });
     }
 

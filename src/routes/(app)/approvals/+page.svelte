@@ -4,10 +4,11 @@
   import * as Table from '$lib/components/ui/table';
   import * as Select from '$lib/components/ui/select';
   import * as Card from '$lib/components/ui/card';
-  import { Label } from '$lib/components/ui/label';
   import { flash } from '$lib/stores';
   import { createApi, ApiClientError } from '$lib/api';
   import { APPROVAL_STATUS } from '$lib/domain';
+  import { resolve } from '$app/paths';
+  import type { Pathname } from '$app/types';
   import { page } from '$app/state';
   import { goto } from '$app/navigation';
   import type { ApprovalStatus } from '$lib/domain';
@@ -15,6 +16,7 @@
   import Plus from '@lucide/svelte/icons/plus';
   import Eye from '@lucide/svelte/icons/eye';
   import Loader2 from '@lucide/svelte/icons/loader-2';
+  import * as t from '$paraglide/messages';
 
   let { data } = $props();
 
@@ -75,7 +77,16 @@
 
   // Format status for display
   function formatStatus(status: ApprovalStatus): string {
-    return status.charAt(0) + status.slice(1).toLowerCase();
+    switch (status) {
+      case APPROVAL_STATUS.PENDING:
+        return t['approvals.status_pending']();
+      case APPROVAL_STATUS.APPROVED:
+        return t['approvals.status_approved']();
+      case APPROVAL_STATUS.REJECTED:
+        return t['approvals.status_rejected']();
+      default:
+        return status;
+    }
   }
 
   // Forward page-level errors to flash so layout shows toast
@@ -91,7 +102,7 @@
       url.searchParams.set('status', value);
     }
     url.searchParams.delete('cursor'); // Reset pagination
-    goto(url.pathname + url.search);
+    goto(resolve(url.pathname + url.search as Pathname));
   }
 
   async function loadMore() {
@@ -111,7 +122,7 @@
       if (err instanceof ApiClientError) {
         flash.error(err.message);
       } else {
-        flash.error('Failed to load more approvals');
+        flash.error(t['approvals.load_error']());
       }
     } finally {
       isLoadingMore = false;
@@ -124,13 +135,13 @@
     <!-- Header -->
     <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
       <div>
-        <h1 class="text-3xl font-bold tracking-tight text-gray-900">Approvals</h1>
-        <p class="text-muted-foreground">Manage and review approval requests.</p>
+        <h1 class="text-3xl font-bold tracking-tight text-gray-900">{t['nav.approvals']()}</h1>
+        <p class="text-muted-foreground">{t['approvals.description']()}</p>
       </div>
       <div class="flex items-center gap-2">
         <Button href="/approvals/create" class="gap-2">
           <Plus class="size-4" />
-          Create Request
+          {t['approvals.create_request']()}
         </Button>
       </div>
     </div>
@@ -141,7 +152,7 @@
       <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div class="flex flex-1 items-center gap-4">
           <div class="flex items-center gap-2">
-            <span class="text-sm font-medium text-muted-foreground">Status</span>
+            <span class="text-sm font-medium text-muted-foreground">{t['common.status']()}</span>
             <Select.Root
               type="single"
               value={page.url.searchParams.get('status') || 'all'}
@@ -150,21 +161,21 @@
               <Select.Trigger class="w-40">
                 {(() => {
                   const status = page.url.searchParams.get('status') as ApprovalStatus | 'all' | null;
-                  if (!status || status === 'all') return 'All Statuses';
+                  if (!status || status === 'all') return t['approvals.status_all']();
                   return formatStatus(status);
                 })()}
               </Select.Trigger>
               <Select.Content>
-                <Select.Item value="all">All Statuses</Select.Item>
-                <Select.Item value={APPROVAL_STATUS.PENDING}>Pending</Select.Item>
-                <Select.Item value={APPROVAL_STATUS.APPROVED}>Approved</Select.Item>
-                <Select.Item value={APPROVAL_STATUS.REJECTED}>Rejected</Select.Item>
+                <Select.Item value="all">{t['approvals.status_all']()}</Select.Item>
+                <Select.Item value={APPROVAL_STATUS.PENDING}>{t['approvals.status_pending']()}</Select.Item>
+                <Select.Item value={APPROVAL_STATUS.APPROVED}>{t['approvals.status_approved']()}</Select.Item>
+                <Select.Item value={APPROVAL_STATUS.REJECTED}>{t['approvals.status_rejected']()}</Select.Item>
               </Select.Content>
             </Select.Root>
           </div>
         </div>
         <div class="flex items-center gap-2">
-          <Label for="auto-load" class="text-sm text-muted-foreground">Auto-load</Label>
+          <span class="text-sm text-muted-foreground">{t['approvals.auto_load']()}</span>
           <Button
             id="auto-load"
             variant={isAutoLoad ? "default" : "outline"}
@@ -172,7 +183,7 @@
             class="h-9 w-16 transition-all"
             onclick={() => (isAutoLoad = !isAutoLoad)}
           >
-            {isAutoLoad ? 'ON' : 'OFF'}
+            {isAutoLoad ? t['approvals.on']() : t['approvals.off']()}
           </Button>
         </div>
       </div>
@@ -183,11 +194,11 @@
       <Table.Root>
         <Table.Header>
           <Table.Row class="bg-muted/50">
-            <Table.Head class="w-16 text-center">ID</Table.Head>
-            <Table.Head>Creator</Table.Head>
-            <Table.Head>Approver</Table.Head>
-            <Table.Head>Status</Table.Head>
-            <Table.Head class="w-24 text-right">Actions</Table.Head>
+            <Table.Head class="w-16 text-center">{t['users.table_id']()}</Table.Head>
+            <Table.Head>{t['approvals.creator']()}</Table.Head>
+            <Table.Head>{t['approvals.approver']()}</Table.Head>
+            <Table.Head>{t['common.status']()}</Table.Head>
+            <Table.Head class="w-24 text-right">{t['users.table_actions']()}</Table.Head>
           </Table.Row>
         </Table.Header>
         <Table.Body>
@@ -211,14 +222,14 @@
                   class="h-8 w-8"
                 >
                   <Eye class="size-4" />
-                  <span class="sr-only">View</span>
+                  <span class="sr-only">{t['common.view']()}</span>
                 </Button>
               </Table.Cell>
             </Table.Row>
           {:else}
             <Table.Row>
               <Table.Cell colspan={5} class="h-24 text-center text-muted-foreground">
-                No approvals found.
+                {t['approvals.no_approvals']()}
               </Table.Cell>
             </Table.Row>
           {/each}
@@ -237,13 +248,13 @@
         >
           {#if isLoadingMore}
             <Loader2 class="mr-2 size-4 animate-spin" />
-            Loading...
+            {t['common.loading']()}
           {:else}
-            Load More
+            {t['approvals.load_more']()}
           {/if}
         </Button>
       {:else if approvals.length > 0}
-        <p class="text-sm text-muted-foreground">You've reached the end of the list.</p>
+        <p class="text-sm text-muted-foreground">{t['approvals.reached_end']()}</p>
       {/if}
     </div>
   </Card.Root>

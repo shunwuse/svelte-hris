@@ -4,14 +4,18 @@
 	import { resolve } from '$app/paths';
 	import type { Pathname } from '$app/types';
 	import { Button } from '$lib/components/ui/button';
+	import * as t from '$paraglide/messages';
+	import { locales, setLocale, getLocale } from '$paraglide/runtime';
+	import * as Select from '$lib/components/ui/select';
+	import Languages from '@lucide/svelte/icons/languages';
 
 	let isLoggingOut = $state(false);
 
-	const navItems = [
-		{ href: '/' as Pathname, label: 'Overview' },
-		{ href: '/users' as Pathname, label: 'Users' },
-		{ href: '/approvals' as Pathname, label: 'Approvals' }
-	];
+	const navItems = $derived([
+		{ href: '/' as Pathname, label: t['nav.overview']() },
+		{ href: '/users' as Pathname, label: t['nav.users']() },
+		{ href: '/approvals' as Pathname, label: t['nav.approvals']() }
+	]);
 
 	function isActive(href: string, pathname: string): boolean {
 		if (href === '/') {
@@ -19,6 +23,11 @@
 		}
 		return pathname.startsWith(href);
 	}
+
+	const localeNames: Record<string, string> = {
+		en: 'English',
+		'zh-TW': '繁體中文'
+	};
 </script>
 
 <nav class="border-b bg-white">
@@ -46,21 +55,48 @@
 				{/each}
 			</div>
 
-			<!-- Logout -->
-			<form
-				method="POST"
-				action="/logout"
-				use:enhance={() => {
-					isLoggingOut = true;
-					return async ({ update }) => {
-						await update();
-					};
-				}}
-			>
-				<Button type="submit" variant="ghost" size="sm" disabled={isLoggingOut}>
-					{isLoggingOut ? 'Logging out...' : 'Logout'}
-				</Button>
-			</form>
+			<div class="flex items-center gap-4">
+				<!-- Language Switcher -->
+				<Select.Root
+					type="single"
+					value={getLocale()}
+					onValueChange={(value) => {
+						if (value) setLocale(value as (typeof locales)[number]);
+					}}
+				>
+					<Select.Trigger class="h-9 w-[130px] border-none bg-transparent hover:bg-gray-100">
+						<div class="flex items-center gap-2">
+							<Languages class="size-4 text-muted-foreground" />
+							<span class="text-sm font-medium">
+								{localeNames[getLocale()]}
+							</span>
+						</div>
+					</Select.Trigger>
+					<Select.Content align="end">
+						{#each locales as locale (locale)}
+							<Select.Item value={locale} class="text-sm">
+								{localeNames[locale]}
+							</Select.Item>
+						{/each}
+					</Select.Content>
+				</Select.Root>
+
+				<!-- Logout -->
+				<form
+					method="POST"
+					action="/logout"
+					use:enhance={() => {
+						isLoggingOut = true;
+						return async ({ update }) => {
+							await update();
+						};
+					}}
+				>
+					<Button type="submit" variant="ghost" size="sm" disabled={isLoggingOut}>
+						{isLoggingOut ? t['nav.logging_out']() : t['nav.logout']()}
+					</Button>
+				</form>
+			</div>
 		</div>
 	</div>
 </nav>

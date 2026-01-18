@@ -16,6 +16,8 @@
   "devDependencies": {
     "@eslint/compat": "^1.4.0",
     "@eslint/js": "^9.39.1",
+    "@inlang/paraglide-js": "^2.9.0",
+    "@inlang/paraglide-sveltekit": "^0.16.1",
     "@internationalized/date": "^3.10.0",
     "@lucide/svelte": "^0.544.0",
     "@sveltejs/adapter-auto": "^7.0.0",

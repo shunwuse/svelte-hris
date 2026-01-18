@@ -4,6 +4,7 @@
   import { Label } from '$lib/components/ui/label';
   import * as Card from '$lib/components/ui/card';
   import { enhance } from '$app/forms';
+  import * as t from '$paraglide/messages';
 
   let { form } = $props();
 
@@ -13,8 +14,8 @@
 <div class="flex min-h-screen items-center justify-center bg-background">
   <Card.Root class="w-full max-w-md">
     <Card.Header class="space-y-1">
-      <Card.Title class="text-2xl font-bold">Login</Card.Title>
-      <Card.Description>Sign in to your account to continue</Card.Description>
+      <Card.Title class="text-2xl font-bold">{t['login.title']()}</Card.Title>
+      <Card.Description>{t['login.description']()}</Card.Description>
     </Card.Header>
 
     <form
@@ -35,24 +36,24 @@
         {/if}
 
         <div class="space-y-2">
-          <Label for="username">Username</Label>
+          <Label for="username">{t['login.username']()}</Label>
           <Input
             id="username"
             name="username"
             type="text"
-            placeholder="Enter your username"
+            placeholder={t['login.username_placeholder']()}
             value={form?.username ?? ''}
             required
           />
         </div>
 
         <div class="space-y-2">
-          <Label for="password">Password</Label>
+          <Label for="password">{t['login.password']()}</Label>
           <Input
             id="password"
             name="password"
             type="password"
-            placeholder="Enter your password"
+            placeholder={t['login.password_placeholder']()}
             required
           />
         </div>
@@ -61,9 +62,9 @@
       <Card.Footer class="pt-6">
         <Button type="submit" class="w-full" disabled={isLoading}>
           {#if isLoading}
-            Logging in...
+            {t['login.submitting']()}
           {:else}
-            Login
+            {t['login.submit']()}
           {/if}
         </Button>
       </Card.Footer>

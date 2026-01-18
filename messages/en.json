@@ -1,0 +1,149 @@
+{
+  "api": {
+    "error": {
+      "not_found": "The requested resource was not found.",
+      "already_exists": "The resource already exists.",
+      "invalid_input": "The input provided is invalid.",
+      "internal_error": "An internal server error occurred. Please try again later.",
+      "unauthorized": "You are not authorized to perform this action.",
+      "invalid_credentials": "Invalid username or password.",
+      "token_expired": "Your session has expired. Please login again.",
+      "token_invalid": "Invalid session token. Please login again.",
+      "validation_failed": "Validation failed. Please check your input.",
+      "forbidden": "Access to this resource is forbidden.",
+      "operation_not_allowed": "This operation is not allowed.",
+      "conflict": "A conflict occurred with the current state of the resource."
+    }
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "view": "View",
+    "create": "Create",
+    "all": "All",
+    "no_data": "No data available",
+    "loading": "Loading...",
+    "saving": "Saving...",
+    "creating": "Creating...",
+    "status": "Status",
+    "role": "Role",
+    "show": "Show",
+    "previous": "Previous",
+    "next": "Next",
+    "error": {
+      "connection_error": "Unable to connect to server",
+      "load_failed": "Failed to load data",
+      "unexpected": "An unexpected error occurred."
+    }
+  },
+  "nav": {
+    "overview": "Overview",
+    "users": "Users",
+    "approvals": "Approvals",
+    "logout": "Logout",
+    "logging_out": "Logging out..."
+  },
+  "login": {
+    "title": "Login",
+    "description": "Sign in to your account to continue",
+    "username": "Username",
+    "username_placeholder": "Enter your username",
+    "password": "Password",
+    "password_placeholder": "Enter your password",
+    "submit": "Login",
+    "submitting": "Logging in...",
+    "error": {
+      "credentials_required": "Username and password are required"
+    }
+  },
+  "role": {
+    "administrator": "Administrator",
+    "manager": "Manager",
+    "staff": "Staff"
+  },
+  "overview": {
+    "welcome": "Welcome back",
+    "description": "Here's an overview of the system activity.",
+    "create_request": "Create Request",
+    "create_user": "Create User",
+    "recent_approvals": "Recent Approvals",
+    "recent_approvals_desc": "Latest approval requests",
+    "recent_users": "Recent Users",
+    "recent_users_desc": "Latest registered users",
+    "view_all": "View All",
+    "no_approvals": "No approvals yet",
+    "no_users": "No users yet"
+  },
+  "users": {
+    "title": "User Management",
+    "description": "Manage system users and their permissions.",
+    "edit_user": "Edit User",
+    "create_user": "Create User",
+    "create_user_desc": "Add a new user to the system",
+    "update_user_desc": "Update user information",
+    "username_readonly": "Username cannot be changed",
+    "enter_name": "Enter full name",
+    "enter_username": "Enter username",
+    "updated": "User updated",
+    "created": "User created",
+    "search_placeholder": "Search users...",
+    "search_placeholder_full": "name or username...",
+    "role_all": "All Roles",
+    "table_id": "ID",
+    "table_username": "Username",
+    "table_name": "Name",
+    "table_user_info": "User Information",
+    "table_role": "Role",
+    "table_created_at": "Created At",
+    "table_updated_at": "Updated At",
+    "table_actions": "Actions",
+    "no_users_found": "No users found",
+    "no_users_found_desc": "Try a different search term or clear filters.",
+    "pagination_showing": "Showing {start} to {end} of {total} users",
+    "pagination_per_page": "{per_page} per page",
+    "error": {
+      "not_found": "The user does not exist or has been deleted",
+      "update_failed_not_found": "Cannot update user as they no longer exist",
+      "name_required": "Name is required",
+      "all_fields_required": "All fields are required",
+      "role_required": "Please select a valid role",
+      "username_taken": "Username is already taken, please choose another one"
+    }
+  },
+  "approvals": {
+    "title": "Approval Requests",
+    "description": "Review and manage system approval requests.",
+    "create_request": "Create Request",
+    "status_all": "All Statuses",
+    "creator": "Creator",
+    "approver": "Approver",
+    "status_pending": "Pending",
+    "status_approved": "Approved",
+    "status_rejected": "Rejected",
+    "auto_load": "Auto-load",
+    "on": "ON",
+    "off": "OFF",
+    "no_approvals": "No approvals found.",
+    "load_more": "Load More",
+    "reached_end": "You've reached the end of the list.",
+    "load_error": "Failed to load more approvals",
+    "item_title": "Approval #{id}",
+    "review_request": "Review Request",
+    "review_desc": "Review and manage this approval request",
+    "create_desc": "Submit a new request for review",
+    "create_info": "Click the button below to submit a new approval request. It will be sent to a manager for review.",
+    "submitted_msg": "Request submitted",
+    "submit": "Submit Request",
+    "submitting": "Submitting...",
+    "approved_msg": "Request approved",
+    "rejected_msg": "Request rejected",
+    "back_to_list": "Back to Approvals",
+    "reject": "Reject",
+    "approve": "Approve",
+    "error": {
+      "not_found": "The approval request does not exist or has been deleted"
+    }
+  }
+}

@@ -3,6 +3,7 @@ import { ApiClientError } from '$lib/api';
 import type { ApiError } from '$lib/types';
 import type { ErrorMessageOverrides } from '$lib/api/error-codes';
 import { getErrorMessage } from '$lib/api/error-codes';
+import * as t from '$paraglide/messages';
 
 /**
  * Helper type for API error handling
@@ -44,11 +45,11 @@ export function handleActionError<T extends FormFields = FormFields>(
 
 	console.error(`${context}:`, err);
 	return fail(500, {
-		error: 'Unable to connect to server',
+		error: t['common.error.connection_error'](),
 		code: 'CONNECTION_ERROR',
-		message: 'Unable to connect to server',
+		message: t['common.error.connection_error'](),
 		...formFields
-	} as ActionErrorResponse & T);
+	});
 }
 
 /**
@@ -70,7 +71,7 @@ export function handleLoadError(
 		return getErrorMessage(err.code, err.message, overrides);
 	}
 
-	return 'Failed to load data';
+	return t['common.error.load_failed']();
 }
 
 /**

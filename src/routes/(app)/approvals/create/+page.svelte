@@ -4,6 +4,7 @@
   import * as Card from '$lib/components/ui/card';
   import { flash } from '$lib/stores';
   import { resolve } from '$app/paths';
+  import * as t from '$paraglide/messages';
 
   let { form } = $props();
 
@@ -19,8 +20,8 @@
   <div class="mx-auto max-w-md">
     <Card.Root>
       <Card.Header>
-        <Card.Title>Create Approval Request</Card.Title>
-        <Card.Description>Submit a new request for review</Card.Description>
+        <Card.Title>{t['approvals.create_request']()}</Card.Title>
+        <Card.Description>{t['approvals.create_desc']()}</Card.Description>
       </Card.Header>
 
       <form
@@ -29,7 +30,7 @@
           isSubmitting = true;
           return async ({ result, update }) => {
             if (result.type === 'redirect') {
-              flash.success('Request submitted');
+              flash.success(t['approvals.submitted_msg']());
             }
             await update();
             isSubmitting = false;
@@ -38,18 +39,17 @@
       >
         <Card.Content class="space-y-4">
           <p class="text-sm text-muted-foreground">
-            Click the button below to submit a new approval request.
-            It will be sent to a manager for review.
+            {t['approvals.create_info']()}
           </p>
         </Card.Content>
 
         <Card.Footer class="flex justify-between pt-6">
-          <Button variant="outline" href={resolve("/approvals")}>Cancel</Button>
+          <Button variant="outline" href={resolve("/approvals")}>{t['common.cancel']()}</Button>
           <Button type="submit" disabled={isSubmitting}>
             {#if isSubmitting}
-              Submitting...
+              {t['approvals.submitting']()}
             {:else}
-              Submit Request
+              {t['approvals.submit']()}
             {/if}
           </Button>
         </Card.Footer>

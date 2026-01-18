@@ -15,6 +15,8 @@
   import Search from '@lucide/svelte/icons/search';
   import UserPlus from '@lucide/svelte/icons/user-plus';
   import Pencil from '@lucide/svelte/icons/pencil';
+  import * as t from '$paraglide/messages';
+  import { getLocale } from '$paraglide/runtime';
 
   let { data } = $props();
 
@@ -26,7 +28,7 @@
 
   function formatDate(timestamp: string): string {
     const date = new Date(Number(timestamp));
-    return date.toLocaleDateString('zh-TW', {
+    return date.toLocaleDateString(getLocale(), {
       year: 'numeric',
       month: '2-digit',
       day: '2-digit',
@@ -50,7 +52,7 @@
       }
     });
     url.searchParams.set('page', '1');
-    goto(url.pathname + url.search);
+    goto(resolve(url.pathname + url.search as Pathname));
   }
 
   function handleNameSearch(e: KeyboardEvent) {
@@ -74,11 +76,18 @@
     return url.pathname + url.search;
   }
 
-  const perPageOptions = [
-    { value: '10', label: '10 per page' },
-    { value: '20', label: '20 per page' },
-    { value: '50', label: '50 per page' }
-  ];
+  const roleNames: Record<string, string> = {
+    all: t['users.role_all'](),
+    [ROLES.ADMINISTRATOR]: t['role.administrator'](),
+    [ROLES.MANAGER]: t['role.manager'](),
+    [ROLES.STAFF]: t['role.staff']()
+  };
+
+  const perPageOptions = $derived([
+    { value: '10', label: t['users.pagination_per_page']({ per_page: 10 }) },
+    { value: '20', label: t['users.pagination_per_page']({ per_page: 20 }) },
+    { value: '50', label: t['users.pagination_per_page']({ per_page: 50 }) }
+  ]);
 </script>
 
 <div class="p-8">
@@ -86,13 +95,13 @@
     <!-- Header -->
     <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
       <div>
-        <h1 class="text-3xl font-bold tracking-tight text-gray-900">User Management</h1>
-        <p class="text-muted-foreground">Manage system users and their permissions.</p>
+        <h1 class="text-3xl font-bold tracking-tight text-gray-900">{t['users.title']()}</h1>
+        <p class="text-muted-foreground">{t['users.description']()}</p>
       </div>
       <div class="flex items-center gap-2">
         <Button href={resolve("/users/create")} class="gap-2">
           <UserPlus class="size-4" />
-          Create User
+          {t['users.create_user']()}
         </Button>
       </div>
     </div>
@@ -105,38 +114,33 @@
             <div class="relative flex-1 max-w-sm">
               <Search class="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
               <Input
-                placeholder="name or username..."
+                placeholder={t['users.search_placeholder_full']()}
                 class="pl-9"
                 bind:value={nameQuery}
                 onkeydown={handleNameSearch}
               />
             </div>
             <div class="flex items-center gap-2">
-              <span class="text-sm font-medium text-muted-foreground">Role</span>
+              <span class="text-sm font-medium text-muted-foreground">{t['common.role']()}</span>
               <Select.Root
                 type="single"
                 value={page.url.searchParams.get('role') || 'all'}
                 onValueChange={handleRoleChange}
               >
               <Select.Trigger class="w-40">
-                {(() => {
-                  const role = page.url.searchParams.get('role') || 'all';
-                  return role === 'all'
-                    ? 'All Roles'
-                    : role.charAt(0).toUpperCase() + role.slice(1);
-                })()}
+                {roleNames[page.url.searchParams.get('role') || 'all']}
               </Select.Trigger>
               <Select.Content>
-                <Select.Item value="all">All Roles</Select.Item>
-                <Select.Item value={ROLES.ADMINISTRATOR}>Administrator</Select.Item>
-                <Select.Item value={ROLES.MANAGER}>Manager</Select.Item>
-                <Select.Item value={ROLES.STAFF}>Staff</Select.Item>
+                <Select.Item value="all">{t['users.role_all']()}</Select.Item>
+                <Select.Item value={ROLES.ADMINISTRATOR}>{t['role.administrator']()}</Select.Item>
+                <Select.Item value={ROLES.MANAGER}>{t['role.manager']()}</Select.Item>
+                <Select.Item value={ROLES.STAFF}>{t['role.staff']()}</Select.Item>
               </Select.Content>
             </Select.Root>
           </div>
         </div>
         <div class="flex items-center gap-2">
-          <span class="text-sm text-muted-foreground">Show</span>
+          <span class="text-sm text-muted-foreground">{t['common.show']()}</span>
           <Select.Root
             type="single"
             value={data.usersResponse.meta.per_page.toString()}
@@ -162,11 +166,11 @@
       <Table.Root>
         <Table.Header>
           <Table.Row class="bg-muted/50">
-            <Table.Head class="w-16 text-center">ID</Table.Head>
-            <Table.Head>User Information</Table.Head>
-            <Table.Head>Created At</Table.Head>
-            <Table.Head>Updated At</Table.Head>
-            <Table.Head class="w-24 text-right">Actions</Table.Head>
+            <Table.Head class="w-16 text-center">{t['users.table_id']()}</Table.Head>
+            <Table.Head>{t['users.table_user_info']()}</Table.Head>
+            <Table.Head>{t['users.table_created_at']()}</Table.Head>
+            <Table.Head>{t['users.table_updated_at']()}</Table.Head>
+            <Table.Head class="w-24 text-right">{t['users.table_actions']()}</Table.Head>
           </Table.Row>
         </Table.Header>
         <Table.Body>
@@ -195,7 +199,7 @@
                   class="h-8 w-8"
                 >
                   <Pencil class="size-4" />
-                  <span class="sr-only">Edit</span>
+                  <span class="sr-only">{t['common.edit']()}</span>
                 </Button>
               </Table.Cell>
             </Table.Row>
@@ -203,8 +207,8 @@
             <Table.Row>
               <Table.Cell colspan={5} class="h-32 text-center">
                 <div class="flex flex-col items-center justify-center gap-1 text-muted-foreground">
-                  <p class="text-lg font-medium">No users found</p>
-                  <p class="text-sm">Try a different search term or clear filters.</p>
+                  <p class="text-lg font-medium">{t['users.no_users_found']()}</p>
+                  <p class="text-sm">{t['users.no_users_found_desc']()}</p>
                 </div>
               </Table.Cell>
             </Table.Row>
@@ -217,9 +221,11 @@
     {#if data.usersResponse.meta.total > 0}
       <Card.Footer class="flex items-center justify-between border-t p-4">
         <p class="text-sm text-muted-foreground">
-          Showing <span class="font-medium text-foreground">{(data.usersResponse.meta.current_page - 1) * data.usersResponse.meta.per_page + 1}</span>
-          to <span class="font-medium text-foreground">{Math.min(data.usersResponse.meta.current_page * data.usersResponse.meta.per_page, data.usersResponse.meta.total)}</span>
-          of <span class="font-medium text-foreground">{data.usersResponse.meta.total}</span> users
+          {@html t['users.pagination_showing']({
+            start: `<span class="font-medium text-foreground">${(data.usersResponse.meta.current_page - 1) * data.usersResponse.meta.per_page + 1}</span>`,
+            end: `<span class="font-medium text-foreground">${Math.min(data.usersResponse.meta.current_page * data.usersResponse.meta.per_page, data.usersResponse.meta.total)}</span>`,
+            total: `<span class="font-medium text-foreground">${data.usersResponse.meta.total}</span>`
+          })}
         </p>
 
         <div class="flex items-center gap-2">
@@ -230,7 +236,7 @@
             href={getPageLink(data.usersResponse.meta.current_page - 1)}
           >
             <ChevronLeft class="size-4" />
-            <span class="sr-only">Previous</span>
+            <span class="sr-only">{t['common.previous']()}</span>
           </Button>
 
           <div class="hidden items-center gap-1 sm:flex">
@@ -257,7 +263,7 @@
             href={getPageLink(data.usersResponse.meta.current_page + 1)}
           >
             <ChevronRight class="size-4" />
-            <span class="sr-only">Next</span>
+            <span class="sr-only">{t['common.next']()}</span>
           </Button>
         </div>
       </Card.Footer>

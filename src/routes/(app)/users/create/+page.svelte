@@ -8,6 +8,7 @@
   import { flash } from '$lib/stores';
   import { resolve } from '$app/paths';
   import { ROLES } from '$lib/domain';
+  import * as t from '$paraglide/messages';
 
   let { form } = $props();
 
@@ -15,8 +16,8 @@
   let selectedRole = $state<string | undefined>(undefined);
 
   const roleOptions = [
-    { value: ROLES.MANAGER, label: 'Manager' },
-    { value: ROLES.STAFF, label: 'Staff' }
+    { value: ROLES.MANAGER, label: t['role.manager']() },
+    { value: ROLES.STAFF, label: t['role.staff']() }
   ];
 
   // Forward page-level errors to flash so layout shows toast
@@ -29,8 +30,8 @@
   <div class="mx-auto max-w-md">
     <Card.Root>
       <Card.Header>
-        <Card.Title>Create New User</Card.Title>
-        <Card.Description>Add a new user to the system</Card.Description>
+        <Card.Title>{t['users.create_user']()}</Card.Title>
+        <Card.Description>{t['users.create_user_desc']()}</Card.Description>
       </Card.Header>
 
       <form
@@ -39,7 +40,7 @@
           isSubmitting = true;
           return async ({ result, update }) => {
             if (result.type === 'redirect') {
-              flash.success('User created');
+              flash.success(t['users.created']());
             }
             await update();
             isSubmitting = false;
@@ -49,12 +50,12 @@
         <Card.Content class="space-y-4">
           <!-- Username -->
           <div class="space-y-2">
-            <Label for="username">Username</Label>
+            <Label for="username">{t['login.username']()}</Label>
             <Input
               id="username"
               name="username"
               type="text"
-              placeholder="Enter username"
+              placeholder={t['users.enter_username']()}
               required
               value={form?.username ?? ''}
             />
@@ -62,12 +63,12 @@
 
           <!-- Name -->
           <div class="space-y-2">
-            <Label for="name">Name</Label>
+            <Label for="name">{t['users.table_name']()}</Label>
             <Input
               id="name"
               name="name"
               type="text"
-              placeholder="Enter full name"
+              placeholder={t['users.enter_name']()}
               required
               value={form?.name ?? ''}
             />
@@ -75,22 +76,22 @@
 
           <!-- Password -->
           <div class="space-y-2">
-            <Label for="password">Password</Label>
+            <Label for="password">{t['login.password']()}</Label>
             <Input
               id="password"
               name="password"
               type="password"
-              placeholder="Enter password"
+              placeholder={t['login.password_placeholder']()}
               required
             />
           </div>
 
           <!-- Role -->
           <div class="space-y-2">
-            <Label>Role</Label>
+            <Label>{t['common.role']()}</Label>
             <Select.Root type="single" name="role" bind:value={selectedRole}>
               <Select.Trigger class="w-full">
-                {roleOptions.find(r => r.value === selectedRole)?.label ?? 'Select a role'}
+                {roleOptions.find(r => r.value === selectedRole)?.label ?? t['common.role']()}
               </Select.Trigger>
               <Select.Content>
                 {#each roleOptions as role (role.value)}
@@ -105,12 +106,12 @@
         </Card.Content>
 
         <Card.Footer class="flex justify-between pt-6">
-          <Button variant="outline" href={resolve("/users")}>Cancel</Button>
+          <Button variant="outline" href={resolve("/users")}>{t['common.cancel']()}</Button>
           <Button type="submit" disabled={isSubmitting}>
             {#if isSubmitting}
-              Creating...
+              {t['common.creating']()}
             {:else}
-              Create User
+              {t['users.create_user']()}
             {/if}
           </Button>
         </Card.Footer>

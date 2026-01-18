@@ -3,6 +3,7 @@ import { dev } from '$app/environment';
 import type { Actions } from './$types';
 import { COOKIE_KEYS } from '$lib/constants';
 import { handleActionError } from '$lib/server/utils';
+import * as t from '$paraglide/messages';
 
 export const actions: Actions = {
   default: async ({ request, cookies, locals }) => {
@@ -12,7 +13,7 @@ export const actions: Actions = {
 
     if (!username || !password) {
       return fail(400, {
-        error: 'Username and password are required',
+        error: t['login.error.credentials_required'](),
         username
       });
     }

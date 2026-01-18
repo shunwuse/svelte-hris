@@ -11,6 +11,7 @@
 	} from '$lib/components/ui/card';
 	import { Badge } from '$lib/components/ui/badge';
 	import { APPROVAL_STATUS } from '$lib/domain';
+	import * as t from '$paraglide/messages';
 	import Eye from '@lucide/svelte/icons/eye';
 	import Plus from '@lucide/svelte/icons/plus';
 	import UserPlus from '@lucide/svelte/icons/user-plus';
@@ -31,18 +32,18 @@
 		<div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
 			<div>
 				<h1 class="text-3xl font-bold tracking-tight text-gray-900">
-					Welcome back{data.userInfo?.username ? `, ${data.userInfo.username}` : ''}!
+					{t['overview.welcome']()}{data.userInfo?.username ? `, ${data.userInfo.username}` : ''}!
 				</h1>
-				<p class="text-muted-foreground">Here's an overview of the system activity.</p>
+				<p class="text-muted-foreground">{t['overview.description']()}</p>
 			</div>
 			<div class="flex items-center gap-3">
 				<Button href={resolve('/approvals/create')} variant="default" class="gap-2">
 					<Plus class="size-4" />
-					Create Request
+					{t['overview.create_request']()}
 				</Button>
 				<Button href={resolve('/users/create')} variant="outline" class="gap-2">
 					<UserPlus class="size-4" />
-					Create User
+					{t['overview.create_user']()}
 				</Button>
 			</div>
 		</div>
@@ -52,21 +53,21 @@
 			<Card>
 				<CardHeader class="flex flex-row items-center justify-between">
 					<div>
-						<CardTitle>Recent Approvals</CardTitle>
-						<CardDescription>Latest approval requests</CardDescription>
+						<CardTitle>{t['overview.recent_approvals']()}</CardTitle>
+						<CardDescription>{t['overview.recent_approvals_desc']()}</CardDescription>
 					</div>
-					<Button href={resolve('/approvals')} variant="ghost" size="sm">View All</Button>
+					<Button href={resolve('/approvals')} variant="ghost" size="sm">{t['overview.view_all']()}</Button>
 				</CardHeader>
 				<CardContent>
 					{#if data.recentApprovals.length === 0}
-						<p class="py-4 text-center text-gray-500">No approvals yet</p>
+						<p class="py-4 text-center text-gray-500">{t['overview.no_approvals']()}</p>
 					{:else}
 						<div class="space-y-3">
 							{#each data.recentApprovals as approval (approval.id)}
 								<div class="flex items-center justify-between rounded-lg border p-3 hover:bg-gray-50">
 									<div>
-										<p class="font-medium">Approval #{approval.id}</p>
-										<p class="text-sm text-gray-500">By {approval.creator_name}</p>
+										<p class="font-medium">{t['approvals.item_title']({ id: approval.id })}</p>
+										<p class="text-sm text-gray-500">{t['approvals.creator']()}: {approval.creator_name}</p>
 									</div>
 									<div class="flex items-center gap-3">
 										<Badge class={statusColors[approval.status]}>{approval.status}</Badge>
@@ -77,7 +78,7 @@
 											class="h-8 w-8"
 										>
 											<Eye class="size-4" />
-											<span class="sr-only">View</span>
+											<span class="sr-only">{t['common.view']()}</span>
 										</Button>
 									</div>
 								</div>
@@ -91,14 +92,14 @@
 			<Card>
 				<CardHeader class="flex flex-row items-center justify-between">
 					<div>
-						<CardTitle>Recent Users</CardTitle>
-						<CardDescription>Latest registered users</CardDescription>
+						<CardTitle>{t['overview.recent_users']()}</CardTitle>
+						<CardDescription>{t['overview.recent_users_desc']()}</CardDescription>
 					</div>
-					<Button href={resolve('/users')} variant="ghost" size="sm">View All</Button>
+					<Button href={resolve('/users')} variant="ghost" size="sm">{t['overview.view_all']()}</Button>
 				</CardHeader>
 				<CardContent>
 					{#if data.recentUsers.length === 0}
-						<p class="py-4 text-center text-gray-500">No users yet</p>
+						<p class="py-4 text-center text-gray-500">{t['overview.no_users']()}</p>
 					{:else}
 						<div class="space-y-3">
 							{#each data.recentUsers as user (user.id)}
@@ -121,7 +122,7 @@
 										class="h-8 w-8"
 									>
 										<Pencil class="size-4" />
-										<span class="sr-only">Edit</span>
+										<span class="sr-only">{t['common.edit']()}</span>
 									</Button>
 								</div>
 							{/each}
