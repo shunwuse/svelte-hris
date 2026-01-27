@@ -1,12 +1,29 @@
+import { browser } from '$app/environment';
 import type { ApiError } from '$lib/types';
 import { getErrorMessage } from './error-codes';
 
-// Backend API base URL
-const API_BASE_URL = 'http://localhost:8080';
+/**
+ * Determine Base URL
+ *
+ * IMPORTANT: We avoid importing $env/dynamic/private here because this file
+ * is included in the client-side bundle. Private environment variables
+ * can only be accessed on the server.
+ */
+const getBaseUrl = () => {
+  if (browser) {
+    return '/api';
+  }
+  // On server, we can't easily access private env here without triggering client-side errors during build.
+  // We will handle the server-side base URL via the fetch function or a default.
+  return '';
+};
+
+const API_BASE_URL = getBaseUrl();
 
 // Options for ApiClient
 export interface ApiClientOptions {
   fetch?: typeof fetch;
+  baseUrl?: string;
   accessToken?: string | null;
   refreshToken?: string | null;
   onTokenUpdate?: (tokens: { access_token: string; refresh_token: string }) => Promise<void> | void;
@@ -16,6 +33,7 @@ export interface ApiClientOptions {
 // Main API client class
 export class ApiClient {
   private fetchFn: typeof fetch;
+  private baseUrl: string;
   private accessToken: string | null;
   private refreshToken: string | null;
   private onTokenUpdate?: ApiClientOptions['onTokenUpdate'];
@@ -27,6 +45,7 @@ export class ApiClient {
 
   constructor(options: ApiClientOptions = {}) {
     this.fetchFn = options.fetch ?? fetch;
+    this.baseUrl = options.baseUrl ?? API_BASE_URL;
     this.accessToken = options.accessToken ?? null;
     this.refreshToken = options.refreshToken ?? null;
     this.onTokenUpdate = options.onTokenUpdate;
@@ -62,7 +81,7 @@ export class ApiClient {
     endpoint: string,
     options: RequestInit = {}
   ): Promise<T> {
-    const url = `${API_BASE_URL}${endpoint}`;
+    const url = `${this.baseUrl}${endpoint}`;
 
     const headers = new Headers(options.headers);
     if (!headers.has('Content-Type') && !(options.body instanceof FormData)) {
@@ -136,7 +155,7 @@ export class ApiClient {
     this.isRefreshing = true;
     this.refreshPromise = (async () => {
       try {
-        const response = await this.fetchFn(`${API_BASE_URL}/auth/refresh`, {
+        const response = await this.fetchFn(`${this.baseUrl}/auth/refresh`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ refresh_token: this.refreshToken })

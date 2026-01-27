@@ -4,10 +4,12 @@ import { dev } from '$app/environment';
 import { COOKIE_KEYS } from '$lib/constants';
 import { createApi } from '$lib/api';
 import { paraglideMiddleware } from '$paraglide/server';
+import { env } from '$env/dynamic/private';
 
 const publicRoutes = ['/login'];
 
 export const handle: Handle = async ({ event, resolve }) => {
+  const apiBaseUrl = env.API_BASE_URL || 'http://localhost:8080';
   // Create a minimal request for the middleware to avoid consuming the original request body.
   // This prevents the "Body has already been read" error in SvelteKit actions.
   const minimalRequest = new Request(event.request.url, {
@@ -38,6 +40,7 @@ export const handle: Handle = async ({ event, resolve }) => {
     event.locals.refreshToken = refreshToken;
     event.locals.api = createApi({
       fetch: event.fetch,
+      baseUrl: apiBaseUrl,
       accessToken,
       refreshToken,
       onTokenUpdate: (tokens) => {

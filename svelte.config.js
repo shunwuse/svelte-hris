@@ -14,6 +14,9 @@ const config = {
     adapter: adapter(),
     alias: {
       $paraglide: './src/paraglide'
+    },
+    csrf: {
+      checkOrigin: false
     }
   }
 };
