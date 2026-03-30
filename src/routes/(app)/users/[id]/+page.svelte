@@ -1,7 +1,9 @@
 <script lang="ts">
   import { enhance } from '$app/forms';
+  import FormErrorAlert from '$lib/components/FormErrorAlert.svelte';
   import FormPageCard from '$lib/components/FormPageCard.svelte';
   import FormSubmitFooter from '$lib/components/FormSubmitFooter.svelte';
+  import { Button } from '$lib/components/ui/button';
   import { createSubmitEnhancer } from '$lib/form-actions';
   import { Input } from '$lib/components/ui/input';
   import { Label } from '$lib/components/ui/label';
@@ -64,5 +66,13 @@
         {isSubmitting}
       />
     </form>
+  {:else}
+    <Card.Content>
+      <FormErrorAlert message={data.error ?? t['users.error.not_found']()} />
+    </Card.Content>
+
+    <Card.Footer class="pt-6">
+      <Button variant="outline" href={resolve(ROUTES.USERS)}>{t['common.cancel']()}</Button>
+    </Card.Footer>
   {/if}
 </FormPageCard>

@@ -178,7 +178,7 @@
               variant={isAutoLoad ? 'default' : 'outline'}
               size="sm"
               class="h-9 w-16 transition-all"
-              onclick={() => (isAutoLoad = !isAutoLoad)}
+              onPress={() => (isAutoLoad = !isAutoLoad)}
             >
               {isAutoLoad ? t['approvals.on']() : t['approvals.off']()}
             </Button>
@@ -237,7 +237,7 @@
         {#if hasMore}
           <Button
             variant="outline"
-            onclick={loadMore}
+            onPress={loadMore}
             disabled={isLoadingMore}
             class="min-w-[120px]"
           >
