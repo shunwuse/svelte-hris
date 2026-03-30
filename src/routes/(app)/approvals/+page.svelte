@@ -6,8 +6,9 @@
   import * as Card from '$lib/components/ui/card';
   import { flash } from '$lib/stores';
   import { createApi, ApiClientError } from '$lib/api';
-  import { APPROVAL_STATUS } from '$lib/domain';
+  import { APPROVAL_STATUS, formatApprovalStatus, getApprovalStatusVariant } from '$lib/domain';
   import { FILTER_VALUES, QUERY_KEYS, ROUTES, ROUTE_BUILDERS } from '$lib/constants';
+  import { toPathWithSearch, updateSearchParams } from '$lib/navigation';
   import { resolve } from '$app/paths';
   import type { Pathname } from '$app/types';
   import { page } from '$app/state';
@@ -63,33 +64,13 @@
     hasMore = data.approvalsResponse.meta.has_more;
   });
 
-  // Get badge variant based on status
-  function getStatusVariant(
-    status: ApprovalStatus
-  ): 'default' | 'secondary' | 'destructive' | 'outline' {
-    switch (status) {
-      case APPROVAL_STATUS.APPROVED:
-        return 'default';
-      case APPROVAL_STATUS.REJECTED:
-        return 'destructive';
-      case APPROVAL_STATUS.PENDING:
-      default:
-        return 'secondary';
-    }
-  }
-
   // Format status for display
   function formatStatus(status: ApprovalStatus): string {
-    switch (status) {
-      case APPROVAL_STATUS.PENDING:
-        return t['approvals.status_pending']();
-      case APPROVAL_STATUS.APPROVED:
-        return t['approvals.status_approved']();
-      case APPROVAL_STATUS.REJECTED:
-        return t['approvals.status_rejected']();
-      default:
-        return status;
-    }
+    return formatApprovalStatus(status, {
+      pending: t['approvals.status_pending'](),
+      approved: t['approvals.status_approved'](),
+      rejected: t['approvals.status_rejected']()
+    });
   }
 
   // Forward page-level errors to flash so layout shows toast
@@ -98,14 +79,15 @@
   });
 
   function handleStatusChange(value: string | undefined) {
-    const url = new URL(page.url);
-    if (!value || value === FILTER_VALUES.ALL) {
-      url.searchParams.delete(QUERY_KEYS.STATUS);
-    } else {
-      url.searchParams.set(QUERY_KEYS.STATUS, value);
-    }
-    url.searchParams.delete(QUERY_KEYS.CURSOR); // Reset pagination
-    goto(resolve((url.pathname + url.search) as Pathname));
+    const url = updateSearchParams(
+      page.url,
+      {
+        [QUERY_KEYS.STATUS]: value,
+        [QUERY_KEYS.CURSOR]: undefined
+      },
+      { deleteValues: [FILTER_VALUES.ALL, ''] }
+    );
+    goto(resolve(toPathWithSearch(url) as Pathname));
   }
 
   async function loadMore() {
@@ -222,7 +204,7 @@
                 <Table.Cell class="font-medium">{approval.creator_name}</Table.Cell>
                 <Table.Cell>{approval.approver_name ?? '-'}</Table.Cell>
                 <Table.Cell>
-                  <Badge variant={getStatusVariant(approval.status)}>
+                  <Badge variant={getApprovalStatusVariant(approval.status)}>
                     {formatStatus(approval.status)}
                   </Badge>
                 </Table.Cell>

@@ -1,6 +1,10 @@
 import type { PageServerLoad } from './$types';
 import { COOKIE_KEYS, DEFAULTS } from '$lib/constants';
-import { safeLoad } from '$lib/server/utils';
+import {
+  createEmptyCursorPaginationResponse,
+  createEmptyOffsetPaginationResponse,
+  safeLoad
+} from '$lib/server/utils';
 
 export const load: PageServerLoad = async ({ cookies, locals }) => {
   // Get user info from cookie
@@ -19,20 +23,12 @@ export const load: PageServerLoad = async ({ cookies, locals }) => {
   const [usersResult, approvalsResult] = await Promise.all([
     safeLoad(
       () => locals.api.users.list({ per_page: DEFAULTS.OVERVIEW_RECENT_LIMIT }),
-      {
-        data: [],
-        meta: {
-          total: 0,
-          per_page: DEFAULTS.OVERVIEW_RECENT_LIMIT,
-          current_page: DEFAULTS.FIRST_PAGE,
-          last_page: DEFAULTS.FIRST_PAGE
-        }
-      },
+      createEmptyOffsetPaginationResponse(DEFAULTS.OVERVIEW_RECENT_LIMIT),
       'Failed to fetch users'
     ),
     safeLoad(
       () => locals.api.approvals.list(),
-      { data: [], meta: { next_cursor: null, has_more: false } },
+      createEmptyCursorPaginationResponse(),
       'Failed to fetch approvals'
     )
   ]);

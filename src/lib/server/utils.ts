@@ -1,7 +1,7 @@
 import { fail } from '@sveltejs/kit';
 import { ApiClientError } from '$lib/api';
-import { HTTP_STATUS } from '$lib/constants';
-import type { ApiError } from '$lib/types';
+import { DEFAULTS, HTTP_STATUS } from '$lib/constants';
+import type { ApiError, CursorPaginationResponse, OffsetPaginationResponse } from '$lib/types';
 import type { ErrorMessageOverrides } from '$lib/api/error-codes';
 import { getErrorMessage } from '$lib/api/error-codes';
 import * as t from '$paraglide/messages';
@@ -98,4 +98,28 @@ export async function safeLoad<T>(
     const error = handleLoadError(err, context, overrides);
     return { data: defaultValue, error };
   }
+}
+
+export function createEmptyOffsetPaginationResponse<T>(
+  perPage: number = DEFAULTS.USERS_PER_PAGE
+): OffsetPaginationResponse<T> {
+  return {
+    data: [],
+    meta: {
+      total: 0,
+      per_page: perPage,
+      current_page: DEFAULTS.FIRST_PAGE,
+      last_page: DEFAULTS.FIRST_PAGE
+    }
+  };
+}
+
+export function createEmptyCursorPaginationResponse<T>(): CursorPaginationResponse<T> {
+  return {
+    data: [],
+    meta: {
+      next_cursor: null,
+      has_more: false
+    }
+  };
 }

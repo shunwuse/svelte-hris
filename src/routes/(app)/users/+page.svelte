@@ -12,6 +12,7 @@
     ROUTES,
     ROUTE_BUILDERS
   } from '$lib/constants';
+  import { toPathWithSearch, updateSearchParams } from '$lib/navigation';
   import { flash } from '$lib/stores';
   import { resolve } from '$app/paths';
   import type { Pathname } from '$app/types';
@@ -52,16 +53,15 @@
   });
 
   function updateFilters(newParams: Record<string, string | undefined>) {
-    const url = new URL(page.url);
-    Object.entries(newParams).forEach(([key, value]) => {
-      if (value === undefined || value === FILTER_VALUES.ALL || value === '') {
-        url.searchParams.delete(key);
-      } else {
-        url.searchParams.set(key, value);
-      }
-    });
-    url.searchParams.set(QUERY_KEYS.PAGE, DEFAULTS.FIRST_PAGE.toString());
-    goto(resolve((url.pathname + url.search) as Pathname));
+    const url = updateSearchParams(
+      page.url,
+      {
+        ...newParams,
+        [QUERY_KEYS.PAGE]: DEFAULTS.FIRST_PAGE.toString()
+      },
+      { deleteValues: [FILTER_VALUES.ALL, ''] }
+    );
+    goto(resolve(toPathWithSearch(url) as Pathname));
   }
 
   function handleNameSearch(e: KeyboardEvent) {
@@ -80,9 +80,11 @@
   }
 
   function getPageLink(p: number) {
-    const url = new URL(page.url);
-    url.searchParams.set(QUERY_KEYS.PAGE, p.toString());
-    return url.pathname + url.search;
+    return toPathWithSearch(
+      updateSearchParams(page.url, {
+        [QUERY_KEYS.PAGE]: p.toString()
+      })
+    );
   }
 
   const roleNames: Record<string, string> = {

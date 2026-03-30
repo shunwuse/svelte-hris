@@ -1,6 +1,6 @@
 import type { PageServerLoad } from './$types';
 import { DEFAULTS, QUERY_KEYS } from '$lib/constants';
-import { safeLoad } from '$lib/server/utils';
+import { createEmptyOffsetPaginationResponse, safeLoad } from '$lib/server/utils';
 import type { Role } from '$lib/domain';
 
 export const load: PageServerLoad = async ({ locals, url }) => {
@@ -11,15 +11,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 
   const { data: usersResponse, error } = await safeLoad(
     () => locals.api.users.list({ page, per_page, name, role }),
-    {
-      data: [],
-      meta: {
-        total: 0,
-        per_page: DEFAULTS.USERS_PER_PAGE,
-        current_page: DEFAULTS.FIRST_PAGE,
-        last_page: DEFAULTS.FIRST_PAGE
-      }
-    },
+    createEmptyOffsetPaginationResponse(),
     'Failed to fetch users'
   );
 

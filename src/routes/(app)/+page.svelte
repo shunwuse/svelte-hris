@@ -11,7 +11,7 @@
     CardTitle
   } from '$lib/components/ui/card';
   import { Badge } from '$lib/components/ui/badge';
-  import { APPROVAL_STATUS } from '$lib/domain';
+  import { getApprovalStatusColorClass } from '$lib/domain';
   import * as t from '$paraglide/messages';
   import Eye from '@lucide/svelte/icons/eye';
   import Plus from '@lucide/svelte/icons/plus';
@@ -19,12 +19,6 @@
   import Pencil from '@lucide/svelte/icons/pencil';
 
   let { data } = $props();
-
-  const statusColors = {
-    [APPROVAL_STATUS.PENDING]: 'bg-yellow-100 text-yellow-800',
-    [APPROVAL_STATUS.APPROVED]: 'bg-green-100 text-green-800',
-    [APPROVAL_STATUS.REJECTED]: 'bg-red-100 text-red-800'
-  } as const;
 </script>
 
 <div class="p-8">
@@ -77,7 +71,9 @@
                     </p>
                   </div>
                   <div class="flex items-center gap-3">
-                    <Badge class={statusColors[approval.status]}>{approval.status}</Badge>
+                    <Badge class={getApprovalStatusColorClass(approval.status)}
+                      >{approval.status}</Badge
+                    >
                     <Button
                       href={resolve(ROUTE_BUILDERS.approvalDetail(approval.id) as Pathname)}
                       size="icon"

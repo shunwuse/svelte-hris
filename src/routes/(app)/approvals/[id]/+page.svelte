@@ -4,9 +4,10 @@
   import { Badge } from '$lib/components/ui/badge';
   import * as Card from '$lib/components/ui/card';
   import { flash } from '$lib/stores';
+  import { createSubmitEnhancer } from '$lib/form-actions';
   import { FORM_ACTIONS, ROUTES } from '$lib/constants';
   import type { ApprovalStatus } from '$lib/domain';
-  import { APPROVAL_STATUS } from '$lib/domain';
+  import { APPROVAL_STATUS, formatApprovalStatus, getApprovalStatusVariant } from '$lib/domain';
   import { resolve } from '$app/paths';
   import * as t from '$paraglide/messages';
 
@@ -14,51 +15,29 @@
 
   let isSubmitting = $state(false);
 
-  function getStatusVariant(status: ApprovalStatus): 'default' | 'secondary' | 'destructive' {
-    switch (status) {
-      case APPROVAL_STATUS.APPROVED:
-        return 'default';
-      case APPROVAL_STATUS.REJECTED:
-        return 'destructive';
-      case APPROVAL_STATUS.PENDING:
-      default:
-        return 'secondary';
-    }
-  }
-
   function formatStatus(status: ApprovalStatus): string {
-    switch (status) {
-      case APPROVAL_STATUS.PENDING:
-        return t['approvals.status_pending']();
-      case APPROVAL_STATUS.APPROVED:
-        return t['approvals.status_approved']();
-      case APPROVAL_STATUS.REJECTED:
-        return t['approvals.status_rejected']();
-      default:
-        return status;
-    }
+    return formatApprovalStatus(status, {
+      pending: t['approvals.status_pending'](),
+      approved: t['approvals.status_approved'](),
+      rejected: t['approvals.status_rejected']()
+    });
   }
 
-  function handleEnhance(action: 'approve' | 'reject') {
-    return () => {
-      isSubmitting = true;
-      return async ({
-        result,
-        update
-      }: {
-        result: { type: string };
-        update: () => Promise<void>;
-      }) => {
-        if (result.type === 'redirect') {
-          flash.success(
-            action === 'approve' ? t['approvals.approved_msg']() : t['approvals.rejected_msg']()
-          );
-        }
-        await update();
-        isSubmitting = false;
-      };
-    };
+  function createApprovalSubmitEnhancer(action: 'approve' | 'reject') {
+    return createSubmitEnhancer({
+      setSubmitting: (value) => {
+        isSubmitting = value;
+      },
+      onRedirect: () => {
+        flash.success(
+          action === 'approve' ? t['approvals.approved_msg']() : t['approvals.rejected_msg']()
+        );
+      }
+    });
   }
+
+  const approveEnhance = createApprovalSubmitEnhancer('approve');
+  const rejectEnhance = createApprovalSubmitEnhancer('reject');
 
   // Forward page-level errors to flash so layout shows toast
   $effect(() => {
@@ -104,7 +83,7 @@
             </div>
             <div class="flex items-center justify-between">
               <span class="text-sm text-muted-foreground">{t['common.status']()}</span>
-              <Badge variant={getStatusVariant(data.approval.status)}>
+              <Badge variant={getApprovalStatusVariant(data.approval.status)}>
                 {formatStatus(data.approval.status)}
               </Badge>
             </div>
@@ -116,21 +95,13 @@
 
           {#if data.approval.status === APPROVAL_STATUS.PENDING}
             <div class="flex gap-2">
-              <form
-                method="POST"
-                action={FORM_ACTIONS.REJECT}
-                use:enhance={handleEnhance('reject')}
-              >
+              <form method="POST" action={FORM_ACTIONS.REJECT} use:enhance={rejectEnhance}>
                 <Button type="submit" variant="destructive" disabled={isSubmitting}>
                   {t['approvals.reject']()}
                 </Button>
               </form>
 
-              <form
-                method="POST"
-                action={FORM_ACTIONS.APPROVE}
-                use:enhance={handleEnhance('approve')}
-              >
+              <form method="POST" action={FORM_ACTIONS.APPROVE} use:enhance={approveEnhance}>
                 <Button type="submit" disabled={isSubmitting}>
                   {t['approvals.approve']()}
                 </Button>

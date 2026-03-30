@@ -4,11 +4,18 @@
   import { Label } from '$lib/components/ui/label';
   import * as Card from '$lib/components/ui/card';
   import { enhance } from '$app/forms';
+  import { createSubmitEnhancer } from '$lib/form-actions';
   import * as t from '$paraglide/messages';
 
   let { form } = $props();
 
   let isLoading = $state(false);
+
+  const submitEnhance = createSubmitEnhancer({
+    setSubmitting: (value) => {
+      isLoading = value;
+    }
+  });
 </script>
 
 <div class="flex min-h-screen items-center justify-center bg-background">
@@ -18,16 +25,7 @@
       <Card.Description>{t['login.description']()}</Card.Description>
     </Card.Header>
 
-    <form
-      method="POST"
-      use:enhance={() => {
-        isLoading = true;
-        return async ({ update }) => {
-          isLoading = false;
-          await update();
-        };
-      }}
-    >
+    <form method="POST" use:enhance={submitEnhance}>
       <Card.Content class="space-y-4">
         {#if form?.error}
           <div class="rounded-md bg-destructive/15 p-3 text-sm text-destructive">

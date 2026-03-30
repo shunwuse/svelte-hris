@@ -1,5 +1,6 @@
 <script lang="ts">
   import { enhance } from '$app/forms';
+  import { createSubmitEnhancer } from '$lib/form-actions';
   import { Button } from '$lib/components/ui/button';
   import * as Card from '$lib/components/ui/card';
   import { ROUTES } from '$lib/constants';
@@ -10,6 +11,15 @@
   let { form } = $props();
 
   let isSubmitting = $state(false);
+
+  const submitEnhance = createSubmitEnhancer({
+    setSubmitting: (value) => {
+      isSubmitting = value;
+    },
+    onRedirect: () => {
+      flash.success(t['approvals.submitted_msg']());
+    }
+  });
 
   // Forward page-level errors to flash so layout shows toast
   $effect(() => {
@@ -25,19 +35,7 @@
         <Card.Description>{t['approvals.create_desc']()}</Card.Description>
       </Card.Header>
 
-      <form
-        method="POST"
-        use:enhance={() => {
-          isSubmitting = true;
-          return async ({ result, update }) => {
-            if (result.type === 'redirect') {
-              flash.success(t['approvals.submitted_msg']());
-            }
-            await update();
-            isSubmitting = false;
-          };
-        }}
-      >
+      <form method="POST" use:enhance={submitEnhance}>
         <Card.Content class="space-y-4">
           <p class="text-sm text-muted-foreground">
             {t['approvals.create_info']()}

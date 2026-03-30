@@ -1,5 +1,6 @@
 <script lang="ts">
   import { enhance } from '$app/forms';
+  import { createSubmitEnhancer } from '$lib/form-actions';
   import { Button } from '$lib/components/ui/button';
   import { Input } from '$lib/components/ui/input';
   import { Label } from '$lib/components/ui/label';
@@ -15,6 +16,15 @@
 
   let isSubmitting = $state(false);
   let selectedRole = $state<string | undefined>(undefined);
+
+  const submitEnhance = createSubmitEnhancer({
+    setSubmitting: (value) => {
+      isSubmitting = value;
+    },
+    onRedirect: () => {
+      flash.success(t['users.created']());
+    }
+  });
 
   const roleOptions = [
     { value: ROLES.MANAGER, label: t['role.manager']() },
@@ -35,19 +45,7 @@
         <Card.Description>{t['users.create_user_desc']()}</Card.Description>
       </Card.Header>
 
-      <form
-        method="POST"
-        use:enhance={() => {
-          isSubmitting = true;
-          return async ({ result, update }) => {
-            if (result.type === 'redirect') {
-              flash.success(t['users.created']());
-            }
-            await update();
-            isSubmitting = false;
-          };
-        }}
-      >
+      <form method="POST" use:enhance={submitEnhance}>
         <Card.Content class="space-y-4">
           <!-- Username -->
           <div class="space-y-2">
