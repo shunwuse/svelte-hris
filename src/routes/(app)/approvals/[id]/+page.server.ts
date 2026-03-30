@@ -1,12 +1,47 @@
 import type { PageServerLoad, Actions } from './$types';
-import { redirect } from '@sveltejs/kit';
+import { fail, redirect } from '@sveltejs/kit';
 import { APPROVAL_STATUS, HTTP_STATUS, ROUTES } from '$lib/constants';
-import { safeLoad, handleActionError } from '$lib/server/utils';
+import { safeLoad, handleActionError, parsePositiveIntParam } from '$lib/server/utils';
 import { ERROR_CODES } from '$lib/api';
+import type { ActionableApprovalStatus } from '$lib/domain';
 import * as t from '$paraglide/messages';
 
+async function performApprovalAction(
+  approvalIdParam: string,
+  locals: App.Locals,
+  action: ActionableApprovalStatus,
+  context: string
+) {
+  const approvalId = parsePositiveIntParam(approvalIdParam);
+
+  if (!approvalId) {
+    return fail(HTTP_STATUS.BAD_REQUEST, {
+      error: t['approvals.error.not_found']()
+    });
+  }
+
+  try {
+    await locals.api.approvals.action(approvalId, { action });
+  } catch (err) {
+    return handleActionError(
+      err,
+      context,
+      {},
+      {
+        [ERROR_CODES.NOT_FOUND]: t['approvals.error.not_found']()
+      }
+    );
+  }
+
+  redirect(HTTP_STATUS.SEE_OTHER, ROUTES.APPROVALS);
+}
+
 export const load: PageServerLoad = async ({ params, locals }) => {
-  const approvalId = Number(params.id);
+  const approvalId = parsePositiveIntParam(params.id);
+
+  if (!approvalId) {
+    return { approval: null, error: t['approvals.error.not_found']() };
+  }
 
   const { data: approval, error } = await safeLoad(
     () => locals.api.approvals.get(approvalId),
@@ -28,40 +63,10 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 
 export const actions: Actions = {
   approve: async ({ params, locals }) => {
-    const approvalId = Number(params.id);
-
-    try {
-      await locals.api.approvals.action(approvalId, { action: APPROVAL_STATUS.APPROVED });
-    } catch (err) {
-      return handleActionError(
-        err,
-        'Approve error',
-        {},
-        {
-          [ERROR_CODES.NOT_FOUND]: t['approvals.error.not_found']()
-        }
-      );
-    }
-
-    redirect(HTTP_STATUS.SEE_OTHER, ROUTES.APPROVALS);
+    return performApprovalAction(params.id, locals, APPROVAL_STATUS.APPROVED, 'Approve error');
   },
 
   reject: async ({ params, locals }) => {
-    const approvalId = Number(params.id);
-
-    try {
-      await locals.api.approvals.action(approvalId, { action: APPROVAL_STATUS.REJECTED });
-    } catch (err) {
-      return handleActionError(
-        err,
-        'Reject error',
-        {},
-        {
-          [ERROR_CODES.NOT_FOUND]: t['approvals.error.not_found']()
-        }
-      );
-    }
-
-    redirect(HTTP_STATUS.SEE_OTHER, ROUTES.APPROVALS);
+    return performApprovalAction(params.id, locals, APPROVAL_STATUS.REJECTED, 'Reject error');
   }
 };

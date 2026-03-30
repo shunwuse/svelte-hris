@@ -123,3 +123,31 @@ export function createEmptyCursorPaginationResponse<T>(): CursorPaginationRespon
     }
   };
 }
+
+export function parsePositiveIntParam(value: string): number | null {
+  const parsed = Number(value);
+
+  if (!Number.isInteger(parsed) || parsed <= 0) {
+    return null;
+  }
+
+  return parsed;
+}
+
+export interface ReadFormFieldOptions {
+  trim?: boolean;
+}
+
+export function readFormField(
+  formData: FormData,
+  key: string,
+  options: ReadFormFieldOptions = {}
+): string {
+  const value = formData.get(key);
+
+  if (typeof value !== 'string') {
+    return '';
+  }
+
+  return options.trim === false ? value : value.trim();
+}

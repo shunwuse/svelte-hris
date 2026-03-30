@@ -1,18 +1,18 @@
 import type { Actions } from './$types';
 import { fail, redirect } from '@sveltejs/kit';
 import { HTTP_STATUS, ROUTES } from '$lib/constants';
-import { handleActionError } from '$lib/server/utils';
+import { handleActionError, readFormField } from '$lib/server/utils';
 import { ERROR_CODES } from '$lib/api';
-import type { CreateableRole } from '$lib/domain';
+import { isCreateableRole } from '$lib/domain';
 import * as t from '$paraglide/messages';
 
 export const actions: Actions = {
   default: async ({ request, locals }) => {
     const formData = await request.formData();
-    const username = formData.get('username') as string;
-    const name = formData.get('name') as string;
-    const password = formData.get('password') as string;
-    const role = formData.get('role') as CreateableRole;
+    const username = readFormField(formData, 'username');
+    const name = readFormField(formData, 'name');
+    const password = readFormField(formData, 'password', { trim: false });
+    const role = readFormField(formData, 'role');
 
     const formFields = { username, name };
 
@@ -24,7 +24,7 @@ export const actions: Actions = {
       });
     }
 
-    if (!role) {
+    if (!isCreateableRole(role)) {
       return fail(HTTP_STATUS.BAD_REQUEST, {
         error: t['users.error.role_required'](),
         ...formFields

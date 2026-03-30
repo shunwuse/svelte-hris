@@ -1,13 +1,21 @@
 import type { PageServerLoad } from './$types';
 import { DEFAULTS, QUERY_KEYS } from '$lib/constants';
-import { createEmptyOffsetPaginationResponse, safeLoad } from '$lib/server/utils';
-import type { Role } from '$lib/domain';
+import {
+  createEmptyOffsetPaginationResponse,
+  safeLoad,
+  parsePositiveIntParam
+} from '$lib/server/utils';
+import { isRole } from '$lib/domain';
 
 export const load: PageServerLoad = async ({ locals, url }) => {
-  const page = Number(url.searchParams.get(QUERY_KEYS.PAGE)) || DEFAULTS.FIRST_PAGE;
-  const per_page = Number(url.searchParams.get(QUERY_KEYS.PER_PAGE)) || DEFAULTS.USERS_PER_PAGE;
+  const page =
+    parsePositiveIntParam(url.searchParams.get(QUERY_KEYS.PAGE) ?? '') ?? DEFAULTS.FIRST_PAGE;
+  const per_page =
+    parsePositiveIntParam(url.searchParams.get(QUERY_KEYS.PER_PAGE) ?? '') ??
+    DEFAULTS.USERS_PER_PAGE;
   const name = url.searchParams.get(QUERY_KEYS.NAME) || undefined;
-  const role = (url.searchParams.get(QUERY_KEYS.ROLE) as Role) || undefined;
+  const roleParam = url.searchParams.get(QUERY_KEYS.ROLE);
+  const role = roleParam && isRole(roleParam) ? roleParam : undefined;
 
   const { data: usersResponse, error } = await safeLoad(
     () => locals.api.users.list({ page, per_page, name, role }),

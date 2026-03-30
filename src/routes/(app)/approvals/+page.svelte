@@ -7,7 +7,7 @@
   import * as Card from '$lib/components/ui/card';
   import { flash } from '$lib/stores';
   import { createApi, ApiClientError } from '$lib/api';
-  import { formatApprovalStatus } from '$lib/domain';
+  import { formatApprovalStatus, isApprovalStatus } from '$lib/domain';
   import {
     APPROVAL_STATUS,
     FILTER_VALUES,
@@ -37,6 +37,17 @@
       refreshToken: data.refreshToken
     });
   });
+
+  const selectedStatus = $derived.by<ApprovalStatus | typeof FILTER_VALUES.ALL>(() => {
+    const statusParam = page.url.searchParams.get(QUERY_KEYS.STATUS);
+    return statusParam && isApprovalStatus(statusParam) ? statusParam : FILTER_VALUES.ALL;
+  });
+
+  const selectedStatusLabel = $derived(
+    selectedStatus === FILTER_VALUES.ALL
+      ? t['approvals.status_all']()
+      : formatStatus(selectedStatus)
+  );
 
   // State for cursor-based pagination
   let approvals = $state<Approval[]>(data.approvalsResponse.data);
@@ -102,9 +113,11 @@
 
     isLoadingMore = true;
     try {
+      const status = selectedStatus === FILTER_VALUES.ALL ? undefined : selectedStatus;
+
       const response = await api.approvals.list({
         cursor: nextCursor,
-        status: page.url.searchParams.get(QUERY_KEYS.STATUS) as ApprovalStatus | undefined
+        status
       });
 
       approvals = [...approvals, ...response.data];
@@ -141,21 +154,8 @@
           <div class="flex flex-1 items-center gap-4">
             <div class="flex items-center gap-2">
               <span class="text-sm font-medium text-muted-foreground">{t['common.status']()}</span>
-              <Select.Root
-                type="single"
-                value={page.url.searchParams.get(QUERY_KEYS.STATUS) || FILTER_VALUES.ALL}
-                onValueChange={handleStatusChange}
-              >
-                <Select.Trigger class="w-40">
-                  {(() => {
-                    const status = page.url.searchParams.get(QUERY_KEYS.STATUS) as
-                      | ApprovalStatus
-                      | typeof FILTER_VALUES.ALL
-                      | null;
-                    if (!status || status === FILTER_VALUES.ALL) return t['approvals.status_all']();
-                    return formatStatus(status);
-                  })()}
-                </Select.Trigger>
+              <Select.Root type="single" value={selectedStatus} onValueChange={handleStatusChange}>
+                <Select.Trigger class="w-40">{selectedStatusLabel}</Select.Trigger>
                 <Select.Content>
                   <Select.Item value={FILTER_VALUES.ALL}>{t['approvals.status_all']()}</Select.Item>
                   <Select.Item value={APPROVAL_STATUS.PENDING}

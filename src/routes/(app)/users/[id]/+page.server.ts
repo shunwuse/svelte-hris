@@ -1,12 +1,21 @@
 import type { PageServerLoad, Actions } from './$types';
 import { fail, redirect } from '@sveltejs/kit';
 import { HTTP_STATUS, ROUTES } from '$lib/constants';
-import { safeLoad, handleActionError } from '$lib/server/utils';
+import {
+  safeLoad,
+  handleActionError,
+  parsePositiveIntParam,
+  readFormField
+} from '$lib/server/utils';
 import { ERROR_CODES } from '$lib/api';
 import * as t from '$paraglide/messages';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
-  const userId = Number(params.id);
+  const userId = parsePositiveIntParam(params.id);
+
+  if (!userId) {
+    return { user: null, error: t['users.error.not_found']() };
+  }
 
   const { data: user, error } = await safeLoad(
     () => locals.api.users.get(userId),
@@ -28,13 +37,20 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 
 export const actions: Actions = {
   default: async ({ request, params, locals }) => {
-    const userId = Number(params.id);
     const formData = await request.formData();
-    const name = formData.get('name') as string;
+    const name = readFormField(formData, 'name');
 
     const formFields = { name };
+    const userId = parsePositiveIntParam(params.id);
 
-    if (!name || name.trim() === '') {
+    if (!userId) {
+      return fail(HTTP_STATUS.BAD_REQUEST, {
+        error: t['users.error.update_failed_not_found'](),
+        ...formFields
+      });
+    }
+
+    if (!name) {
       return fail(HTTP_STATUS.BAD_REQUEST, {
         error: t['users.error.name_required'](),
         ...formFields

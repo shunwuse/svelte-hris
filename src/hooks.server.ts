@@ -1,12 +1,16 @@
 import type { Handle } from '@sveltejs/kit';
 import { redirect } from '@sveltejs/kit';
-import { dev } from '$app/environment';
-import { API_CONFIG, COOKIE_CONFIG, COOKIE_KEYS, HTTP_STATUS, ROUTES } from '$lib/constants';
+import { API_CONFIG, COOKIE_KEYS, HTTP_STATUS, ROUTES } from '$lib/constants';
 import { createApi } from '$lib/api';
+import { clearAuthCookies, setAuthTokenCookies } from '$lib/server/auth-cookies';
 import { paraglideMiddleware } from '$paraglide/server';
 import { env } from '$env/dynamic/private';
 
 const publicRoutes = [ROUTES.LOGIN];
+
+function isPublicRoute(pathname: string): boolean {
+  return publicRoutes.some((route) => pathname === route || pathname.startsWith(`${route}/`));
+}
 
 export const handle: Handle = async ({ event, resolve }) => {
   const apiBaseUrl = env.API_BASE_URL || API_CONFIG.DEFAULT_BASE_URL;
@@ -23,10 +27,10 @@ export const handle: Handle = async ({ event, resolve }) => {
 
     // Use the potentially delocalized request's URL
     const url = new URL(request.url);
-    const isPublicRoute = publicRoutes.some((route) => url.pathname.startsWith(route));
+    const isPublicPath = isPublicRoute(url.pathname);
 
     // Not authenticated then redirect to login
-    if (!accessToken && !isPublicRoute) {
+    if (!accessToken && !isPublicPath) {
       redirect(HTTP_STATUS.SEE_OTHER, ROUTES.LOGIN);
     }
 
@@ -44,22 +48,14 @@ export const handle: Handle = async ({ event, resolve }) => {
       accessToken,
       refreshToken,
       onTokenUpdate: (tokens) => {
-        event.cookies.set(COOKIE_KEYS.ACCESS_TOKEN, tokens.access_token, {
-          path: COOKIE_CONFIG.PATH_ROOT,
-          httpOnly: true,
-          sameSite: COOKIE_CONFIG.SAME_SITE_LAX,
-          secure: !dev
-        });
-        event.cookies.set(COOKIE_KEYS.REFRESH_TOKEN, tokens.refresh_token, {
-          path: COOKIE_CONFIG.PATH_ROOT,
-          httpOnly: true,
-          sameSite: COOKIE_CONFIG.SAME_SITE_LAX,
-          secure: !dev
-        });
+        setAuthTokenCookies(event.cookies, tokens);
+        event.locals.accessToken = tokens.access_token;
+        event.locals.refreshToken = tokens.refresh_token;
       },
       onLogout: () => {
-        event.cookies.delete(COOKIE_KEYS.ACCESS_TOKEN, { path: COOKIE_CONFIG.PATH_ROOT });
-        event.cookies.delete(COOKIE_KEYS.REFRESH_TOKEN, { path: COOKIE_CONFIG.PATH_ROOT });
+        clearAuthCookies(event.cookies);
+        event.locals.accessToken = null;
+        event.locals.refreshToken = null;
         redirect(HTTP_STATUS.SEE_OTHER, ROUTES.LOGIN);
       }
     });

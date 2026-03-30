@@ -25,6 +25,16 @@ export function getApprovalStatusVariant(status: ApprovalStatus): ApprovalStatus
   }
 }
 
+export function isApprovalStatus(value: unknown): value is ApprovalStatus {
+  return (
+    typeof value === 'string' && Object.values(APPROVAL_STATUS).includes(value as ApprovalStatus)
+  );
+}
+
+export function isActionableApprovalStatus(value: unknown): value is ActionableApprovalStatus {
+  return value === APPROVAL_STATUS.APPROVED || value === APPROVAL_STATUS.REJECTED;
+}
+
 export function formatApprovalStatus(status: ApprovalStatus, labels: ApprovalStatusLabels): string {
   switch (status) {
     case APPROVAL_STATUS.PENDING:

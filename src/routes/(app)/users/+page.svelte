@@ -1,4 +1,5 @@
 <script lang="ts">
+  import OffsetPaginationNav from '$lib/components/OffsetPaginationNav.svelte';
   import PageHeader from '$lib/components/PageHeader.svelte';
   import { Button } from '$lib/components/ui/button';
   import { Input } from '$lib/components/ui/input';
@@ -20,8 +21,6 @@
   import type { Pathname } from '$app/types';
   import { goto } from '$app/navigation';
   import { page } from '$app/state';
-  import ChevronLeft from '@lucide/svelte/icons/chevron-left';
-  import ChevronRight from '@lucide/svelte/icons/chevron-right';
   import Search from '@lucide/svelte/icons/search';
   import UserPlus from '@lucide/svelte/icons/user-plus';
   import Pencil from '@lucide/svelte/icons/pencil';
@@ -101,6 +100,17 @@
       label: t['users.pagination_per_page']({ per_page: perPage })
     }))
   ]);
+
+  const usersMeta = $derived(data.usersResponse.meta);
+  const selectedRole = $derived(page.url.searchParams.get(QUERY_KEYS.ROLE) || FILTER_VALUES.ALL);
+  const selectedPerPage = $derived(usersMeta.per_page.toString());
+  const selectedPerPageLabel = $derived(
+    perPageOptions.find((option) => option.value === selectedPerPage)?.label ?? ''
+  );
+  const pageRangeStart = $derived((usersMeta.current_page - 1) * usersMeta.per_page + 1);
+  const pageRangeEnd = $derived(
+    Math.min(usersMeta.current_page * usersMeta.per_page, usersMeta.total)
+  );
 </script>
 
 <div class="p-8">
@@ -133,13 +143,9 @@
             </div>
             <div class="flex items-center gap-2">
               <span class="text-sm font-medium text-muted-foreground">{t['common.role']()}</span>
-              <Select.Root
-                type="single"
-                value={page.url.searchParams.get(QUERY_KEYS.ROLE) || FILTER_VALUES.ALL}
-                onValueChange={handleRoleChange}
-              >
+              <Select.Root type="single" value={selectedRole} onValueChange={handleRoleChange}>
                 <Select.Trigger class="w-40">
-                  {roleNames[page.url.searchParams.get(QUERY_KEYS.ROLE) || FILTER_VALUES.ALL]}
+                  {roleNames[selectedRole]}
                 </Select.Trigger>
                 <Select.Content>
                   <Select.Item value={FILTER_VALUES.ALL}>{t['users.role_all']()}</Select.Item>
@@ -152,15 +158,8 @@
           </div>
           <div class="flex items-center gap-2">
             <span class="text-sm text-muted-foreground">{t['common.show']()}</span>
-            <Select.Root
-              type="single"
-              value={data.usersResponse.meta.per_page.toString()}
-              onValueChange={handlePerPageChange}
-            >
-              <Select.Trigger class="w-[130px]">
-                {perPageOptions.find((o) => o.value === data.usersResponse.meta.per_page.toString())
-                  ?.label}
-              </Select.Trigger>
+            <Select.Root type="single" value={selectedPerPage} onValueChange={handlePerPageChange}>
+              <Select.Trigger class="w-[130px]">{selectedPerPageLabel}</Select.Trigger>
               <Select.Content>
                 {#each perPageOptions as option (option.value)}
                   <Select.Item value={option.value}>{option.label}</Select.Item>
@@ -230,61 +229,23 @@
       </div>
 
       <!-- Pagination Footer -->
-      {#if data.usersResponse.meta.total > 0}
+      {#if usersMeta.total > 0}
         <Card.Footer class="flex items-center justify-between border-t p-4">
           <p class="text-sm text-muted-foreground">
             {t['users.pagination_showing']({
-              start: String(
-                (data.usersResponse.meta.current_page - 1) * data.usersResponse.meta.per_page + 1
-              ),
-              end: String(
-                Math.min(
-                  data.usersResponse.meta.current_page * data.usersResponse.meta.per_page,
-                  data.usersResponse.meta.total
-                )
-              ),
-              total: String(data.usersResponse.meta.total)
+              start: String(pageRangeStart),
+              end: String(pageRangeEnd),
+              total: String(usersMeta.total)
             })}
           </p>
 
-          <div class="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="icon"
-              disabled={data.usersResponse.meta.current_page === 1}
-              href={getPageLink(data.usersResponse.meta.current_page - 1)}
-            >
-              <ChevronLeft class="size-4" />
-              <span class="sr-only">{t['common.previous']()}</span>
-            </Button>
-
-            <div class="hidden items-center gap-1 sm:flex">
-              {#each Array.from({ length: data.usersResponse.meta.last_page }, (_, i) => i + 1) as p (p)}
-                {#if p === 1 || p === data.usersResponse.meta.last_page || (p >= data.usersResponse.meta.current_page - 1 && p <= data.usersResponse.meta.current_page + 1)}
-                  <Button
-                    variant={data.usersResponse.meta.current_page === p ? 'default' : 'outline'}
-                    size="sm"
-                    class="h-8 w-8 p-0"
-                    href={getPageLink(p)}
-                  >
-                    {p}
-                  </Button>
-                {:else if p === 2 || p === data.usersResponse.meta.last_page - 1}
-                  <span class="px-1 text-muted-foreground">...</span>
-                {/if}
-              {/each}
-            </div>
-
-            <Button
-              variant="outline"
-              size="icon"
-              disabled={data.usersResponse.meta.current_page === data.usersResponse.meta.last_page}
-              href={getPageLink(data.usersResponse.meta.current_page + 1)}
-            >
-              <ChevronRight class="size-4" />
-              <span class="sr-only">{t['common.next']()}</span>
-            </Button>
-          </div>
+          <OffsetPaginationNav
+            currentPage={usersMeta.current_page}
+            lastPage={usersMeta.last_page}
+            getPageHref={getPageLink}
+            previousLabel={t['common.previous']()}
+            nextLabel={t['common.next']()}
+          />
         </Card.Footer>
       {/if}
     </Card.Root>
