@@ -1,4 +1,5 @@
 import { BaseApi } from './client';
+import type { RequestOptions } from './client';
 import type {
   GetUsersResponse,
   User,
@@ -9,11 +10,9 @@ import type {
 import { API_ENDPOINTS } from '$lib/constants';
 
 export class UserApi extends BaseApi {
-  async list(
-    query?: ListUsersRequest
-  ): Promise<GetUsersResponse> {
+  async list(query?: ListUsersRequest): Promise<GetUsersResponse> {
     return this.client.get<GetUsersResponse>(API_ENDPOINTS.USERS, {
-      query: query as Record<string, any>
+      query: query as RequestOptions['query']
     });
   }
 

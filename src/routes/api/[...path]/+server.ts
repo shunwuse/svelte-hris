@@ -4,7 +4,7 @@ import { API_CONFIG, HTTP_STATUS } from '$lib/constants';
 
 // Use a safer way to access the environment variable to avoid TypeScript errors
 // if the variable is not yet defined in the generated types.
-const API_BASE_URL = (env as any).API_BASE_URL || API_CONFIG.DEFAULT_BASE_URL;
+const API_BASE_URL = env.API_BASE_URL || API_CONFIG.DEFAULT_BASE_URL;
 const API_PROXY_ERROR_MESSAGE = 'Internal Server Error via Proxy';
 const JSON_CONTENT_TYPE = 'application/json';
 const HOP_BY_HOP_HEADERS = new Set([
@@ -67,10 +67,13 @@ const handle: RequestHandler = async ({ request, params, url }) => {
     });
   } catch (error) {
     console.error('API Proxy Error:', error);
-    return new Response(JSON.stringify({ error: API_PROXY_ERROR_MESSAGE, details: String(error) }), {
-      status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
-      headers: { 'Content-Type': JSON_CONTENT_TYPE }
-    });
+    return new Response(
+      JSON.stringify({ error: API_PROXY_ERROR_MESSAGE, details: String(error) }),
+      {
+        status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
+        headers: { 'Content-Type': JSON_CONTENT_TYPE }
+      }
+    );
   }
 };
 

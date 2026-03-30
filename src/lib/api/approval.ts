@@ -1,4 +1,5 @@
 import { BaseApi } from './client';
+import type { RequestOptions } from './client';
 import type {
   GetApprovalsResponse,
   Approval,
@@ -8,11 +9,9 @@ import type {
 import { API_ENDPOINTS } from '$lib/constants';
 
 export class ApprovalApi extends BaseApi {
-  async list(
-    query?: ListApprovalsRequest
-  ): Promise<GetApprovalsResponse> {
+  async list(query?: ListApprovalsRequest): Promise<GetApprovalsResponse> {
     return this.client.get<GetApprovalsResponse>(API_ENDPOINTS.APPROVALS, {
-      query: query as Record<string, any>
+      query: query as RequestOptions['query']
     });
   }
 

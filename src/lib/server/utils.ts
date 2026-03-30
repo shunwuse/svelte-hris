@@ -15,7 +15,7 @@ export type FormFields = Record<string, unknown>;
  * API error response structure for form actions
  */
 export type ActionErrorResponse = ApiError['error'] & {
-	error: string; // Alias for message (for backward compatibility)
+  error: string; // Alias for message (for backward compatibility)
 };
 
 /**
@@ -28,29 +28,29 @@ export type ActionErrorResponse = ApiError['error'] & {
  * @returns SvelteKit fail response
  */
 export function handleActionError<T extends FormFields = FormFields>(
-	err: unknown,
-	context: string,
-	formFields?: T,
-	overrides?: ErrorMessageOverrides
+  err: unknown,
+  context: string,
+  formFields?: T,
+  overrides?: ErrorMessageOverrides
 ) {
-	if (err instanceof ApiClientError) {
-		const message = getErrorMessage(err.code, err.message, overrides);
-		return fail(HTTP_STATUS.BAD_REQUEST, {
-			error: message,
-			code: err.code,
-			message: message,
-			details: err.details,
-			...formFields
-		} as ActionErrorResponse & T);
-	}
+  if (err instanceof ApiClientError) {
+    const message = getErrorMessage(err.code, err.message, overrides);
+    return fail(HTTP_STATUS.BAD_REQUEST, {
+      error: message,
+      code: err.code,
+      message: message,
+      details: err.details,
+      ...formFields
+    } as ActionErrorResponse & T);
+  }
 
-	console.error(`${context}:`, err);
-	return fail(HTTP_STATUS.INTERNAL_SERVER_ERROR, {
-		error: t['common.error.connection_error'](),
-		code: 'CONNECTION_ERROR',
-		message: t['common.error.connection_error'](),
-		...formFields
-	});
+  console.error(`${context}:`, err);
+  return fail(HTTP_STATUS.INTERNAL_SERVER_ERROR, {
+    error: t['common.error.connection_error'](),
+    code: 'CONNECTION_ERROR',
+    message: t['common.error.connection_error'](),
+    ...formFields
+  });
 }
 
 /**
@@ -62,17 +62,17 @@ export function handleActionError<T extends FormFields = FormFields>(
  * @returns Error message string
  */
 export function handleLoadError(
-	err: unknown,
-	context: string,
-	overrides?: ErrorMessageOverrides
+  err: unknown,
+  context: string,
+  overrides?: ErrorMessageOverrides
 ): string {
-	console.error(`${context}:`, err);
+  console.error(`${context}:`, err);
 
-	if (err instanceof ApiClientError) {
-		return getErrorMessage(err.code, err.message, overrides);
-	}
+  if (err instanceof ApiClientError) {
+    return getErrorMessage(err.code, err.message, overrides);
+  }
 
-	return t['common.error.load_failed']();
+  return t['common.error.load_failed']();
 }
 
 /**
@@ -86,16 +86,16 @@ export function handleLoadError(
  * @returns Promise containing data or error
  */
 export async function safeLoad<T>(
-	fn: () => Promise<T>,
-	defaultValue: T,
-	context: string,
-	overrides?: ErrorMessageOverrides
+  fn: () => Promise<T>,
+  defaultValue: T,
+  context: string,
+  overrides?: ErrorMessageOverrides
 ): Promise<{ data: T; error?: string }> {
-	try {
-		const data = await fn();
-		return { data };
-	} catch (err) {
-		const error = handleLoadError(err, context, overrides);
-		return { data: defaultValue, error };
-	}
+  try {
+    const data = await fn();
+    return { data };
+  } catch (err) {
+    const error = handleLoadError(err, context, overrides);
+    return { data: defaultValue, error };
+  }
 }

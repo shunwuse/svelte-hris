@@ -42,9 +42,17 @@
   function handleEnhance(action: 'approve' | 'reject') {
     return () => {
       isSubmitting = true;
-      return async ({ result, update }: { result: { type: string }; update: () => Promise<void> }) => {
+      return async ({
+        result,
+        update
+      }: {
+        result: { type: string };
+        update: () => Promise<void>;
+      }) => {
         if (result.type === 'redirect') {
-          flash.success(action === 'approve' ? t['approvals.approved_msg']() : t['approvals.rejected_msg']());
+          flash.success(
+            action === 'approve' ? t['approvals.approved_msg']() : t['approvals.rejected_msg']()
+          );
         }
         await update();
         isSubmitting = false;
@@ -74,7 +82,9 @@
           </div>
         </Card.Content>
         <Card.Footer class="pt-6">
-          <Button variant="outline" href={resolve(ROUTES.APPROVALS)}>← {t['approvals.back_to_list']()}</Button>
+          <Button variant="outline" href={resolve(ROUTES.APPROVALS)}
+            >← {t['approvals.back_to_list']()}</Button
+          >
         </Card.Footer>
       {:else if data.approval}
         <Card.Content class="space-y-4">

@@ -92,7 +92,7 @@
             <Label>{t['common.role']()}</Label>
             <Select.Root type="single" name="role" bind:value={selectedRole}>
               <Select.Trigger class="w-full">
-                {roleOptions.find(r => r.value === selectedRole)?.label ?? t['common.role']()}
+                {roleOptions.find((r) => r.value === selectedRole)?.label ?? t['common.role']()}
               </Select.Trigger>
               <Select.Content>
                 {#each roleOptions as role (role.value)}

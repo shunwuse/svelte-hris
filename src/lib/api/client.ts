@@ -54,10 +54,7 @@ export class ApiClient {
   }
 
   // Build URL with query parameters
-  private buildUrl(
-    endpoint: string,
-    query?: RequestOptions['query']
-  ): string {
+  private buildUrl(endpoint: string, query?: RequestOptions['query']): string {
     let url = endpoint;
     if (query) {
       const searchParams = new URLSearchParams();
@@ -78,10 +75,7 @@ export class ApiClient {
   }
 
   // Generic fetch wrapper with error handling and automatic refresh
-  private async request<T>(
-    endpoint: string,
-    options: RequestInit = {}
-  ): Promise<T> {
+  private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`;
 
     const headers = new Headers(options.headers);

@@ -18,17 +18,21 @@ export const actions: Actions = {
 
     // Basic validation
     if (!username || !name || !password) {
-      return fail(HTTP_STATUS.BAD_REQUEST, { error: t['users.error.all_fields_required'](), ...formFields });
+      return fail(HTTP_STATUS.BAD_REQUEST, {
+        error: t['users.error.all_fields_required'](),
+        ...formFields
+      });
     }
 
     if (!role) {
-      return fail(HTTP_STATUS.BAD_REQUEST, { error: t['users.error.role_required'](), ...formFields });
+      return fail(HTTP_STATUS.BAD_REQUEST, {
+        error: t['users.error.role_required'](),
+        ...formFields
+      });
     }
 
     try {
-      await locals.api.users.create(
-        { username, name, password, role }
-      );
+      await locals.api.users.create({ username, name, password, role });
     } catch (err) {
       return handleActionError(err, 'Create user error', formFields, {
         [ERROR_CODES.ALREADY_EXISTS]: t['users.error.username_taken']()

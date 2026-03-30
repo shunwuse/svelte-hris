@@ -29,7 +29,7 @@
       }}
     >
       <Card.Content class="space-y-4">
-        {#if  form?.error}
+        {#if form?.error}
           <div class="rounded-md bg-destructive/15 p-3 text-sm text-destructive">
             {form.error}
           </div>

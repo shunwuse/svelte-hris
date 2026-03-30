@@ -35,7 +35,10 @@ export const actions: Actions = {
     const formFields = { name };
 
     if (!name || name.trim() === '') {
-      return fail(HTTP_STATUS.BAD_REQUEST, { error: t['users.error.name_required'](), ...formFields });
+      return fail(HTTP_STATUS.BAD_REQUEST, {
+        error: t['users.error.name_required'](),
+        ...formFields
+      });
     }
 
     try {

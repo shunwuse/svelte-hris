@@ -40,7 +40,7 @@ export const actions: Actions = {
         {},
         {
           [ERROR_CODES.NOT_FOUND]: t['approvals.error.not_found']()
-        },
+        }
       );
     }
 
@@ -59,7 +59,7 @@ export const actions: Actions = {
         {},
         {
           [ERROR_CODES.NOT_FOUND]: t['approvals.error.not_found']()
-        },
+        }
       );
     }
 
