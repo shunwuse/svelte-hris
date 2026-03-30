@@ -6,10 +6,9 @@
   import { Label } from '$lib/components/ui/label';
   import * as Card from '$lib/components/ui/card';
   import * as Select from '$lib/components/ui/select';
-  import { ROUTES } from '$lib/constants';
+  import { ROLES, ROUTES } from '$lib/constants';
   import { flash } from '$lib/stores';
   import { resolve } from '$app/paths';
-  import { ROLES } from '$lib/domain';
   import * as t from '$paraglide/messages';
 
   let { form } = $props();

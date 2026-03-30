@@ -1,7 +1,6 @@
 import type { PageServerLoad, Actions } from './$types';
 import { redirect } from '@sveltejs/kit';
-import { HTTP_STATUS, ROUTES } from '$lib/constants';
-import { APPROVAL_STATUS } from '$lib/domain';
+import { APPROVAL_STATUS, HTTP_STATUS, ROUTES } from '$lib/constants';
 import { safeLoad, handleActionError } from '$lib/server/utils';
 import { ERROR_CODES } from '$lib/api';
 import * as t from '$paraglide/messages';

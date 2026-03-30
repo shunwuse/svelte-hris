@@ -11,7 +11,8 @@
     CardTitle
   } from '$lib/components/ui/card';
   import { Badge } from '$lib/components/ui/badge';
-  import { getApprovalStatusColorClass } from '$lib/domain';
+  import type { ApprovalStatus } from '$lib/domain';
+  import { formatApprovalStatus, getApprovalStatusVariant } from '$lib/domain';
   import * as t from '$paraglide/messages';
   import Eye from '@lucide/svelte/icons/eye';
   import Plus from '@lucide/svelte/icons/plus';
@@ -19,6 +20,14 @@
   import Pencil from '@lucide/svelte/icons/pencil';
 
   let { data } = $props();
+
+  function formatStatus(status: ApprovalStatus): string {
+    return formatApprovalStatus(status, {
+      pending: t['approvals.status_pending'](),
+      approved: t['approvals.status_approved'](),
+      rejected: t['approvals.status_rejected']()
+    });
+  }
 </script>
 
 <div class="p-8">
@@ -71,9 +80,9 @@
                     </p>
                   </div>
                   <div class="flex items-center gap-3">
-                    <Badge class={getApprovalStatusColorClass(approval.status)}
-                      >{approval.status}</Badge
-                    >
+                    <Badge variant={getApprovalStatusVariant(approval.status)}>
+                      {formatStatus(approval.status)}
+                    </Badge>
                     <Button
                       href={resolve(ROUTE_BUILDERS.approvalDetail(approval.id) as Pathname)}
                       size="icon"

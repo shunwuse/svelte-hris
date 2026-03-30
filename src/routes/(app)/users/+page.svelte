@@ -9,6 +9,7 @@
     FILTER_VALUES,
     PAGINATION,
     QUERY_KEYS,
+    ROLES,
     ROUTES,
     ROUTE_BUILDERS
   } from '$lib/constants';
@@ -18,7 +19,6 @@
   import type { Pathname } from '$app/types';
   import { goto } from '$app/navigation';
   import { page } from '$app/state';
-  import { ROLES } from '$lib/domain';
   import ChevronLeft from '@lucide/svelte/icons/chevron-left';
   import ChevronRight from '@lucide/svelte/icons/chevron-right';
   import Search from '@lucide/svelte/icons/search';

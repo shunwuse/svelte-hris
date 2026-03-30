@@ -5,9 +5,9 @@
   import * as Card from '$lib/components/ui/card';
   import { flash } from '$lib/stores';
   import { createSubmitEnhancer } from '$lib/form-actions';
-  import { FORM_ACTIONS, ROUTES } from '$lib/constants';
+  import { APPROVAL_STATUS, FORM_ACTIONS, ROUTES } from '$lib/constants';
   import type { ApprovalStatus } from '$lib/domain';
-  import { APPROVAL_STATUS, formatApprovalStatus, getApprovalStatusVariant } from '$lib/domain';
+  import { formatApprovalStatus, getApprovalStatusVariant } from '$lib/domain';
   import { resolve } from '$app/paths';
   import * as t from '$paraglide/messages';
 
