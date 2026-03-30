@@ -1,7 +1,8 @@
 <script lang="ts">
   import { enhance } from '$app/forms';
+  import FormPageCard from '$lib/components/FormPageCard.svelte';
+  import FormSubmitFooter from '$lib/components/FormSubmitFooter.svelte';
   import { createSubmitEnhancer } from '$lib/form-actions';
-  import { Button } from '$lib/components/ui/button';
   import * as Card from '$lib/components/ui/card';
   import { ROUTES } from '$lib/constants';
   import { flash } from '$lib/stores';
@@ -27,32 +28,20 @@
   });
 </script>
 
-<div class="p-6">
-  <div class="mx-auto max-w-md">
-    <Card.Root>
-      <Card.Header>
-        <Card.Title>{t['approvals.create_request']()}</Card.Title>
-        <Card.Description>{t['approvals.create_desc']()}</Card.Description>
-      </Card.Header>
+<FormPageCard title={t['approvals.create_request']()} description={t['approvals.create_desc']()}>
+  <form method="POST" use:enhance={submitEnhance}>
+    <Card.Content class="space-y-4">
+      <p class="text-sm text-muted-foreground">
+        {t['approvals.create_info']()}
+      </p>
+    </Card.Content>
 
-      <form method="POST" use:enhance={submitEnhance}>
-        <Card.Content class="space-y-4">
-          <p class="text-sm text-muted-foreground">
-            {t['approvals.create_info']()}
-          </p>
-        </Card.Content>
-
-        <Card.Footer class="flex justify-between pt-6">
-          <Button variant="outline" href={resolve(ROUTES.APPROVALS)}>{t['common.cancel']()}</Button>
-          <Button type="submit" disabled={isSubmitting}>
-            {#if isSubmitting}
-              {t['approvals.submitting']()}
-            {:else}
-              {t['approvals.submit']()}
-            {/if}
-          </Button>
-        </Card.Footer>
-      </form>
-    </Card.Root>
-  </div>
-</div>
+    <FormSubmitFooter
+      cancelHref={resolve(ROUTES.APPROVALS)}
+      cancelLabel={t['common.cancel']()}
+      submitLabel={t['approvals.submit']()}
+      submittingLabel={t['approvals.submitting']()}
+      {isSubmitting}
+    />
+  </form>
+</FormPageCard>

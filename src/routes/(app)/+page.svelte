@@ -1,6 +1,8 @@
 <script lang="ts">
   import { resolve } from '$app/paths';
   import type { Pathname } from '$app/types';
+  import ApprovalStatusBadge from '$lib/components/ApprovalStatusBadge.svelte';
+  import PageHeader from '$lib/components/PageHeader.svelte';
   import { Button } from '$lib/components/ui/button';
   import { ROUTES, ROUTE_BUILDERS } from '$lib/constants';
   import {
@@ -10,9 +12,6 @@
     CardHeader,
     CardTitle
   } from '$lib/components/ui/card';
-  import { Badge } from '$lib/components/ui/badge';
-  import type { ApprovalStatus } from '$lib/domain';
-  import { formatApprovalStatus, getApprovalStatusVariant } from '$lib/domain';
   import * as t from '$paraglide/messages';
   import Eye from '@lucide/svelte/icons/eye';
   import Plus from '@lucide/svelte/icons/plus';
@@ -20,27 +19,17 @@
   import Pencil from '@lucide/svelte/icons/pencil';
 
   let { data } = $props();
-
-  function formatStatus(status: ApprovalStatus): string {
-    return formatApprovalStatus(status, {
-      pending: t['approvals.status_pending'](),
-      approved: t['approvals.status_approved'](),
-      rejected: t['approvals.status_rejected']()
-    });
-  }
 </script>
 
 <div class="p-8">
   <div class="mx-auto max-w-6xl space-y-8">
     <!-- Header -->
-    <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-      <div>
-        <h1 class="text-3xl font-bold tracking-tight text-gray-900">
-          {t['overview.welcome']()}{data.userInfo?.username ? `, ${data.userInfo.username}` : ''}!
-        </h1>
-        <p class="text-muted-foreground">{t['overview.description']()}</p>
-      </div>
-      <div class="flex items-center gap-3">
+    <PageHeader
+      title={`${t['overview.welcome']()}${data.userInfo?.username ? `, ${data.userInfo.username}` : ''}!`}
+      description={t['overview.description']()}
+      actionsClass="flex items-center gap-3"
+    >
+      {#snippet actions()}
         <Button href={resolve(ROUTES.APPROVALS_CREATE as Pathname)} variant="default" class="gap-2">
           <Plus class="size-4" />
           {t['overview.create_request']()}
@@ -49,8 +38,8 @@
           <UserPlus class="size-4" />
           {t['overview.create_user']()}
         </Button>
-      </div>
-    </div>
+      {/snippet}
+    </PageHeader>
 
     <div class="grid gap-6 lg:grid-cols-2">
       <!-- Recent Approvals -->
@@ -80,9 +69,7 @@
                     </p>
                   </div>
                   <div class="flex items-center gap-3">
-                    <Badge variant={getApprovalStatusVariant(approval.status)}>
-                      {formatStatus(approval.status)}
-                    </Badge>
+                    <ApprovalStatusBadge status={approval.status} />
                     <Button
                       href={resolve(ROUTE_BUILDERS.approvalDetail(approval.id) as Pathname)}
                       size="icon"

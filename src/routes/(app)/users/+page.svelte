@@ -1,4 +1,5 @@
 <script lang="ts">
+  import PageHeader from '$lib/components/PageHeader.svelte';
   import { Button } from '$lib/components/ui/button';
   import { Input } from '$lib/components/ui/input';
   import * as Table from '$lib/components/ui/table';
@@ -105,18 +106,14 @@
 <div class="p-8">
   <div class="mx-auto max-w-6xl space-y-6">
     <!-- Header -->
-    <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-      <div>
-        <h1 class="text-3xl font-bold tracking-tight text-gray-900">{t['users.title']()}</h1>
-        <p class="text-muted-foreground">{t['users.description']()}</p>
-      </div>
-      <div class="flex items-center gap-2">
+    <PageHeader title={t['users.title']()} description={t['users.description']()}>
+      {#snippet actions()}
         <Button href={resolve(ROUTES.USERS_CREATE as Pathname)} class="gap-2">
           <UserPlus class="size-4" />
           {t['users.create_user']()}
         </Button>
-      </div>
-    </div>
+      {/snippet}
+    </PageHeader>
 
     <!-- Filters & Actions -->
     <Card.Root>

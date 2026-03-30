@@ -1,27 +1,19 @@
 <script lang="ts">
   import { enhance } from '$app/forms';
+  import ApprovalStatusBadge from '$lib/components/ApprovalStatusBadge.svelte';
+  import FormErrorAlert from '$lib/components/FormErrorAlert.svelte';
+  import FormPageCard from '$lib/components/FormPageCard.svelte';
   import { Button } from '$lib/components/ui/button';
-  import { Badge } from '$lib/components/ui/badge';
   import * as Card from '$lib/components/ui/card';
   import { flash } from '$lib/stores';
   import { createSubmitEnhancer } from '$lib/form-actions';
   import { APPROVAL_STATUS, FORM_ACTIONS, ROUTES } from '$lib/constants';
-  import type { ApprovalStatus } from '$lib/domain';
-  import { formatApprovalStatus, getApprovalStatusVariant } from '$lib/domain';
   import { resolve } from '$app/paths';
   import * as t from '$paraglide/messages';
 
   let { data, form } = $props();
 
   let isSubmitting = $state(false);
-
-  function formatStatus(status: ApprovalStatus): string {
-    return formatApprovalStatus(status, {
-      pending: t['approvals.status_pending'](),
-      approved: t['approvals.status_approved'](),
-      rejected: t['approvals.status_rejected']()
-    });
-  }
 
   function createApprovalSubmitEnhancer(action: 'approve' | 'reject') {
     return createSubmitEnhancer({
@@ -46,70 +38,57 @@
   });
 </script>
 
-<div class="p-6">
-  <div class="mx-auto max-w-md">
-    <Card.Root>
-      <Card.Header>
-        <Card.Title>{t['approvals.review_request']()}</Card.Title>
-        <Card.Description>{t['approvals.review_desc']()}</Card.Description>
-      </Card.Header>
+<FormPageCard title={t['approvals.review_request']()} description={t['approvals.review_desc']()}>
+  {#if data.error}
+    <Card.Content>
+      <FormErrorAlert message={data.error} />
+    </Card.Content>
+    <Card.Footer class="pt-6">
+      <Button variant="outline" href={resolve(ROUTES.APPROVALS)}
+        >← {t['approvals.back_to_list']()}</Button
+      >
+    </Card.Footer>
+  {:else if data.approval}
+    <Card.Content class="space-y-4">
+      <!-- Approval Details -->
+      <div class="space-y-3">
+        <div class="flex items-center justify-between">
+          <span class="text-sm text-muted-foreground">{t['users.table_id']()}</span>
+          <span class="font-medium">{data.approval.id}</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="text-sm text-muted-foreground">{t['approvals.creator']()}</span>
+          <span class="font-medium">{data.approval.creator_name}</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="text-sm text-muted-foreground">{t['approvals.approver']()}</span>
+          <span class="font-medium">{data.approval.approver_name ?? '-'}</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="text-sm text-muted-foreground">{t['common.status']()}</span>
+          <ApprovalStatusBadge status={data.approval.status} />
+        </div>
+      </div>
+    </Card.Content>
 
-      {#if data.error}
-        <Card.Content>
-          <div class="rounded-md bg-destructive/15 p-3 text-sm text-destructive">
-            {data.error}
-          </div>
-        </Card.Content>
-        <Card.Footer class="pt-6">
-          <Button variant="outline" href={resolve(ROUTES.APPROVALS)}
-            >← {t['approvals.back_to_list']()}</Button
-          >
-        </Card.Footer>
-      {:else if data.approval}
-        <Card.Content class="space-y-4">
-          <!-- Approval Details -->
-          <div class="space-y-3">
-            <div class="flex items-center justify-between">
-              <span class="text-sm text-muted-foreground">{t['users.table_id']()}</span>
-              <span class="font-medium">{data.approval.id}</span>
-            </div>
-            <div class="flex items-center justify-between">
-              <span class="text-sm text-muted-foreground">{t['approvals.creator']()}</span>
-              <span class="font-medium">{data.approval.creator_name}</span>
-            </div>
-            <div class="flex items-center justify-between">
-              <span class="text-sm text-muted-foreground">{t['approvals.approver']()}</span>
-              <span class="font-medium">{data.approval.approver_name ?? '-'}</span>
-            </div>
-            <div class="flex items-center justify-between">
-              <span class="text-sm text-muted-foreground">{t['common.status']()}</span>
-              <Badge variant={getApprovalStatusVariant(data.approval.status)}>
-                {formatStatus(data.approval.status)}
-              </Badge>
-            </div>
-          </div>
-        </Card.Content>
+    <Card.Footer class="flex justify-between pt-6">
+      <Button variant="outline" href={resolve(ROUTES.APPROVALS)}>{t['common.cancel']()}</Button>
 
-        <Card.Footer class="flex justify-between pt-6">
-          <Button variant="outline" href={resolve(ROUTES.APPROVALS)}>{t['common.cancel']()}</Button>
+      {#if data.approval.status === APPROVAL_STATUS.PENDING}
+        <div class="flex gap-2">
+          <form method="POST" action={FORM_ACTIONS.REJECT} use:enhance={rejectEnhance}>
+            <Button type="submit" variant="destructive" disabled={isSubmitting}>
+              {t['approvals.reject']()}
+            </Button>
+          </form>
 
-          {#if data.approval.status === APPROVAL_STATUS.PENDING}
-            <div class="flex gap-2">
-              <form method="POST" action={FORM_ACTIONS.REJECT} use:enhance={rejectEnhance}>
-                <Button type="submit" variant="destructive" disabled={isSubmitting}>
-                  {t['approvals.reject']()}
-                </Button>
-              </form>
-
-              <form method="POST" action={FORM_ACTIONS.APPROVE} use:enhance={approveEnhance}>
-                <Button type="submit" disabled={isSubmitting}>
-                  {t['approvals.approve']()}
-                </Button>
-              </form>
-            </div>
-          {/if}
-        </Card.Footer>
+          <form method="POST" action={FORM_ACTIONS.APPROVE} use:enhance={approveEnhance}>
+            <Button type="submit" disabled={isSubmitting}>
+              {t['approvals.approve']()}
+            </Button>
+          </form>
+        </div>
       {/if}
-    </Card.Root>
-  </div>
-</div>
+    </Card.Footer>
+  {/if}
+</FormPageCard>

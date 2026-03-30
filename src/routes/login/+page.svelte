@@ -1,5 +1,7 @@
 <script lang="ts">
-  import { Button } from '$lib/components/ui/button';
+  import FormErrorAlert from '$lib/components/FormErrorAlert.svelte';
+  import FormPageCard from '$lib/components/FormPageCard.svelte';
+  import FormSubmitFooter from '$lib/components/FormSubmitFooter.svelte';
   import { Input } from '$lib/components/ui/input';
   import { Label } from '$lib/components/ui/label';
   import * as Card from '$lib/components/ui/card';
@@ -18,54 +20,48 @@
   });
 </script>
 
-<div class="flex min-h-screen items-center justify-center bg-background">
-  <Card.Root class="w-full max-w-md">
-    <Card.Header class="space-y-1">
-      <Card.Title class="text-2xl font-bold">{t['login.title']()}</Card.Title>
-      <Card.Description>{t['login.description']()}</Card.Description>
-    </Card.Header>
+<FormPageCard
+  title={t['login.title']()}
+  description={t['login.description']()}
+  outerClass="flex min-h-screen items-center justify-center bg-background p-6"
+  innerClass="w-full max-w-md"
+  headerClass="space-y-1"
+  titleClass="text-2xl font-bold"
+>
+  <form method="POST" use:enhance={submitEnhance}>
+    <Card.Content class="space-y-4">
+      <FormErrorAlert message={form?.error} />
 
-    <form method="POST" use:enhance={submitEnhance}>
-      <Card.Content class="space-y-4">
-        {#if form?.error}
-          <div class="rounded-md bg-destructive/15 p-3 text-sm text-destructive">
-            {form.error}
-          </div>
-        {/if}
+      <div class="space-y-2">
+        <Label for="username">{t['login.username']()}</Label>
+        <Input
+          id="username"
+          name="username"
+          type="text"
+          placeholder={t['login.username_placeholder']()}
+          value={form?.username ?? ''}
+          required
+        />
+      </div>
 
-        <div class="space-y-2">
-          <Label for="username">{t['login.username']()}</Label>
-          <Input
-            id="username"
-            name="username"
-            type="text"
-            placeholder={t['login.username_placeholder']()}
-            value={form?.username ?? ''}
-            required
-          />
-        </div>
+      <div class="space-y-2">
+        <Label for="password">{t['login.password']()}</Label>
+        <Input
+          id="password"
+          name="password"
+          type="password"
+          placeholder={t['login.password_placeholder']()}
+          required
+        />
+      </div>
+    </Card.Content>
 
-        <div class="space-y-2">
-          <Label for="password">{t['login.password']()}</Label>
-          <Input
-            id="password"
-            name="password"
-            type="password"
-            placeholder={t['login.password_placeholder']()}
-            required
-          />
-        </div>
-      </Card.Content>
-
-      <Card.Footer class="pt-6">
-        <Button type="submit" class="w-full" disabled={isLoading}>
-          {#if isLoading}
-            {t['login.submitting']()}
-          {:else}
-            {t['login.submit']()}
-          {/if}
-        </Button>
-      </Card.Footer>
-    </form>
-  </Card.Root>
-</div>
+    <FormSubmitFooter
+      submitLabel={t['login.submit']()}
+      submittingLabel={t['login.submitting']()}
+      isSubmitting={isLoading}
+      submitClass="w-full"
+      footerClass="pt-6"
+    />
+  </form>
+</FormPageCard>

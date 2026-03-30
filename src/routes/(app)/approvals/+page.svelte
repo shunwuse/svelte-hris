@@ -1,12 +1,13 @@
 <script lang="ts">
+  import ApprovalStatusBadge from '$lib/components/ApprovalStatusBadge.svelte';
+  import PageHeader from '$lib/components/PageHeader.svelte';
   import { Button } from '$lib/components/ui/button';
-  import { Badge } from '$lib/components/ui/badge';
   import * as Table from '$lib/components/ui/table';
   import * as Select from '$lib/components/ui/select';
   import * as Card from '$lib/components/ui/card';
   import { flash } from '$lib/stores';
   import { createApi, ApiClientError } from '$lib/api';
-  import { formatApprovalStatus, getApprovalStatusVariant } from '$lib/domain';
+  import { formatApprovalStatus } from '$lib/domain';
   import {
     APPROVAL_STATUS,
     FILTER_VALUES,
@@ -124,18 +125,14 @@
 <div class="p-8">
   <div class="mx-auto max-w-6xl space-y-6">
     <!-- Header -->
-    <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-      <div>
-        <h1 class="text-3xl font-bold tracking-tight text-gray-900">{t['nav.approvals']()}</h1>
-        <p class="text-muted-foreground">{t['approvals.description']()}</p>
-      </div>
-      <div class="flex items-center gap-2">
+    <PageHeader title={t['nav.approvals']()} description={t['approvals.description']()}>
+      {#snippet actions()}
         <Button href={ROUTES.APPROVALS_CREATE} class="gap-2">
           <Plus class="size-4" />
           {t['approvals.create_request']()}
         </Button>
-      </div>
-    </div>
+      {/snippet}
+    </PageHeader>
 
     <!-- Filters & Actions -->
     <Card.Root>
@@ -210,9 +207,7 @@
                 <Table.Cell class="font-medium">{approval.creator_name}</Table.Cell>
                 <Table.Cell>{approval.approver_name ?? '-'}</Table.Cell>
                 <Table.Cell>
-                  <Badge variant={getApprovalStatusVariant(approval.status)}>
-                    {formatStatus(approval.status)}
-                  </Badge>
+                  <ApprovalStatusBadge status={approval.status} />
                 </Table.Cell>
                 <Table.Cell class="text-right">
                   <Button
