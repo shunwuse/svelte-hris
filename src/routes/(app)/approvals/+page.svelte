@@ -7,6 +7,7 @@
   import { flash } from '$lib/stores';
   import { createApi, ApiClientError } from '$lib/api';
   import { APPROVAL_STATUS } from '$lib/domain';
+  import { FILTER_VALUES, QUERY_KEYS, ROUTES, ROUTE_BUILDERS } from '$lib/constants';
   import { resolve } from '$app/paths';
   import type { Pathname } from '$app/types';
   import { page } from '$app/state';
@@ -96,12 +97,12 @@
 
   function handleStatusChange(value: string | undefined) {
     const url = new URL(page.url);
-    if (!value || value === 'all') {
-      url.searchParams.delete('status');
+    if (!value || value === FILTER_VALUES.ALL) {
+      url.searchParams.delete(QUERY_KEYS.STATUS);
     } else {
-      url.searchParams.set('status', value);
+      url.searchParams.set(QUERY_KEYS.STATUS, value);
     }
-    url.searchParams.delete('cursor'); // Reset pagination
+    url.searchParams.delete(QUERY_KEYS.CURSOR); // Reset pagination
     goto(resolve(url.pathname + url.search as Pathname));
   }
 
@@ -112,7 +113,7 @@
     try {
       const response = await api.approvals.list({
         cursor: nextCursor,
-        status: page.url.searchParams.get('status') as ApprovalStatus | undefined
+        status: page.url.searchParams.get(QUERY_KEYS.STATUS) as ApprovalStatus | undefined
       });
 
       approvals = [...approvals, ...response.data];
@@ -139,7 +140,7 @@
         <p class="text-muted-foreground">{t['approvals.description']()}</p>
       </div>
       <div class="flex items-center gap-2">
-        <Button href="/approvals/create" class="gap-2">
+        <Button href={ROUTES.APPROVALS_CREATE} class="gap-2">
           <Plus class="size-4" />
           {t['approvals.create_request']()}
         </Button>
@@ -155,18 +156,18 @@
             <span class="text-sm font-medium text-muted-foreground">{t['common.status']()}</span>
             <Select.Root
               type="single"
-              value={page.url.searchParams.get('status') || 'all'}
+              value={page.url.searchParams.get(QUERY_KEYS.STATUS) || FILTER_VALUES.ALL}
               onValueChange={handleStatusChange}
             >
               <Select.Trigger class="w-40">
                 {(() => {
-                  const status = page.url.searchParams.get('status') as ApprovalStatus | 'all' | null;
-                  if (!status || status === 'all') return t['approvals.status_all']();
+                  const status = page.url.searchParams.get(QUERY_KEYS.STATUS) as ApprovalStatus | typeof FILTER_VALUES.ALL | null;
+                  if (!status || status === FILTER_VALUES.ALL) return t['approvals.status_all']();
                   return formatStatus(status);
                 })()}
               </Select.Trigger>
               <Select.Content>
-                <Select.Item value="all">{t['approvals.status_all']()}</Select.Item>
+                <Select.Item value={FILTER_VALUES.ALL}>{t['approvals.status_all']()}</Select.Item>
                 <Select.Item value={APPROVAL_STATUS.PENDING}>{t['approvals.status_pending']()}</Select.Item>
                 <Select.Item value={APPROVAL_STATUS.APPROVED}>{t['approvals.status_approved']()}</Select.Item>
                 <Select.Item value={APPROVAL_STATUS.REJECTED}>{t['approvals.status_rejected']()}</Select.Item>
@@ -218,7 +219,7 @@
                 <Button
                   variant="ghost"
                   size="icon"
-                  href="/approvals/{approval.id}"
+                  href={ROUTE_BUILDERS.approvalDetail(approval.id)}
                   class="h-8 w-8"
                 >
                   <Eye class="size-4" />

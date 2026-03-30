@@ -1,6 +1,7 @@
 import { browser } from '$app/environment';
+import { API_CONFIG, API_ENDPOINTS, HTTP_STATUS } from '$lib/constants';
 import type { ApiError } from '$lib/types';
-import { getErrorMessage } from './error-codes';
+import { ERROR_CODES, getErrorMessage } from './error-codes';
 
 /**
  * Determine Base URL
@@ -11,7 +12,7 @@ import { getErrorMessage } from './error-codes';
  */
 const getBaseUrl = () => {
   if (browser) {
-    return '/api';
+    return API_CONFIG.PROXY_BASE_PATH;
   }
   // On server, we can't easily access private env here without triggering client-side errors during build.
   // We will handle the server-side base URL via the fetch function or a default.
@@ -100,12 +101,12 @@ export class ApiClient {
     let response = await this.fetchFn(url, config);
 
     // Detect 401 and TOKEN_EXPIRED error
-    if (response.status === 401) {
+    if (response.status === HTTP_STATUS.UNAUTHORIZED) {
       const clonedResponse = response.clone();
       try {
         const errorData: ApiError = await clonedResponse.json();
 
-        if (errorData.error.code === 'TOKEN_EXPIRED' && this.refreshToken) {
+        if (errorData.error.code === ERROR_CODES.TOKEN_EXPIRED && this.refreshToken) {
           // Trigger token refresh
           const newTokens = await this.handleTokenRefresh();
 
@@ -136,7 +137,7 @@ export class ApiClient {
     }
 
     // Handle empty responses (e.g., 204 No Content)
-    if (response.status === 204) {
+    if (response.status === HTTP_STATUS.NO_CONTENT) {
       return undefined as T;
     }
 
@@ -155,7 +156,7 @@ export class ApiClient {
     this.isRefreshing = true;
     this.refreshPromise = (async () => {
       try {
-        const response = await this.fetchFn(`${this.baseUrl}/auth/refresh`, {
+        const response = await this.fetchFn(`${this.baseUrl}${API_ENDPOINTS.AUTH_REFRESH}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ refresh_token: this.refreshToken })
@@ -165,9 +166,9 @@ export class ApiClient {
           const errorData: ApiError = await response.json();
           // Critical failure: TOKEN_INVALID or TOKEN_EXPIRED on refresh endpoint
           if (
-            response.status === 401 ||
-            errorData.error.code === 'TOKEN_INVALID' ||
-            errorData.error.code === 'TOKEN_EXPIRED'
+            response.status === HTTP_STATUS.UNAUTHORIZED ||
+            errorData.error.code === ERROR_CODES.TOKEN_INVALID ||
+            errorData.error.code === ERROR_CODES.TOKEN_EXPIRED
           ) {
             await this.handleLogout();
           }

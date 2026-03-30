@@ -1,5 +1,6 @@
 import type { Actions } from './$types';
 import { redirect } from '@sveltejs/kit';
+import { HTTP_STATUS, ROUTES } from '$lib/constants';
 import { handleActionError } from '$lib/server/utils';
 
 export const actions: Actions = {
@@ -10,6 +11,6 @@ export const actions: Actions = {
       return handleActionError(err, 'Create approval error');
     }
 
-    redirect(303, '/approvals');
+    redirect(HTTP_STATUS.SEE_OTHER, ROUTES.APPROVALS);
   }
 };

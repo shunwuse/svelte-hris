@@ -4,6 +4,7 @@
   import { Badge } from '$lib/components/ui/badge';
   import * as Card from '$lib/components/ui/card';
   import { flash } from '$lib/stores';
+  import { FORM_ACTIONS, ROUTES } from '$lib/constants';
   import type { ApprovalStatus } from '$lib/domain';
   import { APPROVAL_STATUS } from '$lib/domain';
   import { resolve } from '$app/paths';
@@ -73,7 +74,7 @@
           </div>
         </Card.Content>
         <Card.Footer class="pt-6">
-          <Button variant="outline" href={resolve("/approvals")}>← {t['approvals.back_to_list']()}</Button>
+          <Button variant="outline" href={resolve(ROUTES.APPROVALS)}>← {t['approvals.back_to_list']()}</Button>
         </Card.Footer>
       {:else if data.approval}
         <Card.Content class="space-y-4">
@@ -101,13 +102,13 @@
         </Card.Content>
 
         <Card.Footer class="flex justify-between pt-6">
-          <Button variant="outline" href={resolve("/approvals")}>{t['common.cancel']()}</Button>
+          <Button variant="outline" href={resolve(ROUTES.APPROVALS)}>{t['common.cancel']()}</Button>
 
           {#if data.approval.status === APPROVAL_STATUS.PENDING}
             <div class="flex gap-2">
               <form
                 method="POST"
-                action="?/reject"
+                action={FORM_ACTIONS.REJECT}
                 use:enhance={handleEnhance('reject')}
               >
                 <Button type="submit" variant="destructive" disabled={isSubmitting}>
@@ -117,7 +118,7 @@
 
               <form
                 method="POST"
-                action="?/approve"
+                action={FORM_ACTIONS.APPROVE}
                 use:enhance={handleEnhance('approve')}
               >
                 <Button type="submit" disabled={isSubmitting}>

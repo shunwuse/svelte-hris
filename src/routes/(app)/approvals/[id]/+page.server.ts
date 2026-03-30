@@ -1,5 +1,6 @@
 import type { PageServerLoad, Actions } from './$types';
 import { redirect } from '@sveltejs/kit';
+import { HTTP_STATUS, ROUTES } from '$lib/constants';
 import { APPROVAL_STATUS } from '$lib/domain';
 import { safeLoad, handleActionError } from '$lib/server/utils';
 import { ERROR_CODES } from '$lib/api';
@@ -43,7 +44,7 @@ export const actions: Actions = {
       );
     }
 
-    redirect(303, '/approvals');
+    redirect(HTTP_STATUS.SEE_OTHER, ROUTES.APPROVALS);
   },
 
   reject: async ({ params, locals }) => {
@@ -62,6 +63,6 @@ export const actions: Actions = {
       );
     }
 
-    redirect(303, '/approvals');
+    redirect(HTTP_STATUS.SEE_OTHER, ROUTES.APPROVALS);
   }
 };

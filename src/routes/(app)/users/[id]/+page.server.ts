@@ -1,5 +1,6 @@
 import type { PageServerLoad, Actions } from './$types';
 import { fail, redirect } from '@sveltejs/kit';
+import { HTTP_STATUS, ROUTES } from '$lib/constants';
 import { safeLoad, handleActionError } from '$lib/server/utils';
 import { ERROR_CODES } from '$lib/api';
 import * as t from '$paraglide/messages';
@@ -34,7 +35,7 @@ export const actions: Actions = {
     const formFields = { name };
 
     if (!name || name.trim() === '') {
-      return fail(400, { error: t['users.error.name_required'](), ...formFields });
+      return fail(HTTP_STATUS.BAD_REQUEST, { error: t['users.error.name_required'](), ...formFields });
     }
 
     try {
@@ -45,6 +46,6 @@ export const actions: Actions = {
       });
     }
 
-    redirect(303, '/users');
+    redirect(HTTP_STATUS.SEE_OTHER, ROUTES.USERS);
   }
 };

@@ -1,5 +1,6 @@
 import type { Actions } from './$types';
 import { fail, redirect } from '@sveltejs/kit';
+import { HTTP_STATUS, ROUTES } from '$lib/constants';
 import { handleActionError } from '$lib/server/utils';
 import { ERROR_CODES } from '$lib/api';
 import type { CreateableRole } from '$lib/domain';
@@ -17,11 +18,11 @@ export const actions: Actions = {
 
     // Basic validation
     if (!username || !name || !password) {
-      return fail(400, { error: t['users.error.all_fields_required'](), ...formFields });
+      return fail(HTTP_STATUS.BAD_REQUEST, { error: t['users.error.all_fields_required'](), ...formFields });
     }
 
     if (!role) {
-      return fail(400, { error: t['users.error.role_required'](), ...formFields });
+      return fail(HTTP_STATUS.BAD_REQUEST, { error: t['users.error.role_required'](), ...formFields });
     }
 
     try {
@@ -34,6 +35,6 @@ export const actions: Actions = {
       });
     }
 
-    redirect(303, '/users');
+    redirect(HTTP_STATUS.SEE_OTHER, ROUTES.USERS);
   }
 };

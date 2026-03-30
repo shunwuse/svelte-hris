@@ -1,7 +1,7 @@
 import { fail, redirect } from '@sveltejs/kit';
 import { dev } from '$app/environment';
 import type { Actions } from './$types';
-import { COOKIE_KEYS } from '$lib/constants';
+import { COOKIE_CONFIG, COOKIE_KEYS, HTTP_STATUS, ROUTES } from '$lib/constants';
 import { handleActionError } from '$lib/server/utils';
 import * as t from '$paraglide/messages';
 
@@ -12,7 +12,7 @@ export const actions: Actions = {
     const password = formData.get('password') as string;
 
     if (!username || !password) {
-      return fail(400, {
+      return fail(HTTP_STATUS.BAD_REQUEST, {
         error: t['login.error.credentials_required'](),
         username
       });
@@ -22,36 +22,36 @@ export const actions: Actions = {
       const data = await locals.api.auth.login({ username, password });
 
       cookies.set(COOKIE_KEYS.ACCESS_TOKEN, data.access_token, {
-        path: '/',
+        path: COOKIE_CONFIG.PATH_ROOT,
         httpOnly: true,
         secure: !dev,
-        sameSite: 'strict',
-        maxAge: 24 * 60 * 60
+        sameSite: COOKIE_CONFIG.SAME_SITE_STRICT,
+        maxAge: COOKIE_CONFIG.AUTH_MAX_AGE_SECONDS
       });
 
       cookies.set(COOKIE_KEYS.REFRESH_TOKEN, data.refresh_token, {
-        path: '/',
+        path: COOKIE_CONFIG.PATH_ROOT,
         httpOnly: true,
         secure: !dev,
-        sameSite: 'strict',
-        maxAge: 24 * 60 * 60
+        sameSite: COOKIE_CONFIG.SAME_SITE_STRICT,
+        maxAge: COOKIE_CONFIG.AUTH_MAX_AGE_SECONDS
       });
 
       cookies.set(
         COOKIE_KEYS.USER_INFO,
         JSON.stringify({ username: data.username, roles: data.roles }),
         {
-          path: '/',
+          path: COOKIE_CONFIG.PATH_ROOT,
           httpOnly: false,
           secure: !dev,
-          sameSite: 'strict',
-          maxAge: 24 * 60 * 60
+          sameSite: COOKIE_CONFIG.SAME_SITE_STRICT,
+          maxAge: COOKIE_CONFIG.AUTH_MAX_AGE_SECONDS
         }
       );
     } catch (err) {
       return handleActionError(err, 'Login error', { username });
     }
 
-    redirect(303, '/');
+    redirect(HTTP_STATUS.SEE_OTHER, ROUTES.ROOT);
   }
 };

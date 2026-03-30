@@ -4,6 +4,14 @@
   import * as Table from '$lib/components/ui/table';
   import * as Select from '$lib/components/ui/select';
   import * as Card from '$lib/components/ui/card';
+  import {
+    DEFAULTS,
+    FILTER_VALUES,
+    PAGINATION,
+    QUERY_KEYS,
+    ROUTES,
+    ROUTE_BUILDERS
+  } from '$lib/constants';
   import { flash } from '$lib/stores';
   import { resolve } from '$app/paths';
   import type { Pathname } from '$app/types';
@@ -20,10 +28,10 @@
 
   let { data } = $props();
 
-  let nameQuery = $state(page.url.searchParams.get('name') || '');
+  let nameQuery = $state(page.url.searchParams.get(QUERY_KEYS.NAME) || '');
 
   $effect(() => {
-    nameQuery = page.url.searchParams.get('name') || '';
+    nameQuery = page.url.searchParams.get(QUERY_KEYS.NAME) || '';
   });
 
   function formatDate(timestamp: string): string {
@@ -45,48 +53,49 @@
   function updateFilters(newParams: Record<string, string | undefined>) {
     const url = new URL(page.url);
     Object.entries(newParams).forEach(([key, value]) => {
-      if (value === undefined || value === 'all' || value === '') {
+      if (value === undefined || value === FILTER_VALUES.ALL || value === '') {
         url.searchParams.delete(key);
       } else {
         url.searchParams.set(key, value);
       }
     });
-    url.searchParams.set('page', '1');
+    url.searchParams.set(QUERY_KEYS.PAGE, DEFAULTS.FIRST_PAGE.toString());
     goto(resolve(url.pathname + url.search as Pathname));
   }
 
   function handleNameSearch(e: KeyboardEvent) {
     if (e.key === 'Enter') {
-      updateFilters({ name: nameQuery });
+      updateFilters({ [QUERY_KEYS.NAME]: nameQuery });
     }
   }
 
   function handleRoleChange(value: string | undefined) {
-    updateFilters({ role: value });
+    updateFilters({ [QUERY_KEYS.ROLE]: value });
   }
 
   function handlePerPageChange(value: string | undefined) {
     if (!value) return;
-    updateFilters({ per_page: value });
+    updateFilters({ [QUERY_KEYS.PER_PAGE]: value });
   }
 
   function getPageLink(p: number) {
     const url = new URL(page.url);
-    url.searchParams.set('page', p.toString());
+    url.searchParams.set(QUERY_KEYS.PAGE, p.toString());
     return url.pathname + url.search;
   }
 
   const roleNames: Record<string, string> = {
-    all: t['users.role_all'](),
+    [FILTER_VALUES.ALL]: t['users.role_all'](),
     [ROLES.ADMINISTRATOR]: t['role.administrator'](),
     [ROLES.MANAGER]: t['role.manager'](),
     [ROLES.STAFF]: t['role.staff']()
   };
 
   const perPageOptions = $derived([
-    { value: '10', label: t['users.pagination_per_page']({ per_page: 10 }) },
-    { value: '20', label: t['users.pagination_per_page']({ per_page: 20 }) },
-    { value: '50', label: t['users.pagination_per_page']({ per_page: 50 }) }
+    ...PAGINATION.USERS_PER_PAGE_OPTIONS.map((perPage) => ({
+      value: perPage.toString(),
+      label: t['users.pagination_per_page']({ per_page: perPage })
+    }))
   ]);
 </script>
 
@@ -99,7 +108,7 @@
         <p class="text-muted-foreground">{t['users.description']()}</p>
       </div>
       <div class="flex items-center gap-2">
-        <Button href={resolve("/users/create")} class="gap-2">
+        <Button href={resolve(ROUTES.USERS_CREATE as Pathname)} class="gap-2">
           <UserPlus class="size-4" />
           {t['users.create_user']()}
         </Button>
@@ -124,14 +133,14 @@
               <span class="text-sm font-medium text-muted-foreground">{t['common.role']()}</span>
               <Select.Root
                 type="single"
-                value={page.url.searchParams.get('role') || 'all'}
+                value={page.url.searchParams.get(QUERY_KEYS.ROLE) || FILTER_VALUES.ALL}
                 onValueChange={handleRoleChange}
               >
               <Select.Trigger class="w-40">
-                {roleNames[page.url.searchParams.get('role') || 'all']}
+                {roleNames[page.url.searchParams.get(QUERY_KEYS.ROLE) || FILTER_VALUES.ALL]}
               </Select.Trigger>
               <Select.Content>
-                <Select.Item value="all">{t['users.role_all']()}</Select.Item>
+                <Select.Item value={FILTER_VALUES.ALL}>{t['users.role_all']()}</Select.Item>
                 <Select.Item value={ROLES.ADMINISTRATOR}>{t['role.administrator']()}</Select.Item>
                 <Select.Item value={ROLES.MANAGER}>{t['role.manager']()}</Select.Item>
                 <Select.Item value={ROLES.STAFF}>{t['role.staff']()}</Select.Item>
@@ -195,7 +204,7 @@
                 <Button
                   variant="ghost"
                   size="icon"
-                  href={resolve(`/users/${user.id}` as Pathname)}
+                  href={resolve(ROUTE_BUILDERS.userDetail(user.id) as Pathname)}
                   class="h-8 w-8"
                 >
                   <Pencil class="size-4" />

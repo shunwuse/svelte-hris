@@ -1,15 +1,15 @@
 import type { Handle } from '@sveltejs/kit';
 import { redirect } from '@sveltejs/kit';
 import { dev } from '$app/environment';
-import { COOKIE_KEYS } from '$lib/constants';
+import { API_CONFIG, COOKIE_CONFIG, COOKIE_KEYS, HTTP_STATUS, ROUTES } from '$lib/constants';
 import { createApi } from '$lib/api';
 import { paraglideMiddleware } from '$paraglide/server';
 import { env } from '$env/dynamic/private';
 
-const publicRoutes = ['/login'];
+const publicRoutes = [ROUTES.LOGIN];
 
 export const handle: Handle = async ({ event, resolve }) => {
-  const apiBaseUrl = env.API_BASE_URL || 'http://localhost:8080';
+  const apiBaseUrl = env.API_BASE_URL || API_CONFIG.DEFAULT_BASE_URL;
   // Create a minimal request for the middleware to avoid consuming the original request body.
   // This prevents the "Body has already been read" error in SvelteKit actions.
   const minimalRequest = new Request(event.request.url, {
@@ -27,12 +27,12 @@ export const handle: Handle = async ({ event, resolve }) => {
 
     // Not authenticated then redirect to login
     if (!accessToken && !isPublicRoute) {
-      redirect(303, '/login');
+      redirect(HTTP_STATUS.SEE_OTHER, ROUTES.LOGIN);
     }
 
     // Authenticated user trying to access login page
-    if (accessToken && url.pathname === '/login') {
-      redirect(303, '/');
+    if (accessToken && url.pathname === ROUTES.LOGIN) {
+      redirect(HTTP_STATUS.SEE_OTHER, ROUTES.ROOT);
     }
 
     // Store token and API instance in locals for use in server load/actions
@@ -45,22 +45,22 @@ export const handle: Handle = async ({ event, resolve }) => {
       refreshToken,
       onTokenUpdate: (tokens) => {
         event.cookies.set(COOKIE_KEYS.ACCESS_TOKEN, tokens.access_token, {
-          path: '/',
+          path: COOKIE_CONFIG.PATH_ROOT,
           httpOnly: true,
-          sameSite: 'lax',
+          sameSite: COOKIE_CONFIG.SAME_SITE_LAX,
           secure: !dev
         });
         event.cookies.set(COOKIE_KEYS.REFRESH_TOKEN, tokens.refresh_token, {
-          path: '/',
+          path: COOKIE_CONFIG.PATH_ROOT,
           httpOnly: true,
-          sameSite: 'lax',
+          sameSite: COOKIE_CONFIG.SAME_SITE_LAX,
           secure: !dev
         });
       },
       onLogout: () => {
-        event.cookies.delete(COOKIE_KEYS.ACCESS_TOKEN, { path: '/' });
-        event.cookies.delete(COOKIE_KEYS.REFRESH_TOKEN, { path: '/' });
-        redirect(303, '/login');
+        event.cookies.delete(COOKIE_KEYS.ACCESS_TOKEN, { path: COOKIE_CONFIG.PATH_ROOT });
+        event.cookies.delete(COOKIE_KEYS.REFRESH_TOKEN, { path: COOKIE_CONFIG.PATH_ROOT });
+        redirect(HTTP_STATUS.SEE_OTHER, ROUTES.LOGIN);
       }
     });
 

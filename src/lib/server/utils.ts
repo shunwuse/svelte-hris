@@ -1,5 +1,6 @@
 import { fail } from '@sveltejs/kit';
 import { ApiClientError } from '$lib/api';
+import { HTTP_STATUS } from '$lib/constants';
 import type { ApiError } from '$lib/types';
 import type { ErrorMessageOverrides } from '$lib/api/error-codes';
 import { getErrorMessage } from '$lib/api/error-codes';
@@ -34,7 +35,7 @@ export function handleActionError<T extends FormFields = FormFields>(
 ) {
 	if (err instanceof ApiClientError) {
 		const message = getErrorMessage(err.code, err.message, overrides);
-		return fail(400, {
+		return fail(HTTP_STATUS.BAD_REQUEST, {
 			error: message,
 			code: err.code,
 			message: message,
@@ -44,7 +45,7 @@ export function handleActionError<T extends FormFields = FormFields>(
 	}
 
 	console.error(`${context}:`, err);
-	return fail(500, {
+	return fail(HTTP_STATUS.INTERNAL_SERVER_ERROR, {
 		error: t['common.error.connection_error'](),
 		code: 'CONNECTION_ERROR',
 		message: t['common.error.connection_error'](),

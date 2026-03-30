@@ -1,9 +1,25 @@
 import type { RequestHandler } from './$types';
 import { env } from '$env/dynamic/private';
+import { API_CONFIG, HTTP_STATUS } from '$lib/constants';
 
 // Use a safer way to access the environment variable to avoid TypeScript errors
 // if the variable is not yet defined in the generated types.
-const API_BASE_URL = (env as any).API_BASE_URL || 'http://localhost:8080';
+const API_BASE_URL = (env as any).API_BASE_URL || API_CONFIG.DEFAULT_BASE_URL;
+const API_PROXY_ERROR_MESSAGE = 'Internal Server Error via Proxy';
+const JSON_CONTENT_TYPE = 'application/json';
+const HOP_BY_HOP_HEADERS = new Set([
+  'host',
+  'connection',
+  'keep-alive',
+  'proxy-authenticate',
+  'proxy-authorization',
+  'te',
+  'trailers',
+  'transfer-encoding',
+  'upgrade'
+]);
+const SKIP_RESPONSE_HEADERS = new Set(['content-encoding', 'content-length', 'transfer-encoding']);
+const METHODS_WITHOUT_BODY = new Set(['GET', 'HEAD']);
 
 const handle: RequestHandler = async ({ request, params, url }) => {
   // Ensure the base URL ends with a slash to avoid path truncation by URL constructor
@@ -17,18 +33,7 @@ const handle: RequestHandler = async ({ request, params, url }) => {
   // Clone headers and remove hop-by-hop headers that shouldn't be forwarded
   const headers = new Headers();
   for (const [key, value] of request.headers.entries()) {
-    const hopByHopHeaders = [
-      'host',
-      'connection',
-      'keep-alive',
-      'proxy-authenticate',
-      'proxy-authorization',
-      'te',
-      'trailers',
-      'transfer-encoding',
-      'upgrade'
-    ];
-    if (!hopByHopHeaders.includes(key.toLowerCase())) {
+    if (!HOP_BY_HOP_HEADERS.has(key.toLowerCase())) {
       headers.set(key, value);
     }
   }
@@ -41,7 +46,7 @@ const handle: RequestHandler = async ({ request, params, url }) => {
 
   // Only attach body for non-GET/HEAD requests
   // Using request.body (ReadableStream) is more efficient than reading into memory
-  if (request.method !== 'GET' && request.method !== 'HEAD') {
+  if (!METHODS_WITHOUT_BODY.has(request.method)) {
     config.body = request.body;
   }
 
@@ -51,8 +56,7 @@ const handle: RequestHandler = async ({ request, params, url }) => {
     // Filter response headers
     const responseHeaders = new Headers();
     for (const [key, value] of response.headers.entries()) {
-      const skipHeaders = ['content-encoding', 'content-length', 'transfer-encoding'];
-      if (!skipHeaders.includes(key.toLowerCase())) {
+      if (!SKIP_RESPONSE_HEADERS.has(key.toLowerCase())) {
         responseHeaders.set(key, value);
       }
     }
@@ -63,9 +67,9 @@ const handle: RequestHandler = async ({ request, params, url }) => {
     });
   } catch (error) {
     console.error('API Proxy Error:', error);
-    return new Response(JSON.stringify({ error: 'Internal Server Error via Proxy', details: String(error) }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
+    return new Response(JSON.stringify({ error: API_PROXY_ERROR_MESSAGE, details: String(error) }), {
+      status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      headers: { 'Content-Type': JSON_CONTENT_TYPE }
     });
   }
 };

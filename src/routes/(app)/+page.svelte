@@ -2,6 +2,7 @@
 	import { resolve } from '$app/paths';
 	import type { Pathname } from '$app/types';
 	import { Button } from '$lib/components/ui/button';
+	import { ROUTES, ROUTE_BUILDERS } from '$lib/constants';
 	import {
 		Card,
 		CardContent,
@@ -37,11 +38,11 @@
 				<p class="text-muted-foreground">{t['overview.description']()}</p>
 			</div>
 			<div class="flex items-center gap-3">
-				<Button href={resolve('/approvals/create')} variant="default" class="gap-2">
+				<Button href={resolve(ROUTES.APPROVALS_CREATE as Pathname)} variant="default" class="gap-2">
 					<Plus class="size-4" />
 					{t['overview.create_request']()}
 				</Button>
-				<Button href={resolve('/users/create')} variant="outline" class="gap-2">
+				<Button href={resolve(ROUTES.USERS_CREATE as Pathname)} variant="outline" class="gap-2">
 					<UserPlus class="size-4" />
 					{t['overview.create_user']()}
 				</Button>
@@ -56,7 +57,7 @@
 						<CardTitle>{t['overview.recent_approvals']()}</CardTitle>
 						<CardDescription>{t['overview.recent_approvals_desc']()}</CardDescription>
 					</div>
-					<Button href={resolve('/approvals')} variant="ghost" size="sm">{t['overview.view_all']()}</Button>
+					<Button href={resolve(ROUTES.APPROVALS as Pathname)} variant="ghost" size="sm">{t['overview.view_all']()}</Button>
 				</CardHeader>
 				<CardContent>
 					{#if data.recentApprovals.length === 0}
@@ -72,7 +73,7 @@
 									<div class="flex items-center gap-3">
 										<Badge class={statusColors[approval.status]}>{approval.status}</Badge>
 										<Button
-											href={resolve(`/approvals/${approval.id}` as Pathname)}
+											href={resolve(ROUTE_BUILDERS.approvalDetail(approval.id) as Pathname)}
 											size="icon"
 											variant="ghost"
 											class="h-8 w-8"
@@ -95,7 +96,7 @@
 						<CardTitle>{t['overview.recent_users']()}</CardTitle>
 						<CardDescription>{t['overview.recent_users_desc']()}</CardDescription>
 					</div>
-					<Button href={resolve('/users')} variant="ghost" size="sm">{t['overview.view_all']()}</Button>
+					<Button href={resolve(ROUTES.USERS as Pathname)} variant="ghost" size="sm">{t['overview.view_all']()}</Button>
 				</CardHeader>
 				<CardContent>
 					{#if data.recentUsers.length === 0}
@@ -116,7 +117,7 @@
 										</div>
 									</div>
 									<Button
-										href={resolve(`/users/${user.id}` as Pathname)}
+										href={resolve(ROUTE_BUILDERS.userDetail(user.id) as Pathname)}
 										size="icon"
 										variant="ghost"
 										class="h-8 w-8"

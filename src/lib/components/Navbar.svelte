@@ -4,6 +4,7 @@
 	import { resolve } from '$app/paths';
 	import type { Pathname } from '$app/types';
 	import { Button } from '$lib/components/ui/button';
+	import { ROUTES } from '$lib/constants';
 	import * as t from '$paraglide/messages';
 	import { locales, setLocale, getLocale } from '$paraglide/runtime';
 	import * as Select from '$lib/components/ui/select';
@@ -12,14 +13,14 @@
 	let isLoggingOut = $state(false);
 
 	const navItems = $derived([
-		{ href: '/' as Pathname, label: t['nav.overview']() },
-		{ href: '/users' as Pathname, label: t['nav.users']() },
-		{ href: '/approvals' as Pathname, label: t['nav.approvals']() }
+		{ href: ROUTES.ROOT as Pathname, label: t['nav.overview']() },
+		{ href: ROUTES.USERS as Pathname, label: t['nav.users']() },
+		{ href: ROUTES.APPROVALS as Pathname, label: t['nav.approvals']() }
 	]);
 
 	function isActive(href: string, pathname: string): boolean {
-		if (href === '/') {
-			return pathname === '/';
+		if (href === ROUTES.ROOT) {
+			return pathname === ROUTES.ROOT;
 		}
 		return pathname.startsWith(href);
 	}
@@ -34,7 +35,7 @@
 	<div class="mx-auto max-w-6xl px-4">
 		<div class="flex h-16 items-center justify-between">
 			<!-- Logo -->
-			<a href={resolve("/")} class="text-xl font-bold text-primary">
+			<a href={resolve(ROUTES.ROOT as Pathname)} class="text-xl font-bold text-primary">
 				HRIS
 			</a>
 
@@ -84,7 +85,7 @@
 				<!-- Logout -->
 				<form
 					method="POST"
-					action="/logout"
+					action={ROUTES.LOGOUT}
 					use:enhance={() => {
 						isLoggingOut = true;
 						return async ({ update }) => {

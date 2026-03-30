@@ -4,6 +4,7 @@
   import { Input } from '$lib/components/ui/input';
   import { Label } from '$lib/components/ui/label';
   import * as Card from '$lib/components/ui/card';
+  import { ROUTES } from '$lib/constants';
   import { flash } from '$lib/stores';
   import { resolve } from '$app/paths';
   import * as t from '$paraglide/messages';
@@ -70,7 +71,7 @@
           </Card.Content>
 
           <Card.Footer class="flex justify-between pt-6">
-            <Button variant="outline" href={resolve("/users")}>{t['common.cancel']()}</Button>
+            <Button variant="outline" href={resolve(ROUTES.USERS)}>{t['common.cancel']()}</Button>
             <Button type="submit" disabled={isSubmitting}>
               {#if isSubmitting}
                 {t['common.saving']()}
