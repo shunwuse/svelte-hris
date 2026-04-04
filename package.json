@@ -1,18 +1,18 @@
 {
   "name": "svelte-hris",
-  "private": true,
   "version": "0.0.1",
+  "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite dev",
     "build": "vite build",
-    "preview": "vite preview",
-    "prepare": "svelte-kit sync || echo ''",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+    "dev": "vite dev",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "eslint . --max-warnings=0",
+    "prepare": "svelte-kit sync || echo ''",
+    "preview": "vite preview",
     "validate": "npm run format:check && npm run lint && npm run check"
   },
   "devDependencies": {

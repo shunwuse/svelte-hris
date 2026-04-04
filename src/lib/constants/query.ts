@@ -4,9 +4,9 @@ export const QUERY_KEYS = {
   PAGE: 'page',
   PER_PAGE: 'per_page',
   NAME: 'name',
-  ROLE: 'role'
+  ROLE: 'role',
 } as const;
 
 export const FILTER_VALUES = {
-  ALL: 'all'
+  ALL: 'all',
 } as const;

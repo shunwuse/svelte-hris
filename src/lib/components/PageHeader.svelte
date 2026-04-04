@@ -1,6 +1,7 @@
 <script lang="ts">
-  import { cn } from '$lib/utils';
   import type { Snippet } from 'svelte';
+
+  import { cn } from '$lib/utils';
 
   interface Props {
     title: string;
@@ -15,11 +16,16 @@
     description,
     class: className,
     actionsClass = 'flex items-center gap-2',
-    actions
+    actions,
   }: Props = $props();
 </script>
 
-<div class={cn('flex flex-col gap-4 md:flex-row md:items-center md:justify-between', className)}>
+<div
+  class={cn(
+    'flex flex-col gap-4 md:flex-row md:items-center md:justify-between',
+    className,
+  )}
+>
   <div>
     <h1 class="text-3xl font-bold tracking-tight text-gray-900">{title}</h1>
     {#if description}

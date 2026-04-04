@@ -1,21 +1,22 @@
 <script lang="ts">
-  import { page } from '$app/state';
+  import Languages from '@lucide/svelte/icons/languages';
+
   import { enhance } from '$app/forms';
   import { resolve } from '$app/paths';
+  import { page } from '$app/state';
   import type { Pathname } from '$app/types';
   import { Button } from '$lib/components/ui/button';
+  import * as Select from '$lib/components/ui/select';
   import { ROUTES } from '$lib/constants';
   import * as t from '$paraglide/messages';
-  import { locales, setLocale, getLocale } from '$paraglide/runtime';
-  import * as Select from '$lib/components/ui/select';
-  import Languages from '@lucide/svelte/icons/languages';
+  import { getLocale, locales, setLocale } from '$paraglide/runtime';
 
   let isLoggingOut = $state(false);
 
   const navItems = $derived([
     { href: ROUTES.ROOT as Pathname, label: t['nav.overview']() },
     { href: ROUTES.USERS as Pathname, label: t['nav.users']() },
-    { href: ROUTES.APPROVALS as Pathname, label: t['nav.approvals']() }
+    { href: ROUTES.APPROVALS as Pathname, label: t['nav.approvals']() },
   ]);
 
   function isActive(href: string, pathname: string): boolean {
@@ -27,7 +28,7 @@
 
   const localeNames: Record<string, string> = {
     en: 'English',
-    'zh-TW': '繁體中文'
+    'zh-TW': '繁體中文',
   };
 </script>
 
@@ -35,7 +36,12 @@
   <div class="mx-auto max-w-6xl px-4">
     <div class="flex h-16 items-center justify-between">
       <!-- Logo -->
-      <a href={resolve(ROUTES.ROOT as Pathname)} class="text-xl font-bold text-primary"> HRIS </a>
+      <a
+        href={resolve(ROUTES.ROOT as Pathname)}
+        class="text-xl font-bold text-primary"
+      >
+        HRIS
+      </a>
 
       <!-- Nav Links -->
       <div class="flex items-center gap-1">
@@ -44,7 +50,7 @@
             href={resolve(item.href)}
             class="rounded-md px-3 py-2 text-sm font-medium transition-colors {isActive(
               item.href,
-              page.url.pathname
+              page.url.pathname,
             )
               ? 'bg-primary/10 text-primary'
               : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'}"
@@ -63,7 +69,9 @@
             if (value) setLocale(value as (typeof locales)[number]);
           }}
         >
-          <Select.Trigger class="h-9 w-[130px] border-none bg-transparent hover:bg-gray-100">
+          <Select.Trigger
+            class="h-9 w-[130px] border-none bg-transparent hover:bg-gray-100"
+          >
             <div class="flex items-center gap-2">
               <Languages class="size-4 text-muted-foreground" />
               <span class="text-sm font-medium">
@@ -91,7 +99,12 @@
             };
           }}
         >
-          <Button type="submit" variant="ghost" size="sm" disabled={isLoggingOut}>
+          <Button
+            type="submit"
+            variant="ghost"
+            size="sm"
+            disabled={isLoggingOut}
+          >
             {isLoggingOut ? t['nav.logging_out']() : t['nav.logout']()}
           </Button>
         </form>

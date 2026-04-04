@@ -1,10 +1,12 @@
-import type { Actions } from './$types';
 import { fail, redirect } from '@sveltejs/kit';
-import { HTTP_STATUS, ROUTES } from '$lib/constants';
-import { handleActionError, readFormField } from '$lib/server/utils';
+
 import { ERROR_CODES } from '$lib/api';
+import { HTTP_STATUS, ROUTES } from '$lib/constants';
 import { isCreateableRole } from '$lib/domain';
+import { handleActionError, readFormField } from '$lib/server/utils';
 import * as t from '$paraglide/messages';
+
+import type { Actions } from './$types';
 
 export const actions: Actions = {
   default: async ({ request, locals }) => {
@@ -20,14 +22,14 @@ export const actions: Actions = {
     if (!username || !name || !password) {
       return fail(HTTP_STATUS.BAD_REQUEST, {
         error: t['users.error.all_fields_required'](),
-        ...formFields
+        ...formFields,
       });
     }
 
     if (!isCreateableRole(role)) {
       return fail(HTTP_STATUS.BAD_REQUEST, {
         error: t['users.error.role_required'](),
-        ...formFields
+        ...formFields,
       });
     }
 
@@ -35,10 +37,10 @@ export const actions: Actions = {
       await locals.api.users.create({ username, name, password, role });
     } catch (err) {
       return handleActionError(err, 'Create user error', formFields, {
-        [ERROR_CODES.ALREADY_EXISTS]: t['users.error.username_taken']()
+        [ERROR_CODES.ALREADY_EXISTS]: t['users.error.username_taken'](),
       });
     }
 
     redirect(HTTP_STATUS.SEE_OTHER, ROUTES.USERS);
-  }
+  },
 };

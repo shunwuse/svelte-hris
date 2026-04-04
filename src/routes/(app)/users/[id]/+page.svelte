@@ -1,16 +1,16 @@
 <script lang="ts">
   import { enhance } from '$app/forms';
+  import { resolve } from '$app/paths';
   import FormErrorAlert from '$lib/components/FormErrorAlert.svelte';
   import FormPageCard from '$lib/components/FormPageCard.svelte';
   import FormSubmitFooter from '$lib/components/FormSubmitFooter.svelte';
   import { Button } from '$lib/components/ui/button';
-  import { createSubmitEnhancer } from '$lib/form-actions';
+  import * as Card from '$lib/components/ui/card';
   import { Input } from '$lib/components/ui/input';
   import { Label } from '$lib/components/ui/label';
-  import * as Card from '$lib/components/ui/card';
   import { ROUTES } from '$lib/constants';
+  import { createSubmitEnhancer } from '$lib/form-actions';
   import { flash } from '$lib/stores';
-  import { resolve } from '$app/paths';
   import * as t from '$paraglide/messages';
 
   let { data, form } = $props();
@@ -23,7 +23,7 @@
     },
     onRedirect: () => {
       flash.success(t['users.updated']());
-    }
+    },
   });
 
   // Forward page-level errors to flash so layout shows toast
@@ -33,15 +33,26 @@
   });
 </script>
 
-<FormPageCard title={t['users.edit_user']()} description={t['users.update_user_desc']()}>
+<FormPageCard
+  title={t['users.edit_user']()}
+  description={t['users.update_user_desc']()}
+>
   {#if data.user}
     <form method="POST" use:enhance={submitEnhance}>
       <Card.Content class="space-y-4">
         <!-- Username (read-only) -->
         <div class="space-y-2">
           <Label for="username">{t['login.username']()}</Label>
-          <Input id="username" type="text" value={data.user.username} disabled class="bg-muted" />
-          <p class="text-xs text-muted-foreground">{t['users.username_readonly']()}</p>
+          <Input
+            id="username"
+            type="text"
+            value={data.user.username}
+            disabled
+            class="bg-muted"
+          />
+          <p class="text-xs text-muted-foreground">
+            {t['users.username_readonly']()}
+          </p>
         </div>
 
         <!-- Name -->
@@ -72,7 +83,9 @@
     </Card.Content>
 
     <Card.Footer class="pt-6">
-      <Button variant="outline" href={resolve(ROUTES.USERS)}>{t['common.cancel']()}</Button>
+      <Button variant="outline" href={resolve(ROUTES.USERS)}
+        >{t['common.cancel']()}</Button
+      >
     </Card.Footer>
   {/if}
 </FormPageCard>

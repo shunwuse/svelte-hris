@@ -1,5 +1,6 @@
-import { dev } from '$app/environment';
 import type { Cookies } from '@sveltejs/kit';
+
+import { dev } from '$app/environment';
 import { COOKIE_CONFIG, COOKIE_KEYS } from '$lib/constants';
 import type { Role } from '$lib/domain';
 
@@ -19,7 +20,7 @@ function createTokenCookieOptions() {
     httpOnly: true,
     secure: !dev,
     sameSite: COOKIE_CONFIG.SAME_SITE_STRICT,
-    maxAge: COOKIE_CONFIG.AUTH_MAX_AGE_SECONDS
+    maxAge: COOKIE_CONFIG.AUTH_MAX_AGE_SECONDS,
   } as const;
 }
 
@@ -29,24 +30,34 @@ function createUserInfoCookieOptions() {
     httpOnly: false,
     secure: !dev,
     sameSite: COOKIE_CONFIG.SAME_SITE_STRICT,
-    maxAge: COOKIE_CONFIG.AUTH_MAX_AGE_SECONDS
+    maxAge: COOKIE_CONFIG.AUTH_MAX_AGE_SECONDS,
   } as const;
 }
 
-export function setAuthTokenCookies(cookies: Cookies, tokens: AuthTokens): void {
+export function setAuthTokenCookies(
+  cookies: Cookies,
+  tokens: AuthTokens,
+): void {
   const options = createTokenCookieOptions();
 
   cookies.set(COOKIE_KEYS.ACCESS_TOKEN, tokens.access_token, options);
   cookies.set(COOKIE_KEYS.REFRESH_TOKEN, tokens.refresh_token, options);
 }
 
-export function setUserInfoCookie(cookies: Cookies, userInfo: UserInfoCookie): void {
-  cookies.set(COOKIE_KEYS.USER_INFO, JSON.stringify(userInfo), createUserInfoCookieOptions());
+export function setUserInfoCookie(
+  cookies: Cookies,
+  userInfo: UserInfoCookie,
+): void {
+  cookies.set(
+    COOKIE_KEYS.USER_INFO,
+    JSON.stringify(userInfo),
+    createUserInfoCookieOptions(),
+  );
 }
 
 export function setAuthSessionCookies(
   cookies: Cookies,
-  payload: AuthTokens & UserInfoCookie
+  payload: AuthTokens & UserInfoCookie,
 ): void {
   setAuthTokenCookies(cookies, payload);
   setUserInfoCookie(cookies, payload);

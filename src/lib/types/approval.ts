@@ -1,5 +1,6 @@
+import type { ActionableApprovalStatus, ApprovalStatus } from '$lib/domain';
+
 import type { CursorPaginationResponse } from './api';
-import type { ApprovalStatus, ActionableApprovalStatus } from '$lib/domain';
 
 // ==================== Approval ====================
 

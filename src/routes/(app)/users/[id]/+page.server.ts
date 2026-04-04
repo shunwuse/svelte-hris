@@ -1,14 +1,16 @@
-import type { PageServerLoad, Actions } from './$types';
 import { fail, redirect } from '@sveltejs/kit';
+
+import { ERROR_CODES } from '$lib/api';
 import { HTTP_STATUS, ROUTES } from '$lib/constants';
 import {
-  safeLoad,
   handleActionError,
   parsePositiveIntParam,
-  readFormField
+  readFormField,
+  safeLoad,
 } from '$lib/server/utils';
-import { ERROR_CODES } from '$lib/api';
 import * as t from '$paraglide/messages';
+
+import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
   const userId = parsePositiveIntParam(params.id);
@@ -21,7 +23,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
     () => locals.api.users.get(userId),
     null,
     'Failed to fetch user',
-    { [ERROR_CODES.NOT_FOUND]: t['users.error.not_found']() }
+    { [ERROR_CODES.NOT_FOUND]: t['users.error.not_found']() },
   );
 
   if (error) {
@@ -46,14 +48,14 @@ export const actions: Actions = {
     if (!userId) {
       return fail(HTTP_STATUS.BAD_REQUEST, {
         error: t['users.error.update_failed_not_found'](),
-        ...formFields
+        ...formFields,
       });
     }
 
     if (!name) {
       return fail(HTTP_STATUS.BAD_REQUEST, {
         error: t['users.error.name_required'](),
-        ...formFields
+        ...formFields,
       });
     }
 
@@ -61,10 +63,10 @@ export const actions: Actions = {
       await locals.api.users.update(userId, { name });
     } catch (err) {
       return handleActionError(err, 'Update user error', formFields, {
-        [ERROR_CODES.NOT_FOUND]: t['users.error.update_failed_not_found']()
+        [ERROR_CODES.NOT_FOUND]: t['users.error.update_failed_not_found'](),
       });
     }
 
     redirect(HTTP_STATUS.SEE_OTHER, ROUTES.USERS);
-  }
+  },
 };

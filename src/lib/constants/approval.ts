@@ -1,5 +1,5 @@
 export const APPROVAL_STATUS = {
   PENDING: 'PENDING',
   APPROVED: 'APPROVED',
-  REJECTED: 'REJECTED'
+  REJECTED: 'REJECTED',
 } as const;

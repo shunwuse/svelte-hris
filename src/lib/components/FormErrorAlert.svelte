@@ -10,7 +10,12 @@
 </script>
 
 {#if message}
-  <div class={cn('rounded-md bg-destructive/15 p-3 text-sm text-destructive', className)}>
+  <div
+    class={cn(
+      'rounded-md bg-destructive/15 p-3 text-sm text-destructive',
+      className,
+    )}
+  >
     {message}
   </div>
 {/if}

@@ -1,6 +1,7 @@
-import type { RequestHandler } from './$types';
 import { env } from '$env/dynamic/private';
 import { API_CONFIG, HTTP_STATUS } from '$lib/constants';
+
+import type { RequestHandler } from './$types';
 
 // Use a safer way to access the environment variable to avoid TypeScript errors
 // if the variable is not yet defined in the generated types.
@@ -16,14 +17,20 @@ const HOP_BY_HOP_HEADERS = new Set([
   'te',
   'trailers',
   'transfer-encoding',
-  'upgrade'
+  'upgrade',
 ]);
-const SKIP_RESPONSE_HEADERS = new Set(['content-encoding', 'content-length', 'transfer-encoding']);
+const SKIP_RESPONSE_HEADERS = new Set([
+  'content-encoding',
+  'content-length',
+  'transfer-encoding',
+]);
 const METHODS_WITHOUT_BODY = new Set(['GET', 'HEAD']);
 
 const handle: RequestHandler = async ({ request, params, url }) => {
   // Ensure the base URL ends with a slash to avoid path truncation by URL constructor
-  const apiBase = API_BASE_URL.endsWith('/') ? API_BASE_URL : `${API_BASE_URL}/`;
+  const apiBase = API_BASE_URL.endsWith('/')
+    ? API_BASE_URL
+    : `${API_BASE_URL}/`;
   const targetPath = params.path;
   const targetUrl = new URL(targetPath, apiBase);
 
@@ -41,7 +48,7 @@ const handle: RequestHandler = async ({ request, params, url }) => {
   const config: RequestInit & { duplex?: string } = {
     method: request.method,
     headers,
-    duplex: 'half'
+    duplex: 'half',
   };
 
   // Only attach body for non-GET/HEAD requests
@@ -63,16 +70,19 @@ const handle: RequestHandler = async ({ request, params, url }) => {
 
     return new Response(response.body, {
       status: response.status,
-      headers: responseHeaders
+      headers: responseHeaders,
     });
   } catch (error) {
     console.error('API Proxy Error:', error);
     return new Response(
-      JSON.stringify({ error: API_PROXY_ERROR_MESSAGE, details: String(error) }),
+      JSON.stringify({
+        error: API_PROXY_ERROR_MESSAGE,
+        details: String(error),
+      }),
       {
         status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
-        headers: { 'Content-Type': JSON_CONTENT_TYPE }
-      }
+        headers: { 'Content-Type': JSON_CONTENT_TYPE },
+      },
     );
   }
 };

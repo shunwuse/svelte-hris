@@ -1,11 +1,11 @@
+import { ApprovalApi } from './approval';
+import { AuthApi } from './auth';
 import type { ApiClientOptions } from './client';
 import { ApiClient, ApiClientError } from './client';
-import { AuthApi } from './auth';
+import { ERROR_CODES, getErrorMessage } from './error-codes';
 import { UserApi } from './user';
-import { ApprovalApi } from './approval';
-import { getErrorMessage, ERROR_CODES } from './error-codes';
 
-export { ApiClientError, getErrorMessage, ERROR_CODES };
+export { ApiClientError, ERROR_CODES, getErrorMessage };
 export type { ApiClientOptions };
 
 export function createApi(options: ApiClientOptions = {}) {
@@ -14,7 +14,7 @@ export function createApi(options: ApiClientOptions = {}) {
   return {
     auth: new AuthApi(client),
     users: new UserApi(client),
-    approvals: new ApprovalApi(client)
+    approvals: new ApprovalApi(client),
   };
 }
 

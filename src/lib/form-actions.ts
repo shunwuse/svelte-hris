@@ -5,7 +5,9 @@ export interface EnhanceSubmitOptions {
   onRedirect?: () => void;
 }
 
-export function createSubmitEnhancer(options: EnhanceSubmitOptions = {}): SubmitFunction {
+export function createSubmitEnhancer(
+  options: EnhanceSubmitOptions = {},
+): SubmitFunction {
   return () => {
     options.setSubmitting?.(true);
 

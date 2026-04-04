@@ -1,7 +1,8 @@
 <script lang="ts">
   import { toast } from 'svelte-sonner';
-  import { flash } from '$lib/stores';
+
   import Navbar from '$lib/components/Navbar.svelte';
+  import { flash } from '$lib/stores';
 
   let { children } = $props();
 

@@ -3,7 +3,7 @@ export type PaginationItem = number | 'ellipsis';
 export function createPaginationItems(
   currentPage: number,
   lastPage: number,
-  siblingCount = 1
+  siblingCount = 1,
 ): PaginationItem[] {
   if (lastPage <= 0) {
     return [];
@@ -12,7 +12,11 @@ export function createPaginationItems(
   const clampedCurrent = Math.min(Math.max(currentPage, 1), lastPage);
   const pages = new Set<number>([1, lastPage]);
 
-  for (let page = clampedCurrent - siblingCount; page <= clampedCurrent + siblingCount; page += 1) {
+  for (
+    let page = clampedCurrent - siblingCount;
+    page <= clampedCurrent + siblingCount;
+    page += 1
+  ) {
     if (page >= 1 && page <= lastPage) {
       pages.add(page);
     }

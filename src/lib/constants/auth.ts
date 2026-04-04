@@ -1,7 +1,7 @@
 export const ROLES = {
   ADMINISTRATOR: 'administrator',
   MANAGER: 'manager',
-  STAFF: 'staff'
+  STAFF: 'staff',
 } as const;
 
 export const PERMISSIONS = {
@@ -10,5 +10,5 @@ export const PERMISSIONS = {
   UPDATE_USER: 'update_user',
   CREATE_APPROVAL: 'create_approval',
   READ_APPROVAL: 'read_approval',
-  ACTION_APPROVAL: 'action_approval'
+  ACTION_APPROVAL: 'action_approval',
 } as const;

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Button, type ButtonVariant } from '$lib/components/ui/button';
-  import { cn } from '$lib/utils';
   import * as Card from '$lib/components/ui/card';
+  import { cn } from '$lib/utils';
 
   interface Props {
     cancelHref?: string;
@@ -24,7 +24,7 @@
     submitDisabled,
     submitVariant = 'default',
     submitClass,
-    footerClass = 'flex justify-between pt-6'
+    footerClass = 'flex justify-between pt-6',
   }: Props = $props();
 </script>
 

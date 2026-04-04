@@ -8,13 +8,13 @@ import Header from './table-header.svelte';
 import Row from './table-row.svelte';
 
 export {
-  Root,
   Body,
   Caption,
   Cell,
   Footer,
   Head,
   Header,
+  Root,
   Row,
   //
   Root as Table,
@@ -24,5 +24,5 @@ export {
   Footer as TableFooter,
   Head as TableHead,
   Header as TableHeader,
-  Row as TableRow
+  Row as TableRow,
 };

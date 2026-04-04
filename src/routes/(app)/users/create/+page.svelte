@@ -1,15 +1,15 @@
 <script lang="ts">
   import { enhance } from '$app/forms';
+  import { resolve } from '$app/paths';
   import FormPageCard from '$lib/components/FormPageCard.svelte';
   import FormSubmitFooter from '$lib/components/FormSubmitFooter.svelte';
-  import { createSubmitEnhancer } from '$lib/form-actions';
+  import * as Card from '$lib/components/ui/card';
   import { Input } from '$lib/components/ui/input';
   import { Label } from '$lib/components/ui/label';
-  import * as Card from '$lib/components/ui/card';
   import * as Select from '$lib/components/ui/select';
   import { ROLES, ROUTES } from '$lib/constants';
+  import { createSubmitEnhancer } from '$lib/form-actions';
   import { flash } from '$lib/stores';
-  import { resolve } from '$app/paths';
   import * as t from '$paraglide/messages';
 
   let { form } = $props();
@@ -23,12 +23,12 @@
     },
     onRedirect: () => {
       flash.success(t['users.created']());
-    }
+    },
   });
 
   const roleOptions = [
     { value: ROLES.MANAGER, label: t['role.manager']() },
-    { value: ROLES.STAFF, label: t['role.staff']() }
+    { value: ROLES.STAFF, label: t['role.staff']() },
   ];
 
   // Forward page-level errors to flash so layout shows toast
@@ -37,7 +37,10 @@
   });
 </script>
 
-<FormPageCard title={t['users.create_user']()} description={t['users.create_user_desc']()}>
+<FormPageCard
+  title={t['users.create_user']()}
+  description={t['users.create_user_desc']()}
+>
   <form method="POST" use:enhance={submitEnhance}>
     <Card.Content class="space-y-4">
       <!-- Username -->
@@ -83,7 +86,8 @@
         <Label>{t['common.role']()}</Label>
         <Select.Root type="single" name="role" bind:value={selectedRole}>
           <Select.Trigger class="w-full">
-            {roleOptions.find((r) => r.value === selectedRole)?.label ?? t['common.role']()}
+            {roleOptions.find((r) => r.value === selectedRole)?.label ??
+              t['common.role']()}
           </Select.Trigger>
           <Select.Content>
             {#each roleOptions as role (role.value)}

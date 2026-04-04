@@ -1,9 +1,14 @@
 import { fail } from '@sveltejs/kit';
+
 import { ApiClientError } from '$lib/api';
-import { DEFAULTS, HTTP_STATUS } from '$lib/constants';
-import type { ApiError, CursorPaginationResponse, OffsetPaginationResponse } from '$lib/types';
 import type { ErrorMessageOverrides } from '$lib/api/error-codes';
 import { getErrorMessage } from '$lib/api/error-codes';
+import { DEFAULTS, HTTP_STATUS } from '$lib/constants';
+import type {
+  ApiError,
+  CursorPaginationResponse,
+  OffsetPaginationResponse,
+} from '$lib/types';
 import * as t from '$paraglide/messages';
 
 /**
@@ -31,7 +36,7 @@ export function handleActionError<T extends FormFields = FormFields>(
   err: unknown,
   context: string,
   formFields?: T,
-  overrides?: ErrorMessageOverrides
+  overrides?: ErrorMessageOverrides,
 ) {
   if (err instanceof ApiClientError) {
     const message = getErrorMessage(err.code, err.message, overrides);
@@ -40,7 +45,7 @@ export function handleActionError<T extends FormFields = FormFields>(
       code: err.code,
       message: message,
       details: err.details,
-      ...formFields
+      ...formFields,
     } as ActionErrorResponse & T);
   }
 
@@ -49,7 +54,7 @@ export function handleActionError<T extends FormFields = FormFields>(
     error: t['common.error.connection_error'](),
     code: 'CONNECTION_ERROR',
     message: t['common.error.connection_error'](),
-    ...formFields
+    ...formFields,
   });
 }
 
@@ -64,7 +69,7 @@ export function handleActionError<T extends FormFields = FormFields>(
 export function handleLoadError(
   err: unknown,
   context: string,
-  overrides?: ErrorMessageOverrides
+  overrides?: ErrorMessageOverrides,
 ): string {
   console.error(`${context}:`, err);
 
@@ -89,7 +94,7 @@ export async function safeLoad<T>(
   fn: () => Promise<T>,
   defaultValue: T,
   context: string,
-  overrides?: ErrorMessageOverrides
+  overrides?: ErrorMessageOverrides,
 ): Promise<{ data: T; error?: string }> {
   try {
     const data = await fn();
@@ -101,7 +106,7 @@ export async function safeLoad<T>(
 }
 
 export function createEmptyOffsetPaginationResponse<T>(
-  perPage: number = DEFAULTS.USERS_PER_PAGE
+  perPage: number = DEFAULTS.USERS_PER_PAGE,
 ): OffsetPaginationResponse<T> {
   return {
     data: [],
@@ -109,18 +114,20 @@ export function createEmptyOffsetPaginationResponse<T>(
       total: 0,
       per_page: perPage,
       current_page: DEFAULTS.FIRST_PAGE,
-      last_page: DEFAULTS.FIRST_PAGE
-    }
+      last_page: DEFAULTS.FIRST_PAGE,
+    },
   };
 }
 
-export function createEmptyCursorPaginationResponse<T>(): CursorPaginationResponse<T> {
+export function createEmptyCursorPaginationResponse<
+  T,
+>(): CursorPaginationResponse<T> {
   return {
     data: [],
     meta: {
       next_cursor: null,
-      has_more: false
-    }
+      has_more: false,
+    },
   };
 }
 
@@ -141,7 +148,7 @@ export interface ReadFormFieldOptions {
 export function readFormField(
   formData: FormData,
   key: string,
-  options: ReadFormFieldOptions = {}
+  options: ReadFormFieldOptions = {},
 ): string {
   const value = formData.get(key);
 

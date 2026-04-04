@@ -9,7 +9,7 @@ const DEFAULT_DELETE_VALUES = [''] as const;
 export function updateSearchParams(
   sourceUrl: URL,
   updates: Record<string, SearchParamValue>,
-  options: UpdateSearchParamsOptions = {}
+  options: UpdateSearchParamsOptions = {},
 ): URL {
   const url = new URL(sourceUrl);
   const deleteValues = options.deleteValues ?? DEFAULT_DELETE_VALUES;

@@ -1,6 +1,7 @@
 <script lang="ts">
   import ChevronLeft from '@lucide/svelte/icons/chevron-left';
   import ChevronRight from '@lucide/svelte/icons/chevron-right';
+
   import { Button } from '$lib/components/ui/button';
   import { createPaginationItems } from '$lib/pagination';
 
@@ -12,9 +13,12 @@
     nextLabel: string;
   }
 
-  let { currentPage, lastPage, getPageHref, previousLabel, nextLabel }: Props = $props();
+  let { currentPage, lastPage, getPageHref, previousLabel, nextLabel }: Props =
+    $props();
 
-  const paginationItems = $derived(createPaginationItems(currentPage, lastPage));
+  const paginationItems = $derived(
+    createPaginationItems(currentPage, lastPage),
+  );
 </script>
 
 <div class="flex items-center gap-2">

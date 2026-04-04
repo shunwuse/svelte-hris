@@ -1,22 +1,28 @@
-import type { PageServerLoad, Actions } from './$types';
 import { fail, redirect } from '@sveltejs/kit';
-import { APPROVAL_STATUS, HTTP_STATUS, ROUTES } from '$lib/constants';
-import { safeLoad, handleActionError, parsePositiveIntParam } from '$lib/server/utils';
+
 import { ERROR_CODES } from '$lib/api';
+import { APPROVAL_STATUS, HTTP_STATUS, ROUTES } from '$lib/constants';
 import type { ActionableApprovalStatus } from '$lib/domain';
+import {
+  handleActionError,
+  parsePositiveIntParam,
+  safeLoad,
+} from '$lib/server/utils';
 import * as t from '$paraglide/messages';
+
+import type { Actions, PageServerLoad } from './$types';
 
 async function performApprovalAction(
   approvalIdParam: string,
   locals: App.Locals,
   action: ActionableApprovalStatus,
-  context: string
+  context: string,
 ) {
   const approvalId = parsePositiveIntParam(approvalIdParam);
 
   if (!approvalId) {
     return fail(HTTP_STATUS.BAD_REQUEST, {
-      error: t['approvals.error.not_found']()
+      error: t['approvals.error.not_found'](),
     });
   }
 
@@ -28,8 +34,8 @@ async function performApprovalAction(
       context,
       {},
       {
-        [ERROR_CODES.NOT_FOUND]: t['approvals.error.not_found']()
-      }
+        [ERROR_CODES.NOT_FOUND]: t['approvals.error.not_found'](),
+      },
     );
   }
 
@@ -47,7 +53,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
     () => locals.api.approvals.get(approvalId),
     null,
     'Failed to fetch approval',
-    { [ERROR_CODES.NOT_FOUND]: t['approvals.error.not_found']() }
+    { [ERROR_CODES.NOT_FOUND]: t['approvals.error.not_found']() },
   );
 
   if (error) {
@@ -63,10 +69,20 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 
 export const actions: Actions = {
   approve: async ({ params, locals }) => {
-    return performApprovalAction(params.id, locals, APPROVAL_STATUS.APPROVED, 'Approve error');
+    return performApprovalAction(
+      params.id,
+      locals,
+      APPROVAL_STATUS.APPROVED,
+      'Approve error',
+    );
   },
 
   reject: async ({ params, locals }) => {
-    return performApprovalAction(params.id, locals, APPROVAL_STATUS.REJECTED, 'Reject error');
-  }
+    return performApprovalAction(
+      params.id,
+      locals,
+      APPROVAL_STATUS.REJECTED,
+      'Reject error',
+    );
+  },
 };

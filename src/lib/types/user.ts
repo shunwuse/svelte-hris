@@ -1,5 +1,6 @@
-import type { OffsetPaginationResponse } from './api';
 import type { CreateableRole, Role } from '$lib/domain';
+
+import type { OffsetPaginationResponse } from './api';
 
 // ==================== User ====================
 

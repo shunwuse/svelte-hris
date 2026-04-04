@@ -13,12 +13,12 @@ const config = {
     // See https://svelte.dev/docs/kit/adapters for more information about adapters.
     adapter: adapter(),
     alias: {
-      $paraglide: './src/paraglide'
+      $paraglide: './src/paraglide',
     },
     csrf: {
-      checkOrigin: false
-    }
-  }
+      checkOrigin: false,
+    },
+  },
 };
 
 export default config;

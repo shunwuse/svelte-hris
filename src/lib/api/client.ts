@@ -1,6 +1,7 @@
 import { browser } from '$app/environment';
 import { API_CONFIG, API_ENDPOINTS, HTTP_STATUS } from '$lib/constants';
 import type { ApiError } from '$lib/types';
+
 import { ERROR_CODES, getErrorMessage } from './error-codes';
 
 /**
@@ -119,7 +120,9 @@ export class ApiClient {
     return headers;
   }
 
-  private async parseApiErrorFromResponse(response: Response): Promise<ApiError['error'] | null> {
+  private async parseApiErrorFromResponse(
+    response: Response,
+  ): Promise<ApiError['error'] | null> {
     try {
       const payload = await response.clone().json();
       return isApiErrorPayload(payload) ? payload.error : null;
@@ -139,14 +142,17 @@ export class ApiClient {
   }
 
   // Generic fetch wrapper with error handling and automatic refresh
-  private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
+  private async request<T>(
+    endpoint: string,
+    options: RequestInit = {},
+  ): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`;
 
     const headers = this.buildHeaders(options);
 
     const config: RequestInit = {
       ...options,
-      headers
+      headers,
     };
 
     let response = await this.fetchFn(url, config);
@@ -155,7 +161,10 @@ export class ApiClient {
     if (response.status === HTTP_STATUS.UNAUTHORIZED) {
       const unauthorizedError = await this.parseApiErrorFromResponse(response);
 
-      if (unauthorizedError?.code === ERROR_CODES.TOKEN_EXPIRED && this.refreshToken) {
+      if (
+        unauthorizedError?.code === ERROR_CODES.TOKEN_EXPIRED &&
+        this.refreshToken
+      ) {
         const newTokens = await this.handleTokenRefresh();
         headers.set('Authorization', `Bearer ${newTokens.access_token}`);
         response = await this.fetchFn(url, { ...config, headers });
@@ -196,11 +205,14 @@ export class ApiClient {
     this.isRefreshing = true;
     this.refreshPromise = (async () => {
       try {
-        const response = await this.fetchFn(`${this.baseUrl}${API_ENDPOINTS.AUTH_REFRESH}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ refresh_token: this.refreshToken })
-        });
+        const response = await this.fetchFn(
+          `${this.baseUrl}${API_ENDPOINTS.AUTH_REFRESH}`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ refresh_token: this.refreshToken }),
+          },
+        );
 
         if (!response.ok) {
           const refreshError = await this.parseApiErrorFromResponse(response);
@@ -218,7 +230,9 @@ export class ApiClient {
             throw new ApiClientError(refreshError);
           }
 
-          throw new Error(`Token refresh failed with status ${response.status}`);
+          throw new Error(
+            `Token refresh failed with status ${response.status}`,
+          );
         }
 
         const tokens = await response.json();
@@ -258,7 +272,7 @@ export class ApiClient {
   public get<T>(endpoint: string, options?: RequestOptions) {
     return this.request<T>(this.buildUrl(endpoint, options?.query), {
       method: 'GET',
-      headers: options?.headers
+      headers: options?.headers,
     });
   }
 
@@ -266,7 +280,7 @@ export class ApiClient {
     return this.request<T>(this.buildUrl(endpoint, options?.query), {
       method: 'POST',
       body: this.serializeBody(body),
-      headers: options?.headers
+      headers: options?.headers,
     });
   }
 
@@ -274,14 +288,14 @@ export class ApiClient {
     return this.request<T>(this.buildUrl(endpoint, options?.query), {
       method: 'PUT',
       body: this.serializeBody(body),
-      headers: options?.headers
+      headers: options?.headers,
     });
   }
 
   public delete<T>(endpoint: string, options?: RequestOptions) {
     return this.request<T>(this.buildUrl(endpoint, options?.query), {
       method: 'DELETE',
-      headers: options?.headers
+      headers: options?.headers,
     });
   }
 }

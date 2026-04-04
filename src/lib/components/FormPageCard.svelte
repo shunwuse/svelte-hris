@@ -1,7 +1,8 @@
 <script lang="ts">
-  import { cn } from '$lib/utils';
   import type { Snippet } from 'svelte';
+
   import * as Card from '$lib/components/ui/card';
+  import { cn } from '$lib/utils';
 
   interface Props {
     title: string;
@@ -20,7 +21,7 @@
     innerClass = 'mx-auto max-w-md',
     headerClass,
     titleClass,
-    children
+    children,
   }: Props = $props();
 </script>
 

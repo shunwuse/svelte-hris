@@ -1,10 +1,11 @@
-import type { PageServerLoad } from './$types';
 import { COOKIE_KEYS, DEFAULTS } from '$lib/constants';
 import {
   createEmptyCursorPaginationResponse,
   createEmptyOffsetPaginationResponse,
-  safeLoad
+  safeLoad,
 } from '$lib/server/utils';
+
+import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ cookies, locals }) => {
   // Get user info from cookie
@@ -24,18 +25,21 @@ export const load: PageServerLoad = async ({ cookies, locals }) => {
     safeLoad(
       () => locals.api.users.list({ per_page: DEFAULTS.OVERVIEW_RECENT_LIMIT }),
       createEmptyOffsetPaginationResponse(DEFAULTS.OVERVIEW_RECENT_LIMIT),
-      'Failed to fetch users'
+      'Failed to fetch users',
     ),
     safeLoad(
       () => locals.api.approvals.list(),
       createEmptyCursorPaginationResponse(),
-      'Failed to fetch approvals'
-    )
+      'Failed to fetch approvals',
+    ),
   ]);
 
   return {
     userInfo,
     recentUsers: usersResult.data.data,
-    recentApprovals: approvalsResult.data.data.slice(0, DEFAULTS.OVERVIEW_RECENT_LIMIT)
+    recentApprovals: approvalsResult.data.data.slice(
+      0,
+      DEFAULTS.OVERVIEW_RECENT_LIMIT,
+    ),
   };
 };

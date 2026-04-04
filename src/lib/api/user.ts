@@ -1,18 +1,19 @@
-import { BaseApi } from './client';
-import type { RequestOptions } from './client';
-import type {
-  GetUsersResponse,
-  User,
-  ListUsersRequest,
-  CreateUserRequest,
-  UpdateUserRequest
-} from '$lib/types';
 import { API_ENDPOINTS } from '$lib/constants';
+import type {
+  CreateUserRequest,
+  GetUsersResponse,
+  ListUsersRequest,
+  UpdateUserRequest,
+  User,
+} from '$lib/types';
+
+import type { RequestOptions } from './client';
+import { BaseApi } from './client';
 
 export class UserApi extends BaseApi {
   async list(query?: ListUsersRequest): Promise<GetUsersResponse> {
     return this.client.get<GetUsersResponse>(API_ENDPOINTS.USERS, {
-      query: query as RequestOptions['query']
+      query: query as RequestOptions['query'],
     });
   }
 

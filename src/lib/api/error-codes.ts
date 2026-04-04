@@ -22,7 +22,7 @@ export const ERROR_CODES = {
   CONFLICT: 'CONFLICT',
 
   // Infrastructure errors
-  DATABASE_ERROR: 'DATABASE_ERROR'
+  DATABASE_ERROR: 'DATABASE_ERROR',
 } as const;
 
 export type ApiErrorCode = keyof typeof ERROR_CODES;
@@ -47,14 +47,14 @@ const API_ERROR_MESSAGES: Record<ApiErrorCode, () => string> = {
   [ERROR_CODES.OPERATION_NOT_ALLOWED]: t['api.error.operation_not_allowed'],
   [ERROR_CODES.CONFLICT]: t['api.error.conflict'],
 
-  [ERROR_CODES.DATABASE_ERROR]: t['api.error.internal_error']
+  [ERROR_CODES.DATABASE_ERROR]: t['api.error.internal_error'],
 };
 
 // Gets a user-friendly error message based on the API error code
 export function getErrorMessage(
   code: string,
   defaultMessage?: string,
-  overrides?: ErrorMessageOverrides
+  overrides?: ErrorMessageOverrides,
 ): string {
   if (overrides && overrides[code] !== undefined) {
     return overrides[code]!;

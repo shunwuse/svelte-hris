@@ -14,8 +14,8 @@
     formatApprovalStatus(status, {
       pending: t['approvals.status_pending'](),
       approved: t['approvals.status_approved'](),
-      rejected: t['approvals.status_rejected']()
-    })
+      rejected: t['approvals.status_rejected'](),
+    }),
   );
 </script>
 

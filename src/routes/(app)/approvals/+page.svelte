@@ -1,30 +1,31 @@
 <script lang="ts">
+  import Eye from '@lucide/svelte/icons/eye';
+  import Loader2 from '@lucide/svelte/icons/loader-2';
+  import Plus from '@lucide/svelte/icons/plus';
+
+  import { goto } from '$app/navigation';
+  import { resolve } from '$app/paths';
+  import { page } from '$app/state';
+  import type { Pathname } from '$app/types';
+  import { ApiClientError, createApi } from '$lib/api';
   import ApprovalStatusBadge from '$lib/components/ApprovalStatusBadge.svelte';
   import PageHeader from '$lib/components/PageHeader.svelte';
   import { Button } from '$lib/components/ui/button';
-  import * as Table from '$lib/components/ui/table';
-  import * as Select from '$lib/components/ui/select';
   import * as Card from '$lib/components/ui/card';
-  import { flash } from '$lib/stores';
-  import { createApi, ApiClientError } from '$lib/api';
-  import { formatApprovalStatus, isApprovalStatus } from '$lib/domain';
+  import * as Select from '$lib/components/ui/select';
+  import * as Table from '$lib/components/ui/table';
   import {
     APPROVAL_STATUS,
     FILTER_VALUES,
     QUERY_KEYS,
+    ROUTE_BUILDERS,
     ROUTES,
-    ROUTE_BUILDERS
   } from '$lib/constants';
-  import { toPathWithSearch, updateSearchParams } from '$lib/navigation';
-  import { resolve } from '$app/paths';
-  import type { Pathname } from '$app/types';
-  import { page } from '$app/state';
-  import { goto } from '$app/navigation';
   import type { ApprovalStatus } from '$lib/domain';
+  import { formatApprovalStatus, isApprovalStatus } from '$lib/domain';
+  import { toPathWithSearch, updateSearchParams } from '$lib/navigation';
+  import { flash } from '$lib/stores';
   import type { Approval } from '$lib/types';
-  import Plus from '@lucide/svelte/icons/plus';
-  import Eye from '@lucide/svelte/icons/eye';
-  import Loader2 from '@lucide/svelte/icons/loader-2';
   import * as t from '$paraglide/messages';
 
   let { data } = $props();
@@ -34,24 +35,30 @@
     if (typeof window === 'undefined') return null;
     return createApi({
       accessToken: data.accessToken,
-      refreshToken: data.refreshToken
+      refreshToken: data.refreshToken,
     });
   });
 
-  const selectedStatus = $derived.by<ApprovalStatus | typeof FILTER_VALUES.ALL>(() => {
-    const statusParam = page.url.searchParams.get(QUERY_KEYS.STATUS);
-    return statusParam && isApprovalStatus(statusParam) ? statusParam : FILTER_VALUES.ALL;
-  });
+  const selectedStatus = $derived.by<ApprovalStatus | typeof FILTER_VALUES.ALL>(
+    () => {
+      const statusParam = page.url.searchParams.get(QUERY_KEYS.STATUS);
+      return statusParam && isApprovalStatus(statusParam)
+        ? statusParam
+        : FILTER_VALUES.ALL;
+    },
+  );
 
   const selectedStatusLabel = $derived(
     selectedStatus === FILTER_VALUES.ALL
       ? t['approvals.status_all']()
-      : formatStatus(selectedStatus)
+      : formatStatus(selectedStatus),
   );
 
   // State for cursor-based pagination
   let approvals = $state<Approval[]>(data.approvalsResponse.data);
-  let nextCursor = $state<string | null>(data.approvalsResponse.meta.next_cursor);
+  let nextCursor = $state<string | null>(
+    data.approvalsResponse.meta.next_cursor,
+  );
   let hasMore = $state<boolean>(data.approvalsResponse.meta.has_more);
   let isLoadingMore = $state(false);
   let isAutoLoad = $state(false);
@@ -60,7 +67,8 @@
   let loadMoreTrigger = $state<HTMLElement | null>(null);
 
   $effect(() => {
-    if (!isAutoLoad || !hasMore || !loadMoreTrigger || approvals.length === 0) return;
+    if (!isAutoLoad || !hasMore || !loadMoreTrigger || approvals.length === 0)
+      return;
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -68,7 +76,7 @@
           loadMore();
         }
       },
-      { threshold: 0.1 }
+      { threshold: 0.1 },
     );
 
     observer.observe(loadMoreTrigger);
@@ -87,7 +95,7 @@
     return formatApprovalStatus(status, {
       pending: t['approvals.status_pending'](),
       approved: t['approvals.status_approved'](),
-      rejected: t['approvals.status_rejected']()
+      rejected: t['approvals.status_rejected'](),
     });
   }
 
@@ -101,9 +109,9 @@
       page.url,
       {
         [QUERY_KEYS.STATUS]: value,
-        [QUERY_KEYS.CURSOR]: undefined
+        [QUERY_KEYS.CURSOR]: undefined,
       },
-      { deleteValues: [FILTER_VALUES.ALL, ''] }
+      { deleteValues: [FILTER_VALUES.ALL, ''] },
     );
     goto(resolve(toPathWithSearch(url) as Pathname));
   }
@@ -113,11 +121,12 @@
 
     isLoadingMore = true;
     try {
-      const status = selectedStatus === FILTER_VALUES.ALL ? undefined : selectedStatus;
+      const status =
+        selectedStatus === FILTER_VALUES.ALL ? undefined : selectedStatus;
 
       const response = await api.approvals.list({
         cursor: nextCursor,
-        status
+        status,
       });
 
       approvals = [...approvals, ...response.data];
@@ -138,7 +147,10 @@
 <div class="p-8">
   <div class="mx-auto max-w-6xl space-y-6">
     <!-- Header -->
-    <PageHeader title={t['nav.approvals']()} description={t['approvals.description']()}>
+    <PageHeader
+      title={t['nav.approvals']()}
+      description={t['approvals.description']()}
+    >
       {#snippet actions()}
         <Button href={ROUTES.APPROVALS_CREATE} class="gap-2">
           <Plus class="size-4" />
@@ -150,14 +162,26 @@
     <!-- Filters & Actions -->
     <Card.Root>
       <Card.Content class="p-4">
-        <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div
+          class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between"
+        >
           <div class="flex flex-1 items-center gap-4">
             <div class="flex items-center gap-2">
-              <span class="text-sm font-medium text-muted-foreground">{t['common.status']()}</span>
-              <Select.Root type="single" value={selectedStatus} onValueChange={handleStatusChange}>
-                <Select.Trigger class="w-40">{selectedStatusLabel}</Select.Trigger>
+              <span class="text-sm font-medium text-muted-foreground"
+                >{t['common.status']()}</span
+              >
+              <Select.Root
+                type="single"
+                value={selectedStatus}
+                onValueChange={handleStatusChange}
+              >
+                <Select.Trigger class="w-40"
+                  >{selectedStatusLabel}</Select.Trigger
+                >
                 <Select.Content>
-                  <Select.Item value={FILTER_VALUES.ALL}>{t['approvals.status_all']()}</Select.Item>
+                  <Select.Item value={FILTER_VALUES.ALL}
+                    >{t['approvals.status_all']()}</Select.Item
+                  >
                   <Select.Item value={APPROVAL_STATUS.PENDING}
                     >{t['approvals.status_pending']()}</Select.Item
                   >
@@ -172,7 +196,9 @@
             </div>
           </div>
           <div class="flex items-center gap-2">
-            <span class="text-sm text-muted-foreground">{t['approvals.auto_load']()}</span>
+            <span class="text-sm text-muted-foreground"
+              >{t['approvals.auto_load']()}</span
+            >
             <Button
               id="auto-load"
               variant={isAutoLoad ? 'default' : 'outline'}
@@ -191,20 +217,28 @@
         <Table.Root>
           <Table.Header>
             <Table.Row class="bg-muted/50">
-              <Table.Head class="w-16 text-center">{t['users.table_id']()}</Table.Head>
+              <Table.Head class="w-16 text-center"
+                >{t['users.table_id']()}</Table.Head
+              >
               <Table.Head>{t['approvals.creator']()}</Table.Head>
               <Table.Head>{t['approvals.approver']()}</Table.Head>
               <Table.Head>{t['common.status']()}</Table.Head>
-              <Table.Head class="w-24 text-right">{t['users.table_actions']()}</Table.Head>
+              <Table.Head class="w-24 text-right"
+                >{t['users.table_actions']()}</Table.Head
+              >
             </Table.Row>
           </Table.Header>
           <Table.Body>
             {#each approvals as approval (approval.id)}
               <Table.Row>
-                <Table.Cell class="text-center font-mono text-xs text-muted-foreground">
+                <Table.Cell
+                  class="text-center font-mono text-xs text-muted-foreground"
+                >
                   {approval.id}
                 </Table.Cell>
-                <Table.Cell class="font-medium">{approval.creator_name}</Table.Cell>
+                <Table.Cell class="font-medium"
+                  >{approval.creator_name}</Table.Cell
+                >
                 <Table.Cell>{approval.approver_name ?? '-'}</Table.Cell>
                 <Table.Cell>
                   <ApprovalStatusBadge status={approval.status} />
@@ -223,7 +257,10 @@
               </Table.Row>
             {:else}
               <Table.Row>
-                <Table.Cell colspan={5} class="h-24 text-center text-muted-foreground">
+                <Table.Cell
+                  colspan={5}
+                  class="h-24 text-center text-muted-foreground"
+                >
                   {t['approvals.no_approvals']()}
                 </Table.Cell>
               </Table.Row>
@@ -249,7 +286,9 @@
             {/if}
           </Button>
         {:else if approvals.length > 0}
-          <p class="text-sm text-muted-foreground">{t['approvals.reached_end']()}</p>
+          <p class="text-sm text-muted-foreground">
+            {t['approvals.reached_end']()}
+          </p>
         {/if}
       </div>
     </Card.Root>

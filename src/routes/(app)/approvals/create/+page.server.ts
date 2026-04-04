@@ -1,7 +1,9 @@
-import type { Actions } from './$types';
 import { redirect } from '@sveltejs/kit';
+
 import { HTTP_STATUS, ROUTES } from '$lib/constants';
 import { handleActionError } from '$lib/server/utils';
+
+import type { Actions } from './$types';
 
 export const actions: Actions = {
   default: async ({ locals }) => {
@@ -12,5 +14,5 @@ export const actions: Actions = {
     }
 
     redirect(HTTP_STATUS.SEE_OTHER, ROUTES.APPROVALS);
-  }
+  },
 };

@@ -16,5 +16,5 @@ export const flash = {
   error: (message: string) => flashStore.set({ type: 'error', message }),
   info: (message: string) => flashStore.set({ type: 'info', message }),
   warning: (message: string) => flashStore.set({ type: 'warning', message }),
-  clear: () => flashStore.set(null)
+  clear: () => flashStore.set(null),
 };

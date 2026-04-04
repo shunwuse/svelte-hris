@@ -1,17 +1,18 @@
-import { BaseApi } from './client';
-import type { RequestOptions } from './client';
+import { API_ENDPOINTS } from '$lib/constants';
 import type {
-  GetApprovalsResponse,
   Approval,
   ApprovalActionRequest,
-  ListApprovalsRequest
+  GetApprovalsResponse,
+  ListApprovalsRequest,
 } from '$lib/types';
-import { API_ENDPOINTS } from '$lib/constants';
+
+import type { RequestOptions } from './client';
+import { BaseApi } from './client';
 
 export class ApprovalApi extends BaseApi {
   async list(query?: ListApprovalsRequest): Promise<GetApprovalsResponse> {
     return this.client.get<GetApprovalsResponse>(API_ENDPOINTS.APPROVALS, {
-      query: query as RequestOptions['query']
+      query: query as RequestOptions['query'],
     });
   }
 

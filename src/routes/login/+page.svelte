@@ -1,11 +1,11 @@
 <script lang="ts">
+  import { enhance } from '$app/forms';
   import FormErrorAlert from '$lib/components/FormErrorAlert.svelte';
   import FormPageCard from '$lib/components/FormPageCard.svelte';
   import FormSubmitFooter from '$lib/components/FormSubmitFooter.svelte';
+  import * as Card from '$lib/components/ui/card';
   import { Input } from '$lib/components/ui/input';
   import { Label } from '$lib/components/ui/label';
-  import * as Card from '$lib/components/ui/card';
-  import { enhance } from '$app/forms';
   import { createSubmitEnhancer } from '$lib/form-actions';
   import * as t from '$paraglide/messages';
 
@@ -16,7 +16,7 @@
   const submitEnhance = createSubmitEnhancer({
     setSubmitting: (value) => {
       isLoading = value;
-    }
+    },
   });
 </script>
 

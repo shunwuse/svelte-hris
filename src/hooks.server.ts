@@ -1,15 +1,21 @@
 import type { Handle } from '@sveltejs/kit';
 import { redirect } from '@sveltejs/kit';
-import { API_CONFIG, COOKIE_KEYS, HTTP_STATUS, ROUTES } from '$lib/constants';
-import { createApi } from '$lib/api';
-import { clearAuthCookies, setAuthTokenCookies } from '$lib/server/auth-cookies';
-import { paraglideMiddleware } from '$paraglide/server';
+
 import { env } from '$env/dynamic/private';
+import { createApi } from '$lib/api';
+import { API_CONFIG, COOKIE_KEYS, HTTP_STATUS, ROUTES } from '$lib/constants';
+import {
+  clearAuthCookies,
+  setAuthTokenCookies,
+} from '$lib/server/auth-cookies';
+import { paraglideMiddleware } from '$paraglide/server';
 
 const publicRoutes = [ROUTES.LOGIN];
 
 function isPublicRoute(pathname: string): boolean {
-  return publicRoutes.some((route) => pathname === route || pathname.startsWith(`${route}/`));
+  return publicRoutes.some(
+    (route) => pathname === route || pathname.startsWith(`${route}/`),
+  );
 }
 
 export const handle: Handle = async ({ event, resolve }) => {
@@ -18,7 +24,7 @@ export const handle: Handle = async ({ event, resolve }) => {
   // This prevents the "Body has already been read" error in SvelteKit actions.
   const minimalRequest = new Request(event.request.url, {
     method: event.request.method,
-    headers: event.request.headers
+    headers: event.request.headers,
   });
 
   return paraglideMiddleware(minimalRequest, async ({ request }) => {
@@ -57,7 +63,7 @@ export const handle: Handle = async ({ event, resolve }) => {
         event.locals.accessToken = null;
         event.locals.refreshToken = null;
         redirect(HTTP_STATUS.SEE_OTHER, ROUTES.LOGIN);
-      }
+      },
     });
 
     return resolve(event);
