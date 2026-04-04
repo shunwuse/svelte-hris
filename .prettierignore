@@ -5,5 +5,11 @@ yarn.lock
 bun.lock
 bun.lockb
 
+# Generated artifacts
+/src/paraglide/**
+/project.inlang/cache/**
+/project.inlang/.meta.json
+/project.inlang/.gitignore
+
 # Miscellaneous
 /static/
