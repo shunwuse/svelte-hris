@@ -1,35 +1,66 @@
-# Stage 1: Build
-FROM node:20-alpine AS builder
+# syntax=docker/dockerfile:1.7
+
+# Stage 1: Base
+FROM node:20-alpine AS base
 
 WORKDIR /app
 
-# Copy package files for better caching
-COPY package.json pnpm-lock.yaml .npmrc ./
-RUN corepack enable && pnpm install --frozen-lockfile
+ENV PNPM_HOME=/pnpm
+ENV PATH=$PNPM_HOME:$PATH
 
-# Copy the rest of the source code
+RUN corepack enable
+
+# Stage 2: Deps
+FROM base AS deps
+
+# Copy only the manifests needed to resolve dependencies.
+COPY package.json pnpm-lock.yaml .npmrc ./
+
+# Fetch all packages from the lockfile into the shared pnpm store.
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
+	pnpm fetch --frozen-lockfile
+
+# Stage 3: Builder
+FROM deps AS builder
+
+# Install from the cached store without hitting the network.
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
+	pnpm install --frozen-lockfile --offline
+
+# Copy the application source.
 COPY . .
 
-# Build the SvelteKit app
-# Note: For production Docker, we usually use @sveltejs/adapter-node
-RUN pnpm run build
+# Build the SvelteKit Node adapter output.
+RUN pnpm build
 
-# Stage 2: Runtime
-FROM node:20-alpine AS runner
+# Stage 4: Prod-deps
+FROM base AS prod-deps
+
+# Reuse the cached store and skip lifecycle scripts in the runtime dependency tree.
+COPY package.json pnpm-lock.yaml .npmrc ./
+
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
+	pnpm install --prod --frozen-lockfile --offline --ignore-scripts
+
+# Stage 5: runtime
+FROM node:20-alpine AS runtime
 
 WORKDIR /app
 
-# Copy built app and necessary files from builder
-COPY --from=builder /app/build ./build
-COPY --from=builder /app/package.json ./package.json
-COPY --from=builder /app/node_modules ./node_modules
-
-# Set environment variables
+# Set environment variables.
 ENV NODE_ENV=production
+ENV HOST=0.0.0.0
 ENV PORT=3000
 
-# Expose the port the app runs on
+# Copy the build output, package metadata, and production node_modules.
+COPY --chown=node:node --from=builder /app/build ./build
+COPY --chown=node:node --from=builder /app/package.json ./package.json
+COPY --chown=node:node --from=prod-deps /app/node_modules ./node_modules
+
+USER node
+
+# Expose the port the app runs on.
 EXPOSE 3000
 
-# Start the application
+# Start the application.
 CMD ["node", "build"]
