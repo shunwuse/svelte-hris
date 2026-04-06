@@ -13,7 +13,7 @@
     "lint": "eslint . --max-warnings=0",
     "prepare": "svelte-kit sync || echo ''",
     "preview": "vite preview",
-    "validate": "npm run format:check && npm run lint && npm run check"
+    "validate": "pnpm format:check && pnpm lint && pnpm check"
   },
   "devDependencies": {
     "@eslint/compat": "^1.4.0",
@@ -53,5 +53,6 @@
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.47.0",
     "vite": "^7.2.2"
-  }
+  },
+  "packageManager": "pnpm@10.30.0"
 }

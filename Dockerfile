@@ -4,15 +4,15 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 
 # Copy package files for better caching
-COPY package*.json ./
-RUN npm ci
+COPY package.json pnpm-lock.yaml .npmrc ./
+RUN corepack enable && pnpm install --frozen-lockfile
 
 # Copy the rest of the source code
 COPY . .
 
 # Build the SvelteKit app
 # Note: For production Docker, we usually use @sveltejs/adapter-node
-RUN npm run build
+RUN pnpm run build
 
 # Stage 2: Runtime
 FROM node:20-alpine AS runner
