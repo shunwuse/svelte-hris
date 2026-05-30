@@ -9,6 +9,7 @@
   import type { Pathname } from '$app/types';
   import OffsetPaginationNav from '$lib/components/OffsetPaginationNav.svelte';
   import PageHeader from '$lib/components/PageHeader.svelte';
+  import PageShell from '$lib/components/PageShell.svelte';
   import { Button } from '$lib/components/ui/button';
   import * as Card from '$lib/components/ui/card';
   import { Input } from '$lib/components/ui/input';
@@ -119,180 +120,172 @@
   );
 </script>
 
-<div class="p-8">
-  <div class="mx-auto max-w-6xl space-y-6">
-    <!-- Header -->
-    <PageHeader
-      title={t['users.title']()}
-      description={t['users.description']()}
-    >
-      {#snippet actions()}
-        <Button href={resolve(ROUTES.USERS_CREATE as Pathname)} class="gap-2">
-          <UserPlus class="size-4" />
-          {t['users.create_user']()}
-        </Button>
-      {/snippet}
-    </PageHeader>
+<PageShell>
+  <!-- Header -->
+  <PageHeader title={t['users.title']()} description={t['users.description']()}>
+    {#snippet actions()}
+      <Button href={resolve(ROUTES.USERS_CREATE as Pathname)} class="gap-2">
+        <UserPlus class="size-4" />
+        {t['users.create_user']()}
+      </Button>
+    {/snippet}
+  </PageHeader>
 
-    <!-- Filters & Actions -->
-    <Card.Root>
-      <Card.Content class="p-4">
-        <div
-          class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between"
-        >
-          <div class="flex flex-1 flex-col gap-4 sm:flex-row sm:items-center">
-            <div class="relative max-w-sm flex-1">
-              <Search
-                class="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
-              />
-              <Input
-                placeholder={t['users.search_placeholder_full']()}
-                class="pl-9"
-                bind:value={nameQuery}
-                onkeydown={handleNameSearch}
-              />
-            </div>
-            <div class="flex items-center gap-2">
-              <span class="text-sm font-medium text-muted-foreground"
-                >{t['common.role']()}</span
-              >
-              <Select.Root
-                type="single"
-                value={selectedRole}
-                onValueChange={handleRoleChange}
-              >
-                <Select.Trigger class="w-40">
-                  {roleNames[selectedRole]}
-                </Select.Trigger>
-                <Select.Content>
-                  <Select.Item value={FILTER_VALUES.ALL}
-                    >{t['users.role_all']()}</Select.Item
-                  >
-                  <Select.Item value={ROLES.ADMINISTRATOR}
-                    >{t['role.administrator']()}</Select.Item
-                  >
-                  <Select.Item value={ROLES.MANAGER}
-                    >{t['role.manager']()}</Select.Item
-                  >
-                  <Select.Item value={ROLES.STAFF}
-                    >{t['role.staff']()}</Select.Item
-                  >
-                </Select.Content>
-              </Select.Root>
-            </div>
+  <!-- Filters & Actions -->
+  <Card.Root>
+    <Card.Content class="p-4">
+      <div
+        class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between"
+      >
+        <div class="flex flex-1 flex-col gap-4 sm:flex-row sm:items-center">
+          <div class="relative max-w-sm flex-1">
+            <Search
+              class="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
+            />
+            <Input
+              placeholder={t['users.search_placeholder_full']()}
+              class="pl-9"
+              bind:value={nameQuery}
+              onkeydown={handleNameSearch}
+            />
           </div>
           <div class="flex items-center gap-2">
-            <span class="text-sm text-muted-foreground"
-              >{t['common.show']()}</span
+            <span class="text-sm font-medium text-muted-foreground"
+              >{t['common.role']()}</span
             >
             <Select.Root
               type="single"
-              value={selectedPerPage}
-              onValueChange={handlePerPageChange}
+              value={selectedRole}
+              onValueChange={handleRoleChange}
             >
-              <Select.Trigger class="w-[130px]"
-                >{selectedPerPageLabel}</Select.Trigger
-              >
+              <Select.Trigger class="w-40">
+                {roleNames[selectedRole]}
+              </Select.Trigger>
               <Select.Content>
-                {#each perPageOptions as option (option.value)}
-                  <Select.Item value={option.value}>{option.label}</Select.Item>
-                {/each}
+                <Select.Item value={FILTER_VALUES.ALL}
+                  >{t['users.role_all']()}</Select.Item
+                >
+                <Select.Item value={ROLES.ADMINISTRATOR}
+                  >{t['role.administrator']()}</Select.Item
+                >
+                <Select.Item value={ROLES.MANAGER}
+                  >{t['role.manager']()}</Select.Item
+                >
+                <Select.Item value={ROLES.STAFF}
+                  >{t['role.staff']()}</Select.Item
+                >
               </Select.Content>
             </Select.Root>
           </div>
         </div>
-      </Card.Content>
-
-      <!-- Users Table -->
-      <div class="border-t">
-        <Table.Root>
-          <Table.Header>
-            <Table.Row class="bg-muted/50">
-              <Table.Head class="w-16 text-center"
-                >{t['users.table_id']()}</Table.Head
-              >
-              <Table.Head>{t['users.table_user_info']()}</Table.Head>
-              <Table.Head>{t['users.table_created_at']()}</Table.Head>
-              <Table.Head>{t['users.table_updated_at']()}</Table.Head>
-              <Table.Head class="w-24 text-right"
-                >{t['users.table_actions']()}</Table.Head
-              >
-            </Table.Row>
-          </Table.Header>
-          <Table.Body>
-            {#each data.usersResponse.data as user (user.id)}
-              <Table.Row class="group transition-colors hover:bg-muted/30">
-                <Table.Cell
-                  class="text-center font-mono text-xs text-muted-foreground"
-                >
-                  {user.id}
-                </Table.Cell>
-                <Table.Cell>
-                  <div class="flex flex-col">
-                    <span class="font-semibold text-gray-900">{user.name}</span>
-                    <span class="text-xs text-muted-foreground"
-                      >@{user.username}</span
-                    >
-                  </div>
-                </Table.Cell>
-                <Table.Cell class="text-sm text-muted-foreground">
-                  {formatDate(user.created_time)}
-                </Table.Cell>
-                <Table.Cell class="text-sm text-muted-foreground">
-                  {formatDate(user.last_updated_time)}
-                </Table.Cell>
-                <Table.Cell class="text-right">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    href={resolve(
-                      ROUTE_BUILDERS.userDetail(user.id) as Pathname,
-                    )}
-                    class="h-8 w-8"
-                  >
-                    <Pencil class="size-4" />
-                    <span class="sr-only">{t['common.edit']()}</span>
-                  </Button>
-                </Table.Cell>
-              </Table.Row>
-            {:else}
-              <Table.Row>
-                <Table.Cell colspan={5} class="h-32 text-center">
-                  <div
-                    class="flex flex-col items-center justify-center gap-1 text-muted-foreground"
-                  >
-                    <p class="text-lg font-medium">
-                      {t['users.no_users_found']()}
-                    </p>
-                    <p class="text-sm">{t['users.no_users_found_desc']()}</p>
-                  </div>
-                </Table.Cell>
-              </Table.Row>
-            {/each}
-          </Table.Body>
-        </Table.Root>
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-muted-foreground">{t['common.show']()}</span
+          >
+          <Select.Root
+            type="single"
+            value={selectedPerPage}
+            onValueChange={handlePerPageChange}
+          >
+            <Select.Trigger class="w-[130px]"
+              >{selectedPerPageLabel}</Select.Trigger
+            >
+            <Select.Content>
+              {#each perPageOptions as option (option.value)}
+                <Select.Item value={option.value}>{option.label}</Select.Item>
+              {/each}
+            </Select.Content>
+          </Select.Root>
+        </div>
       </div>
+    </Card.Content>
 
-      <!-- Pagination Footer -->
-      {#if usersMeta.total > 0}
-        <Card.Footer class="flex items-center justify-between border-t p-4">
-          <p class="text-sm text-muted-foreground">
-            {t['users.pagination_showing']({
-              start: String(pageRangeStart),
-              end: String(pageRangeEnd),
-              total: String(usersMeta.total),
-            })}
-          </p>
+    <!-- Users Table -->
+    <div class="border-t">
+      <Table.Root>
+        <Table.Header>
+          <Table.Row class="bg-muted/50">
+            <Table.Head class="w-16 text-center"
+              >{t['users.table_id']()}</Table.Head
+            >
+            <Table.Head>{t['users.table_user_info']()}</Table.Head>
+            <Table.Head>{t['users.table_created_at']()}</Table.Head>
+            <Table.Head>{t['users.table_updated_at']()}</Table.Head>
+            <Table.Head class="w-24 text-right"
+              >{t['users.table_actions']()}</Table.Head
+            >
+          </Table.Row>
+        </Table.Header>
+        <Table.Body>
+          {#each data.usersResponse.data as user (user.id)}
+            <Table.Row class="group transition-colors hover:bg-muted/30">
+              <Table.Cell
+                class="text-center font-mono text-xs text-muted-foreground"
+              >
+                {user.id}
+              </Table.Cell>
+              <Table.Cell>
+                <div class="flex flex-col">
+                  <span class="font-semibold text-gray-900">{user.name}</span>
+                  <span class="text-xs text-muted-foreground"
+                    >@{user.username}</span
+                  >
+                </div>
+              </Table.Cell>
+              <Table.Cell class="text-sm text-muted-foreground">
+                {formatDate(user.created_time)}
+              </Table.Cell>
+              <Table.Cell class="text-sm text-muted-foreground">
+                {formatDate(user.last_updated_time)}
+              </Table.Cell>
+              <Table.Cell class="text-right">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  href={resolve(ROUTE_BUILDERS.userDetail(user.id) as Pathname)}
+                  class="h-8 w-8"
+                >
+                  <Pencil class="size-4" />
+                  <span class="sr-only">{t['common.edit']()}</span>
+                </Button>
+              </Table.Cell>
+            </Table.Row>
+          {:else}
+            <Table.Row>
+              <Table.Cell colspan={5} class="h-32 text-center">
+                <div
+                  class="flex flex-col items-center justify-center gap-1 text-muted-foreground"
+                >
+                  <p class="text-lg font-medium">
+                    {t['users.no_users_found']()}
+                  </p>
+                  <p class="text-sm">{t['users.no_users_found_desc']()}</p>
+                </div>
+              </Table.Cell>
+            </Table.Row>
+          {/each}
+        </Table.Body>
+      </Table.Root>
+    </div>
 
-          <OffsetPaginationNav
-            currentPage={usersMeta.current_page}
-            lastPage={usersMeta.last_page}
-            getPageHref={getPageLink}
-            previousLabel={t['common.previous']()}
-            nextLabel={t['common.next']()}
-          />
-        </Card.Footer>
-      {/if}
-    </Card.Root>
-  </div>
-</div>
+    <!-- Pagination Footer -->
+    {#if usersMeta.total > 0}
+      <Card.Footer class="flex items-center justify-between border-t p-4">
+        <p class="text-sm text-muted-foreground">
+          {t['users.pagination_showing']({
+            start: String(pageRangeStart),
+            end: String(pageRangeEnd),
+            total: String(usersMeta.total),
+          })}
+        </p>
+
+        <OffsetPaginationNav
+          currentPage={usersMeta.current_page}
+          lastPage={usersMeta.last_page}
+          getPageHref={getPageLink}
+          previousLabel={t['common.previous']()}
+          nextLabel={t['common.next']()}
+        />
+      </Card.Footer>
+    {/if}
+  </Card.Root>
+</PageShell>

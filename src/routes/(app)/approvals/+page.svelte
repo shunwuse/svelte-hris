@@ -10,6 +10,7 @@
   import { ApiClientError, createApi } from '$lib/api';
   import ApprovalStatusBadge from '$lib/components/ApprovalStatusBadge.svelte';
   import PageHeader from '$lib/components/PageHeader.svelte';
+  import PageShell from '$lib/components/PageShell.svelte';
   import { Button } from '$lib/components/ui/button';
   import * as Card from '$lib/components/ui/card';
   import * as Select from '$lib/components/ui/select';
@@ -144,153 +145,150 @@
   }
 </script>
 
-<div class="p-8">
-  <div class="mx-auto max-w-6xl space-y-6">
-    <!-- Header -->
-    <PageHeader
-      title={t['nav.approvals']()}
-      description={t['approvals.description']()}
-    >
-      {#snippet actions()}
-        <Button href={ROUTES.APPROVALS_CREATE} class="gap-2">
-          <Plus class="size-4" />
-          {t['approvals.create_request']()}
-        </Button>
-      {/snippet}
-    </PageHeader>
+<PageShell>
+  <!-- Header -->
+  <PageHeader
+    title={t['nav.approvals']()}
+    description={t['approvals.description']()}
+  >
+    {#snippet actions()}
+      <Button href={ROUTES.APPROVALS_CREATE} class="gap-2">
+        <Plus class="size-4" />
+        {t['approvals.create_request']()}
+      </Button>
+    {/snippet}
+  </PageHeader>
 
-    <!-- Filters & Actions -->
-    <Card.Root>
-      <Card.Content class="p-4">
-        <div
-          class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between"
-        >
-          <div class="flex flex-1 items-center gap-4">
-            <div class="flex items-center gap-2">
-              <span class="text-sm font-medium text-muted-foreground"
-                >{t['common.status']()}</span
-              >
-              <Select.Root
-                type="single"
-                value={selectedStatus}
-                onValueChange={handleStatusChange}
-              >
-                <Select.Trigger class="w-40"
-                  >{selectedStatusLabel}</Select.Trigger
-                >
-                <Select.Content>
-                  <Select.Item value={FILTER_VALUES.ALL}
-                    >{t['approvals.status_all']()}</Select.Item
-                  >
-                  <Select.Item value={APPROVAL_STATUS.PENDING}
-                    >{t['approvals.status_pending']()}</Select.Item
-                  >
-                  <Select.Item value={APPROVAL_STATUS.APPROVED}
-                    >{t['approvals.status_approved']()}</Select.Item
-                  >
-                  <Select.Item value={APPROVAL_STATUS.REJECTED}
-                    >{t['approvals.status_rejected']()}</Select.Item
-                  >
-                </Select.Content>
-              </Select.Root>
-            </div>
-          </div>
+  <!-- Filters & Actions -->
+  <Card.Root>
+    <Card.Content class="p-4">
+      <div
+        class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between"
+      >
+        <div class="flex flex-1 items-center gap-4">
           <div class="flex items-center gap-2">
-            <span class="text-sm text-muted-foreground"
-              >{t['approvals.auto_load']()}</span
+            <span class="text-sm font-medium text-muted-foreground"
+              >{t['common.status']()}</span
             >
-            <Button
-              id="auto-load"
-              variant={isAutoLoad ? 'default' : 'outline'}
-              size="sm"
-              class="h-9 w-16 transition-all"
-              onPress={() => (isAutoLoad = !isAutoLoad)}
+            <Select.Root
+              type="single"
+              value={selectedStatus}
+              onValueChange={handleStatusChange}
             >
-              {isAutoLoad ? t['approvals.on']() : t['approvals.off']()}
-            </Button>
+              <Select.Trigger class="w-40">{selectedStatusLabel}</Select.Trigger
+              >
+              <Select.Content>
+                <Select.Item value={FILTER_VALUES.ALL}
+                  >{t['approvals.status_all']()}</Select.Item
+                >
+                <Select.Item value={APPROVAL_STATUS.PENDING}
+                  >{t['approvals.status_pending']()}</Select.Item
+                >
+                <Select.Item value={APPROVAL_STATUS.APPROVED}
+                  >{t['approvals.status_approved']()}</Select.Item
+                >
+                <Select.Item value={APPROVAL_STATUS.REJECTED}
+                  >{t['approvals.status_rejected']()}</Select.Item
+                >
+              </Select.Content>
+            </Select.Root>
           </div>
         </div>
-      </Card.Content>
-
-      <!-- Approvals Table -->
-      <div class="border-t">
-        <Table.Root>
-          <Table.Header>
-            <Table.Row class="bg-muted/50">
-              <Table.Head class="w-16 text-center"
-                >{t['users.table_id']()}</Table.Head
-              >
-              <Table.Head>{t['approvals.creator']()}</Table.Head>
-              <Table.Head>{t['approvals.approver']()}</Table.Head>
-              <Table.Head>{t['common.status']()}</Table.Head>
-              <Table.Head class="w-24 text-right"
-                >{t['users.table_actions']()}</Table.Head
-              >
-            </Table.Row>
-          </Table.Header>
-          <Table.Body>
-            {#each approvals as approval (approval.id)}
-              <Table.Row>
-                <Table.Cell
-                  class="text-center font-mono text-xs text-muted-foreground"
-                >
-                  {approval.id}
-                </Table.Cell>
-                <Table.Cell class="font-medium"
-                  >{approval.creator_name}</Table.Cell
-                >
-                <Table.Cell>{approval.approver_name ?? '-'}</Table.Cell>
-                <Table.Cell>
-                  <ApprovalStatusBadge status={approval.status} />
-                </Table.Cell>
-                <Table.Cell class="text-right">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    href={ROUTE_BUILDERS.approvalDetail(approval.id)}
-                    class="h-8 w-8"
-                  >
-                    <Eye class="size-4" />
-                    <span class="sr-only">{t['common.view']()}</span>
-                  </Button>
-                </Table.Cell>
-              </Table.Row>
-            {:else}
-              <Table.Row>
-                <Table.Cell
-                  colspan={5}
-                  class="h-24 text-center text-muted-foreground"
-                >
-                  {t['approvals.no_approvals']()}
-                </Table.Cell>
-              </Table.Row>
-            {/each}
-          </Table.Body>
-        </Table.Root>
-      </div>
-
-      <!-- Load More / End of List -->
-      <div bind:this={loadMoreTrigger} class="flex justify-center border-t p-4">
-        {#if hasMore}
-          <Button
-            variant="outline"
-            onPress={loadMore}
-            disabled={isLoadingMore}
-            class="min-w-[120px]"
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-muted-foreground"
+            >{t['approvals.auto_load']()}</span
           >
-            {#if isLoadingMore}
-              <Loader2 class="mr-2 size-4 animate-spin" />
-              {t['common.loading']()}
-            {:else}
-              {t['approvals.load_more']()}
-            {/if}
+          <Button
+            id="auto-load"
+            variant={isAutoLoad ? 'default' : 'outline'}
+            size="sm"
+            class="h-9 w-16 transition-all"
+            onPress={() => (isAutoLoad = !isAutoLoad)}
+          >
+            {isAutoLoad ? t['approvals.on']() : t['approvals.off']()}
           </Button>
-        {:else if approvals.length > 0}
-          <p class="text-sm text-muted-foreground">
-            {t['approvals.reached_end']()}
-          </p>
-        {/if}
+        </div>
       </div>
-    </Card.Root>
-  </div>
-</div>
+    </Card.Content>
+
+    <!-- Approvals Table -->
+    <div class="border-t">
+      <Table.Root>
+        <Table.Header>
+          <Table.Row class="bg-muted/50">
+            <Table.Head class="w-16 text-center"
+              >{t['users.table_id']()}</Table.Head
+            >
+            <Table.Head>{t['approvals.creator']()}</Table.Head>
+            <Table.Head>{t['approvals.approver']()}</Table.Head>
+            <Table.Head>{t['common.status']()}</Table.Head>
+            <Table.Head class="w-24 text-right"
+              >{t['users.table_actions']()}</Table.Head
+            >
+          </Table.Row>
+        </Table.Header>
+        <Table.Body>
+          {#each approvals as approval (approval.id)}
+            <Table.Row>
+              <Table.Cell
+                class="text-center font-mono text-xs text-muted-foreground"
+              >
+                {approval.id}
+              </Table.Cell>
+              <Table.Cell class="font-medium"
+                >{approval.creator_name}</Table.Cell
+              >
+              <Table.Cell>{approval.approver_name ?? '-'}</Table.Cell>
+              <Table.Cell>
+                <ApprovalStatusBadge status={approval.status} />
+              </Table.Cell>
+              <Table.Cell class="text-right">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  href={ROUTE_BUILDERS.approvalDetail(approval.id)}
+                  class="h-8 w-8"
+                >
+                  <Eye class="size-4" />
+                  <span class="sr-only">{t['common.view']()}</span>
+                </Button>
+              </Table.Cell>
+            </Table.Row>
+          {:else}
+            <Table.Row>
+              <Table.Cell
+                colspan={5}
+                class="h-24 text-center text-muted-foreground"
+              >
+                {t['approvals.no_approvals']()}
+              </Table.Cell>
+            </Table.Row>
+          {/each}
+        </Table.Body>
+      </Table.Root>
+    </div>
+
+    <!-- Load More / End of List -->
+    <div bind:this={loadMoreTrigger} class="flex justify-center border-t p-4">
+      {#if hasMore}
+        <Button
+          variant="outline"
+          onPress={loadMore}
+          disabled={isLoadingMore}
+          class="min-w-[120px]"
+        >
+          {#if isLoadingMore}
+            <Loader2 class="mr-2 size-4 animate-spin" />
+            {t['common.loading']()}
+          {:else}
+            {t['approvals.load_more']()}
+          {/if}
+        </Button>
+      {:else if approvals.length > 0}
+        <p class="text-sm text-muted-foreground">
+          {t['approvals.reached_end']()}
+        </p>
+      {/if}
+    </div>
+  </Card.Root>
+</PageShell>

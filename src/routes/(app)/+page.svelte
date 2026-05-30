@@ -8,6 +8,7 @@
   import type { Pathname } from '$app/types';
   import ApprovalStatusBadge from '$lib/components/ApprovalStatusBadge.svelte';
   import PageHeader from '$lib/components/PageHeader.svelte';
+  import PageShell from '$lib/components/PageShell.svelte';
   import { Button } from '$lib/components/ui/button';
   import {
     Card,
@@ -22,144 +23,138 @@
   let { data } = $props();
 </script>
 
-<div class="p-8">
-  <div class="mx-auto max-w-6xl space-y-8">
-    <!-- Header -->
-    <PageHeader
-      title={`${t['overview.welcome']()}${data.userInfo?.username ? `, ${data.userInfo.username}` : ''}!`}
-      description={t['overview.description']()}
-      actionsClass="flex items-center gap-3"
-    >
-      {#snippet actions()}
-        <Button
-          href={resolve(ROUTES.APPROVALS_CREATE as Pathname)}
-          variant="default"
-          class="gap-2"
-        >
-          <Plus class="size-4" />
-          {t['overview.create_request']()}
-        </Button>
-        <Button
-          href={resolve(ROUTES.USERS_CREATE as Pathname)}
-          variant="outline"
-          class="gap-2"
-        >
-          <UserPlus class="size-4" />
-          {t['overview.create_user']()}
-        </Button>
-      {/snippet}
-    </PageHeader>
+<PageShell contentClass="space-y-8">
+  <!-- Header -->
+  <PageHeader
+    title={`${t['overview.welcome']()}${data.userInfo?.username ? `, ${data.userInfo.username}` : ''}!`}
+    description={t['overview.description']()}
+    actionsClass="flex items-center gap-3"
+  >
+    {#snippet actions()}
+      <Button
+        href={resolve(ROUTES.APPROVALS_CREATE as Pathname)}
+        variant="default"
+        class="gap-2"
+      >
+        <Plus class="size-4" />
+        {t['overview.create_request']()}
+      </Button>
+      <Button
+        href={resolve(ROUTES.USERS_CREATE as Pathname)}
+        variant="outline"
+        class="gap-2"
+      >
+        <UserPlus class="size-4" />
+        {t['overview.create_user']()}
+      </Button>
+    {/snippet}
+  </PageHeader>
 
-    <div class="grid gap-6 lg:grid-cols-2">
-      <!-- Recent Approvals -->
-      <Card>
-        <CardHeader class="flex flex-row items-center justify-between">
-          <div>
-            <CardTitle>{t['overview.recent_approvals']()}</CardTitle>
-            <CardDescription
-              >{t['overview.recent_approvals_desc']()}</CardDescription
-            >
-          </div>
-          <Button
-            href={resolve(ROUTES.APPROVALS as Pathname)}
-            variant="ghost"
-            size="sm">{t['overview.view_all']()}</Button
+  <div class="grid gap-6 lg:grid-cols-2">
+    <!-- Recent Approvals -->
+    <Card>
+      <CardHeader class="flex flex-row items-center justify-between">
+        <div>
+          <CardTitle>{t['overview.recent_approvals']()}</CardTitle>
+          <CardDescription
+            >{t['overview.recent_approvals_desc']()}</CardDescription
           >
-        </CardHeader>
-        <CardContent>
-          {#if data.recentApprovals.length === 0}
-            <p class="py-4 text-center text-gray-500">
-              {t['overview.no_approvals']()}
-            </p>
-          {:else}
-            <div class="space-y-3">
-              {#each data.recentApprovals as approval (approval.id)}
-                <div
-                  class="flex items-center justify-between rounded-lg border p-3 hover:bg-gray-50"
-                >
-                  <div>
-                    <p class="font-medium">
-                      {t['approvals.item_title']({ id: approval.id })}
-                    </p>
-                    <p class="text-sm text-gray-500">
-                      {t['approvals.creator']()}: {approval.creator_name}
-                    </p>
-                  </div>
-                  <div class="flex items-center gap-3">
-                    <ApprovalStatusBadge status={approval.status} />
-                    <Button
-                      href={resolve(
-                        ROUTE_BUILDERS.approvalDetail(approval.id) as Pathname,
-                      )}
-                      size="icon"
-                      variant="ghost"
-                      class="h-8 w-8"
-                    >
-                      <Eye class="size-4" />
-                      <span class="sr-only">{t['common.view']()}</span>
-                    </Button>
-                  </div>
+        </div>
+        <Button
+          href={resolve(ROUTES.APPROVALS as Pathname)}
+          variant="ghost"
+          size="sm">{t['overview.view_all']()}</Button
+        >
+      </CardHeader>
+      <CardContent>
+        {#if data.recentApprovals.length === 0}
+          <p class="py-4 text-center text-gray-500">
+            {t['overview.no_approvals']()}
+          </p>
+        {:else}
+          <div class="space-y-3">
+            {#each data.recentApprovals as approval (approval.id)}
+              <div
+                class="flex items-center justify-between rounded-lg border p-3 hover:bg-gray-50"
+              >
+                <div>
+                  <p class="font-medium">
+                    {t['approvals.item_title']({ id: approval.id })}
+                  </p>
+                  <p class="text-sm text-gray-500">
+                    {t['approvals.creator']()}: {approval.creator_name}
+                  </p>
                 </div>
-              {/each}
-            </div>
-          {/if}
-        </CardContent>
-      </Card>
-
-      <!-- Recent Users -->
-      <Card>
-        <CardHeader class="flex flex-row items-center justify-between">
-          <div>
-            <CardTitle>{t['overview.recent_users']()}</CardTitle>
-            <CardDescription
-              >{t['overview.recent_users_desc']()}</CardDescription
-            >
-          </div>
-          <Button
-            href={resolve(ROUTES.USERS as Pathname)}
-            variant="ghost"
-            size="sm">{t['overview.view_all']()}</Button
-          >
-        </CardHeader>
-        <CardContent>
-          {#if data.recentUsers.length === 0}
-            <p class="py-4 text-center text-gray-500">
-              {t['overview.no_users']()}
-            </p>
-          {:else}
-            <div class="space-y-3">
-              {#each data.recentUsers as user (user.id)}
-                <div
-                  class="flex items-center justify-between rounded-lg border p-3 hover:bg-gray-50"
-                >
-                  <div class="flex items-center gap-3">
-                    <div
-                      class="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary"
-                    >
-                      {user.username.charAt(0).toUpperCase()}
-                    </div>
-                    <div>
-                      <p class="font-medium">{user.username}</p>
-                      <p class="text-xs text-gray-500">{user.name}</p>
-                    </div>
-                  </div>
+                <div class="flex items-center gap-3">
+                  <ApprovalStatusBadge status={approval.status} />
                   <Button
                     href={resolve(
-                      ROUTE_BUILDERS.userDetail(user.id) as Pathname,
+                      ROUTE_BUILDERS.approvalDetail(approval.id) as Pathname,
                     )}
                     size="icon"
                     variant="ghost"
                     class="h-8 w-8"
                   >
-                    <Pencil class="size-4" />
-                    <span class="sr-only">{t['common.edit']()}</span>
+                    <Eye class="size-4" />
+                    <span class="sr-only">{t['common.view']()}</span>
                   </Button>
                 </div>
-              {/each}
-            </div>
-          {/if}
-        </CardContent>
-      </Card>
-    </div>
+              </div>
+            {/each}
+          </div>
+        {/if}
+      </CardContent>
+    </Card>
+
+    <!-- Recent Users -->
+    <Card>
+      <CardHeader class="flex flex-row items-center justify-between">
+        <div>
+          <CardTitle>{t['overview.recent_users']()}</CardTitle>
+          <CardDescription>{t['overview.recent_users_desc']()}</CardDescription>
+        </div>
+        <Button
+          href={resolve(ROUTES.USERS as Pathname)}
+          variant="ghost"
+          size="sm">{t['overview.view_all']()}</Button
+        >
+      </CardHeader>
+      <CardContent>
+        {#if data.recentUsers.length === 0}
+          <p class="py-4 text-center text-gray-500">
+            {t['overview.no_users']()}
+          </p>
+        {:else}
+          <div class="space-y-3">
+            {#each data.recentUsers as user (user.id)}
+              <div
+                class="flex items-center justify-between rounded-lg border p-3 hover:bg-gray-50"
+              >
+                <div class="flex items-center gap-3">
+                  <div
+                    class="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary"
+                  >
+                    {user.username.charAt(0).toUpperCase()}
+                  </div>
+                  <div>
+                    <p class="font-medium">{user.username}</p>
+                    <p class="text-xs text-gray-500">{user.name}</p>
+                  </div>
+                </div>
+                <Button
+                  href={resolve(ROUTE_BUILDERS.userDetail(user.id) as Pathname)}
+                  size="icon"
+                  variant="ghost"
+                  class="h-8 w-8"
+                >
+                  <Pencil class="size-4" />
+                  <span class="sr-only">{t['common.edit']()}</span>
+                </Button>
+              </div>
+            {/each}
+          </div>
+        {/if}
+      </CardContent>
+    </Card>
   </div>
-</div>
+</PageShell>
