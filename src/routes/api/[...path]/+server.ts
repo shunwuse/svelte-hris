@@ -1,11 +1,11 @@
 import { env } from '$env/dynamic/private';
-import { API_CONFIG, HTTP_STATUS } from '$lib/constants';
+import { HTTP_STATUS, resolveApiBaseUrl } from '$lib/constants';
 
 import type { RequestHandler } from './$types';
 
 // Use a safer way to access the environment variable to avoid TypeScript errors
 // if the variable is not yet defined in the generated types.
-const API_BASE_URL = env.API_BASE_URL || API_CONFIG.DEFAULT_BASE_URL;
+const API_BASE_URL = resolveApiBaseUrl(env.API_BASE_URL);
 const API_PROXY_ERROR_MESSAGE = 'Internal Server Error via Proxy';
 const JSON_CONTENT_TYPE = 'application/json';
 const HOP_BY_HOP_HEADERS = new Set([

@@ -5,6 +5,10 @@ export const API_CONFIG = {
   PROXY_BASE_PATH: '/api',
 } as const;
 
+export function resolveApiBaseUrl(apiBaseUrl?: string | null): string {
+  return apiBaseUrl || API_CONFIG.DEFAULT_BASE_URL;
+}
+
 export const API_ENDPOINTS = {
   LOGIN: '/login',
   USERS: '/users',

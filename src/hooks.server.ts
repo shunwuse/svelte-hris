@@ -3,7 +3,12 @@ import { redirect } from '@sveltejs/kit';
 
 import { env } from '$env/dynamic/private';
 import { createApi } from '$lib/api';
-import { API_CONFIG, COOKIE_KEYS, HTTP_STATUS, ROUTES } from '$lib/constants';
+import {
+  COOKIE_KEYS,
+  HTTP_STATUS,
+  resolveApiBaseUrl,
+  ROUTES,
+} from '$lib/constants';
 import {
   clearAuthCookies,
   setAuthTokenCookies,
@@ -19,7 +24,7 @@ function isPublicRoute(pathname: string): boolean {
 }
 
 export const handle: Handle = async ({ event, resolve }) => {
-  const apiBaseUrl = env.API_BASE_URL || API_CONFIG.DEFAULT_BASE_URL;
+  const apiBaseUrl = resolveApiBaseUrl(env.API_BASE_URL);
   // Create a minimal request for the middleware to avoid consuming the original request body.
   // This prevents the "Body has already been read" error in SvelteKit actions.
   const minimalRequest = new Request(event.request.url, {
