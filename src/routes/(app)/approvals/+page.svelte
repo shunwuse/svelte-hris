@@ -31,14 +31,8 @@
 
   let { data } = $props();
 
-  // Create API client - only on client side to avoid SSR fetch warnings
-  const api = $derived.by<ReturnType<typeof createApi> | null>(() => {
-    if (typeof window === 'undefined') return null;
-    return createApi({
-      accessToken: data.accessToken,
-      refreshToken: data.refreshToken,
-    });
-  });
+  // The frontend endpoint authenticates with the HttpOnly auth cookies.
+  const api = createApi();
 
   const selectedStatus = $derived.by<ApprovalStatus | typeof FILTER_VALUES.ALL>(
     () => {
@@ -118,7 +112,7 @@
   }
 
   async function loadMore() {
-    if (!api || isLoadingMore || !nextCursor) return;
+    if (isLoadingMore || !nextCursor) return;
 
     isLoadingMore = true;
     try {

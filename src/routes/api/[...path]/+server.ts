@@ -19,6 +19,7 @@ const HOP_BY_HOP_HEADERS = new Set([
   'transfer-encoding',
   'upgrade',
 ]);
+const CLIENT_AUTH_HEADERS = new Set(['authorization', 'cookie']);
 const SKIP_RESPONSE_HEADERS = new Set([
   'content-encoding',
   'content-length',
@@ -26,7 +27,14 @@ const SKIP_RESPONSE_HEADERS = new Set([
 ]);
 const METHODS_WITHOUT_BODY = new Set(['GET', 'HEAD']);
 
-const handle: RequestHandler = async ({ request, params, url }) => {
+const handle: RequestHandler = async ({ request, params, url, locals }) => {
+  if (!locals.accessToken) {
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      status: HTTP_STATUS.UNAUTHORIZED,
+      headers: { 'Content-Type': JSON_CONTENT_TYPE },
+    });
+  }
+
   // Ensure the base URL ends with a slash to avoid path truncation by URL constructor
   const apiBase = API_BASE_URL.endsWith('/')
     ? API_BASE_URL
@@ -40,10 +48,15 @@ const handle: RequestHandler = async ({ request, params, url }) => {
   // Clone headers and remove hop-by-hop headers that shouldn't be forwarded
   const headers = new Headers();
   for (const [key, value] of request.headers.entries()) {
-    if (!HOP_BY_HOP_HEADERS.has(key.toLowerCase())) {
+    const headerName = key.toLowerCase();
+    if (
+      !HOP_BY_HOP_HEADERS.has(headerName) &&
+      !CLIENT_AUTH_HEADERS.has(headerName)
+    ) {
       headers.set(key, value);
     }
   }
+  headers.set('Authorization', `Bearer ${locals.accessToken}`);
 
   const config: RequestInit & { duplex?: string } = {
     method: request.method,

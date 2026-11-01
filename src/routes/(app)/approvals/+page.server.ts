@@ -21,7 +21,5 @@ export const load: PageServerLoad = async ({ locals, url }) => {
   return {
     approvalsResponse,
     error,
-    accessToken: locals.accessToken,
-    refreshToken: locals.refreshToken,
   };
 };
